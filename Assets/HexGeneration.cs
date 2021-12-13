@@ -8,12 +8,9 @@ namespace Tirocinio
     {
 
 
-        const int CENTER_HEX_INDEX = 0;
-        const int TOP_HEX_INDEX = 1;
-        const int TOP_RIGHT_HEX_INDEX = 6;
         public GameObject[] exits = new GameObject[6];
         public float exitProbability = 0.3f;
-        public int hexIndex = 0;
+        int hexIndex = 0;
 
         // Start is called before the first frame update
         void Awake()
@@ -43,19 +40,19 @@ namespace Tirocinio
                     GenerateExits();
                     break;
                 case HexPosition.UP:
-                    GenerateExits(ExitDirection.DOWN_LEFT,ExitDirection.DOWN_RIGHT);
+                    GenerateExits(ExitDirection.SOUTHWEST,ExitDirection.SOUTHEAST);
                     break;
                 case HexPosition.UP_LEFT:
-                    GenerateExits(ExitDirection.DOWN);
+                    GenerateExits(ExitDirection.SOUTH);
                     break;
                 case HexPosition.DOWN_LEFT:
-                    GenerateExits(ExitDirection.DOWN_RIGHT);
+                    GenerateExits(ExitDirection.SOUTHEAST);
                     break;
                 case HexPosition.DOWN:
-                    GenerateExits(ExitDirection.UP_RIGHT);
+                    GenerateExits(ExitDirection.NORTHEAST);
                     break;
                 case HexPosition.DOWN_RIGHT:
-                    GenerateExits(ExitDirection.UP);
+                    GenerateExits(ExitDirection.NORTH);
                     break;
                 case HexPosition.UP_RIGHT:
                     break;

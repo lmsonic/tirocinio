@@ -7,6 +7,6 @@ namespace Tirocinio
     
     public enum ExitDirection
     {
-        UP, UP_LEFT, DOWN_LEFT, DOWN, DOWN_RIGHT, UP_RIGHT, NONE
+        NORTH, NORTHWEST, SOUTHWEST, SOUTH, SOUTHEAST, NORTHEAST, NONE
     }
 }
