@@ -10,7 +10,7 @@ namespace Tirocinio
 
         public GameObject[] exits = new GameObject[6];
         public float exitProbability = 0.3f;
-        int hexIndex = 0;
+        public int hexIndex = 0;
 
         // Start is called before the first frame update
         void Awake()
