@@ -5,6 +5,12 @@ using UnityEngine;
 public class HexGraph : MonoBehaviour
 {
 
+    public enum HexPosition
+    {
+        CENTER, UP, UP_LEFT, DOWN_LEFT, DOWN, DOWN_RIGHT, UP_RIGHT, NONE
+    }
+
+
     public enum ExitDirection
     {
         NORTH, NORTHWEST, SOUTHWEST, SOUTH, SOUTHEAST, NORTHEAST
@@ -14,23 +20,104 @@ public class HexGraph : MonoBehaviour
         public Dictionary<ExitDirection, Exit> exits = new Dictionary<ExitDirection, Exit>();
         static public GameObject prefab;
 
-        const float hexRadius = 18f;
+        public float hexRadius = 18f;
 
-        GameObject gameObject;
+        public GameObject gameObject;
 
-        public Hex(Vector3 position, Transform parent)
+        public HexPosition hexPosition;
+        public Hex(Vector3 position, Transform parent, HexPosition hexPosition)
         {
+            this.hexPosition = hexPosition;
             gameObject = Instantiate(prefab, position, Quaternion.identity, parent);
         }
-        public void AddExit(ExitDirection direction)
+        public void AddExit(ExitDirection direction, Hex otherHex)
         {
-            Quaternion rotation = Quaternion.AngleAxis((int)direction * 60f, Vector3.up);
+            Quaternion rotation = Quaternion.AngleAxis(-(int)direction * 60f, Vector3.up);
             Vector3 offset = rotation * Vector3.forward * hexRadius;
-            Hex hex = new Hex(gameObject.transform.position + offset, gameObject.transform.parent);
-            Exit exit = new Exit(this, hex, gameObject.transform.position + offset / 2, rotation, gameObject.transform);
+
+            Exit exit = new Exit(this, otherHex, gameObject.transform.position + offset / 2, rotation, gameObject.transform);
             exits[direction] = exit;
+
             ExitDirection oppositeDirection = (ExitDirection)(((int)direction + 3) % 6);
-            hex.exits[oppositeDirection] = exit;
+            otherHex.exits[oppositeDirection] = exit;
+        }
+
+        public HexPosition GetAdjacentHexPosition(ExitDirection direction)
+        {
+            switch (hexPosition)
+            {
+                case HexPosition.CENTER:
+                    return (HexPosition)((int)direction+1);
+                case HexPosition.UP:
+                    switch(direction){
+                        case ExitDirection.SOUTHWEST:
+                            return HexPosition.UP_LEFT;
+                        case ExitDirection.SOUTH:
+                            return HexPosition.CENTER;
+                        case ExitDirection.SOUTHEAST:
+                            return HexPosition.UP_RIGHT;
+                        default:
+                            return HexPosition.NONE;
+                    }
+                case HexPosition.UP_LEFT:
+                    switch(direction){
+                        case ExitDirection.NORTHEAST:
+                            return HexPosition.UP;
+                        case ExitDirection.SOUTHEAST:
+                            return HexPosition.CENTER;
+                        case ExitDirection.SOUTH:
+                            return HexPosition.DOWN_LEFT;
+                        default:
+                            return HexPosition.NONE;
+                    }
+                case HexPosition.DOWN_LEFT:
+                    switch(direction){
+                        case ExitDirection.NORTH:
+                            return HexPosition.UP_LEFT;
+                        case ExitDirection.NORTHEAST:
+                            return HexPosition.CENTER;
+                        case ExitDirection.SOUTHEAST:
+                            return HexPosition.DOWN;
+                        default:
+                            return HexPosition.NONE;
+                    }
+                case HexPosition.DOWN:
+                    switch(direction){
+                        case ExitDirection.NORTHWEST:
+                            return HexPosition.DOWN_LEFT;
+                        case ExitDirection.NORTH:
+                            return HexPosition.CENTER;
+                        case ExitDirection.NORTHEAST:
+                            return HexPosition.DOWN_RIGHT;
+                        default:
+                            return HexPosition.NONE;
+                    }
+                case HexPosition.DOWN_RIGHT:
+                    switch(direction){
+                        case ExitDirection.SOUTHWEST:
+                            return HexPosition.DOWN;
+                        case ExitDirection.NORTHWEST:
+                            return HexPosition.CENTER;
+                        case ExitDirection.NORTH:
+                            return HexPosition.UP_RIGHT;
+                        default:
+                            return HexPosition.NONE;
+                    }
+                case HexPosition.UP_RIGHT:
+                    switch(direction){
+                        case ExitDirection.SOUTH:
+                            return HexPosition.DOWN_RIGHT;
+                        case ExitDirection.SOUTHWEST:
+                            return HexPosition.CENTER;
+                        case ExitDirection.NORTHWEST:
+                            return HexPosition.UP;
+                        default:
+                            return HexPosition.NONE;
+                    }
+                default:
+                    return HexPosition.NONE;
+
+            }
         }
 
 
@@ -49,46 +136,67 @@ public class HexGraph : MonoBehaviour
 
     }
 
+    public class Chunk
+    {
+        Hex[] hexes = new Hex[7];
+        static public float exitProbability = 0.5f;
+        public Chunk(Hex centerHex)
+        {
+            hexes[0] = centerHex;
+            for (int i = 0; i < hexes.Length - 1; i++)
+            {
+                Quaternion rotation = Quaternion.AngleAxis(-i * 60f, Vector3.up);
+                Vector3 offset = Vector3.forward * centerHex.hexRadius;
+                offset = rotation * offset;
+
+                hexes[i + 1] = new Hex( centerHex.gameObject.transform.position + offset, 
+                                    centerHex.gameObject.transform.parent, (HexPosition) i + 1);
+            }
+        }
+
+        public void GenerateExits()
+        {
+            for (int i = 0; i < hexes.Length; i++)
+            {
+                Hex hex = hexes[i];
+                for (int j = 0; j < 6; j++)
+                {
+                    ExitDirection direction = (ExitDirection)j;
+                    if (hex.exits.ContainsKey(direction)) continue;
+
+                    HexPosition hexPosition = hex.GetAdjacentHexPosition(direction);
+                    if (hexPosition == HexPosition.NONE) continue;
+
+                    if (Random.value < exitProbability)
+                    {
+                        Debug.Log(hex.hexPosition +" "+direction+" "+hexPosition);
+                        Hex otherHex = hexes[(int)hexPosition];
+                        hex.AddExit(direction,otherHex);
+                    }
+                }
+            }
+        }
+
+
+    }
+
 
     public GameObject hexPrefab;
     public GameObject exitPrefab;
 
-    Hex originalHex;
-    public int generationSteps = 3;
     public float exitProbability = 0.5f;
+
 
     private void Start()
     {
         Hex.prefab = hexPrefab;
         Exit.prefab = exitPrefab;
+        Chunk.exitProbability = exitProbability;
 
-        originalHex = new Hex(transform.position, transform);
+        Hex centerHex = new Hex(transform.position, transform, HexPosition.CENTER);
+        Chunk chunk = new Chunk(centerHex);
+        chunk.GenerateExits();
 
-
-        for (int i = 0; i < 6; i++)
-        {
-            ExitDirection direction = (ExitDirection)i;
-            if (originalHex.exits.ContainsKey(direction)) continue;
-
-            if (Random.value < exitProbability)
-                originalHex.AddExit(direction);
-        }
-        foreach (KeyValuePair<ExitDirection, Exit> entry in originalHex.exits)
-        {
-            ExitDirection direction = entry.Key;
-            Exit exit = entry.Value;
-
-            Hex otherHex = (exit.hex1 == originalHex) ? exit.hex2 : exit.hex1;
-
-            for (int i = 0; i < 6; i++)
-            {
-                ExitDirection dir = (ExitDirection)i;
-                if (otherHex.exits.ContainsKey(dir)) continue;
-
-                if (Random.value < exitProbability)
-                    otherHex.AddExit(dir);
-            }
-        }
 
     }
 
