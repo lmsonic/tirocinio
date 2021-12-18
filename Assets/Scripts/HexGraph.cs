@@ -296,16 +296,7 @@ public class HexGraph : MonoBehaviour
 
     }
 
-    public void ChangeDirection(int indexDirection)
-    {
-        selectedDirection = (ExitDirection)indexDirection;
-    }
-
-    public void MoveInDirection()
-    {
-        HexPosition pos = chunk.hexes[0].GetAdjacentHexPosition(selectedDirection);
-        chunk.MoveChunkCenter(chunk.hexes[(int)pos]);
-    }
+    
 
 }
 
