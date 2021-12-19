@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 510165164721317614}
   - component: {fileID: 5813805989662665914}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Exit
   m_TagString: Untagged
   m_Icon: {fileID: 4162164826716764455, guid: 0000000000000000d000000000000000, type: 0}
@@ -59,7 +59,7 @@ GameObject:
   - component: {fileID: 4205656601939020811}
   - component: {fileID: 4205656601939020810}
   - component: {fileID: 4205656601939020821}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Mesh
   m_TagString: Untagged
   m_Icon: {fileID: 0}

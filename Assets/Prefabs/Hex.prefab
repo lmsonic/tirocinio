@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 7011641781879200780}
   - component: {fileID: 7011641781879200783}
   - component: {fileID: 7011641781879200782}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Cylinder
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -641,7 +641,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7011641782255620834}
   - component: {fileID: 3987062800405337076}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Hex
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -676,5 +676,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   hexRadius: 18
-  exitPrefab: {fileID: 3054202882452888221, guid: e63782bfdf447ca49a51afca10c58644, type: 3}
   hexPosition: 0

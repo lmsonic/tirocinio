@@ -7,7 +7,7 @@ namespace Tirocinio
     public class Hex : MonoBehaviour
     {
         public Dictionary<ExitDirection, Exit> exits = new Dictionary<ExitDirection, Exit>();
-        public float hexRadius = 18f;
+        public float hexRadius = 20f;
 
         public HexPosition hexPosition;
 
