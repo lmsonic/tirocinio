@@ -22,7 +22,6 @@ public class ObjectPooler : MonoBehaviour
             Instance = this;
             pooledExits  = InitializePool(pooledExits, exitPrefab, 12);
             pooledHexes  = InitializePool(pooledHexes, hexPrefab, 6);
-            Debug.Log("Created Object Pooler");
         }
         else
         {
