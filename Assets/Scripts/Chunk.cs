@@ -5,7 +5,6 @@ namespace Tirocinio
     {
         public Hex[] hexes = new Hex[7];
 
-        public GameObject hexPrefab;
         public Hex centerHex;
 
         public float exitProbability = 0.5f;
@@ -25,6 +24,7 @@ namespace Tirocinio
 
         public void Start()
         {
+            ObjectPooler.Instance.AddCentralHex(centerHex.gameObject);
             GenerateHexes(centerHex);
             GenerateExits();
         }
@@ -41,9 +41,10 @@ namespace Tirocinio
                 Vector3 offset = Vector3.forward * centerHex.hexRadius;
                 offset = rotation * offset;
 
-                GameObject hexGO = Instantiate(hexPrefab,
-                                        centerHexTransform.position + offset, Quaternion.identity,
-                                            centerHexTransform.parent);
+                GameObject hexGO = ObjectPooler.Instance.
+                    GetPooledHex(centerHex.transform.position + offset,Quaternion.identity,centerHexTransform.parent);
+
+
                 Hex hex = hexGO.GetComponent<Hex>();
                 hex.SetHexPosition((HexPosition)(i + 1));
                 hexes[i + 1] = hex;
@@ -84,48 +85,53 @@ namespace Tirocinio
 
             ExitDirection[] directionsToHexesToKeep = new ExitDirection[3];
             HexPosition[] hexPositionsToKeep = new HexPosition[3];
-            HexPosition[] hexPositionsToDelete = new HexPosition[3];
 
-            int j = 0;
-            for (int i = 0; i < 6; i++)
+            
+
+            int indexToKeep = 0;
+            for (int i = 0; i < 6 ;i++)
             {
                 //at this point the new center has not set its position
                 HexPosition hexPosition = newCenter.GetAdjacentHexPosition((ExitDirection)i);
                 if (hexPosition != HexPosition.NONE)
                 {
-                    directionsToHexesToKeep[j] = (ExitDirection)i;
-                    hexPositionsToKeep[j] = hexPosition;
-                    j++;
-                    if (j > 2) break; //in any direction, only 3 hexes other than center are kept
+                    directionsToHexesToKeep[indexToKeep] = (ExitDirection)i;
+                    hexPositionsToKeep[indexToKeep] = hexPosition;
+                    indexToKeep++;
+                    if (indexToKeep>2) break;
                 }
             }
-            j = 0;
+
+            HexPosition[] hexPositionsToDelete = new HexPosition[3];
+
+            int indexToDelete = 0;
             for (int i = 1; i < 7; i++)
             {
                 bool flagForDeletion = true;
                 HexPosition pos = (HexPosition)i;
-                if (pos == newCenter.hexPosition) continue;
+                if (pos == newCenter.hexPosition) continue; //doesnt set new center to be deleted
 
                 for (int k = 0; k < 3; k++)
                 {
                     if (pos == hexPositionsToKeep[k])
                     {
                         flagForDeletion = false;
+                        break;
                     }
                 }
 
                 if (flagForDeletion)
                 {
                     Debug.Log("Flagged for deletion: " + pos);
-                    hexPositionsToDelete[j] = pos;
-                    j++;
-
+                    hexPositionsToDelete[indexToDelete] = pos;
+                    indexToDelete++;
+                    if (indexToDelete > 2) break;
                 }
             }
 
             newCenter.SetHexPosition(HexPosition.CENTER);
             Debug.Log("MOVING CENTER");
-            for (int i = 0; i < 3; i++) //saving old hexes
+            for (int i = 0; i < 3; i++) //saving old hexes that need to be kept
             {
                 ExitDirection oldDirection = directionsToHexesToKeep[i];
                 HexPosition oldHexPosition = hexPositionsToKeep[i];
@@ -138,7 +144,9 @@ namespace Tirocinio
 
             for (int i = 0; i < 3; i++)
             {
-                Destroy(oldHexes[(int)hexPositionsToDelete[i]].gameObject);
+                Hex hexToDelete = oldHexes[(int)hexPositionsToDelete[i]];
+                hexToDelete.ClearExits();
+                hexToDelete.gameObject.SetActive(false);
             }
 
             GenerateHexes(newCenter);

@@ -9,8 +9,6 @@ namespace Tirocinio
         public Dictionary<ExitDirection, Exit> exits = new Dictionary<ExitDirection, Exit>();
         public float hexRadius = 18f;
 
-        public GameObject exitPrefab;
-
         public HexPosition hexPosition;
 
         public void SetHexPosition(HexPosition pos)
@@ -23,7 +21,8 @@ namespace Tirocinio
             Quaternion rotation = Quaternion.AngleAxis(-(int)direction * 60f, Vector3.up);
             Vector3 offset = rotation * Vector3.forward * hexRadius;
 
-            GameObject exitGO = Instantiate(exitPrefab, transform.position + offset / 2, rotation, transform);
+            GameObject exitGO = ObjectPooler.Instance.
+                GetPooledExit(transform.position + offset / 2,rotation,transform);
             Exit exit = exitGO.GetComponent<Exit>();
             exit.Initialize(this, otherHex);
 
@@ -31,7 +30,14 @@ namespace Tirocinio
             ExitDirection oppositeDirection = (ExitDirection)(((int)direction + 3) % 6);
             otherHex.exits[oppositeDirection] = exit;
         }
-
+        
+        public void ClearExits(){
+            foreach (KeyValuePair<ExitDirection,Exit> entry in exits){
+                Exit exit = entry.Value;
+                exit.gameObject.SetActive(false);
+            }
+            exits.Clear();
+        }
         public HexPosition GetAdjacentHexPosition(ExitDirection direction)
         {
             switch (hexPosition)
