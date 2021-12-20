@@ -36,6 +36,7 @@ namespace Tirocinio
             pooledExit.transform.position = position;
             pooledExit.transform.rotation = rotation;
             pooledExit.transform.parent = parent;
+            pooledExit.transform.localScale = Vector3.one;
             return pooledExit;
         }
 
@@ -47,6 +48,7 @@ namespace Tirocinio
             pooledHex.transform.position = position;
             pooledHex.transform.rotation = rotation;
             pooledHex.transform.parent = parent;
+            pooledHex.transform.localScale = Vector3.one;
             return pooledHex;
         }
 

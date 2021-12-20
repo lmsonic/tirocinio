@@ -10,7 +10,7 @@ namespace Tirocinio
         public Dictionary<ExitDirection, Exit> exits = new Dictionary<ExitDirection, Exit>();
 
 
-        static public float hexRadius = 8.5f;
+        static public float hexRadius = 8f  * 3f;
 
         public HexPosition hexPosition;
 
@@ -27,6 +27,7 @@ namespace Tirocinio
 
             GameObject exitGO = Locator.Instance.ObjectPooler.
                 GetPooledExit(transform.position + offset, rotation, transform);
+            
             Exit exit = exitGO.GetComponent<Exit>();
             exit.Initialize(this, otherHex);
 
