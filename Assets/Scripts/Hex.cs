@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -9,10 +10,11 @@ namespace Tirocinio
         public Dictionary<ExitDirection, Exit> exits = new Dictionary<ExitDirection, Exit>();
 
 
-        static public float hexRadius = 9f;
+        static public float hexRadius = 8.5f;
 
         public HexPosition hexPosition;
 
+        
         public void SetHexPosition(HexPosition pos)
         {
             hexPosition = pos;

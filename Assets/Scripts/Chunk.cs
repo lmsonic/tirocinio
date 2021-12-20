@@ -13,14 +13,10 @@ namespace Tirocinio
 
         public float exitProbability = 0.5f;
 
-        public ExitDirection selectedDirection = ExitDirection.NORTH;
 
-        public void MoveCenterFromExit(Exit exit)
-        {
-            Hex newCenter = exit.GetOtherHex(centerHex);
-            if (newCenter)
-                MoveChunkCenter(newCenter);
 
+        public void PlayerNotOnCenterHex(Hex newCenter){
+            MoveChunkCenter(newCenter);
         }
 
 

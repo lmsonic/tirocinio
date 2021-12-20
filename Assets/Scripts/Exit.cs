@@ -12,12 +12,6 @@ namespace Tirocinio
 
         public Collider coll;
 
-        public event Action<Exit> OnExitEntered;
-
-        private void Start()
-        {
-            OnExitEntered += Locator.Instance.Chunk.MoveCenterFromExit;
-        }
         public void Open()
         {
             rend.enabled = false;
@@ -47,11 +41,8 @@ namespace Tirocinio
 
         }
 
-        private void OnTriggerExit(Collider other)
-        {
-            if (other.tag == "Player")
-                OnExitEntered.Invoke(this);
-        }
+
+
 
 
 
