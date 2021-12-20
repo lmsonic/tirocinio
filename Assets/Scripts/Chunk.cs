@@ -1,4 +1,8 @@
+
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
+
 namespace Tirocinio
 {
     public class Chunk : MonoBehaviour
@@ -11,38 +15,38 @@ namespace Tirocinio
 
         public ExitDirection selectedDirection = ExitDirection.NORTH;
 
-        public void ChangeDirection(int indexDirection)
+        public void MoveCenterFromExit(Exit exit)
         {
-            selectedDirection = (ExitDirection)indexDirection;
+            Hex newCenter = exit.GetOtherHex(centerHex);
+            if (newCenter)
+                MoveChunkCenter(newCenter);
+
         }
 
-        public void MoveInDirection()
-        {
-            HexPosition pos = hexes[0].GetAdjacentHexPosition(selectedDirection);
-            MoveChunkCenter(hexes[(int)pos]);
-        }
 
         public void Start()
         {
-            ObjectPooler.Instance.AddCentralHex(centerHex.gameObject);
+            Locator.Instance.ObjectPooler.AddCentralHex(centerHex.gameObject);
             GenerateHexes(centerHex);
             GenerateExits();
         }
 
-        void GenerateHexes(Hex centerHex)
+        void GenerateHexes(Hex newCenterHex)
         {
-            hexes[0] = centerHex;
-            Transform centerHexTransform = centerHex.gameObject.transform;
-            for (int i = 0; i < hexes.Length - 1; i++)
+            hexes[0] = newCenterHex;
+            this.centerHex = newCenterHex;
+            Transform centerHexTransform = newCenterHex.gameObject.transform;
+            for (int i = 0; i < hexes.Length-1; i++)
             {
-                if (hexes[i + 1] != null) continue;
+
+                if (hexes[i+1] != null) continue;
 
                 Quaternion rotation = Quaternion.AngleAxis(-i * 60f, Vector3.up);
-                Vector3 offset = Vector3.forward * centerHex.hexRadius;
+                Vector3 offset = Vector3.forward * Hex.hexRadius * 2f;
                 offset = rotation * offset;
 
-                GameObject hexGO = ObjectPooler.Instance.
-                    GetPooledHex(centerHex.transform.position + offset,Quaternion.identity,centerHexTransform.parent);
+                GameObject hexGO = Locator.Instance.ObjectPooler.
+                    GetPooledHex(newCenterHex.transform.position + offset, Quaternion.identity, centerHexTransform.parent);
 
 
                 Hex hex = hexGO.GetComponent<Hex>();
@@ -64,96 +68,64 @@ namespace Tirocinio
                     HexPosition hexPosition = hex.GetAdjacentHexPosition(direction);
                     if (hexPosition == HexPosition.NONE) continue;
 
-                    if (Random.value < exitProbability)
-                    {
-                        Debug.Log(hex.hexPosition + " " + direction + " " + hexPosition);
-                        Hex otherHex = hexes[(int)hexPosition];
-                        hex.AddExit(direction, otherHex);
-                    }
+                    bool isOpen = Random.value < exitProbability;
+
+                    Hex otherHex = hexes[(int)hexPosition];
+                    hex.AddExit(direction, otherHex, isOpen);
+
                 }
             }
         }
 
         public void MoveChunkCenter(Hex newCenter)
         {
-            Hex[] oldHexes = new Hex[hexes.Length];
-            for (int i = 0; i < hexes.Length; i++) //clearing hexes
+            Hex[] newHexes = new Hex[7];
+            for (int i = 0; i < newHexes.Length; i++)//initialize to null
             {
-                oldHexes[i] = hexes[i];
-                hexes[i] = null;
+                newHexes[i] = null;
             }
 
-            ExitDirection[] directionsToHexesToKeep = new ExitDirection[3];
-            HexPosition[] hexPositionsToKeep = new HexPosition[3];
+            List<Hex> hexesToKeep = new List<Hex>();
 
-            
-
-            int indexToKeep = 0;
-            for (int i = 0; i < 6 ;i++)
+            foreach (KeyValuePair<ExitDirection, Exit> entry in newCenter.exits)
             {
-                //at this point the new center has not set its position
-                HexPosition hexPosition = newCenter.GetAdjacentHexPosition((ExitDirection)i);
-                if (hexPosition != HexPosition.NONE)
-                {
-                    directionsToHexesToKeep[indexToKeep] = (ExitDirection)i;
-                    hexPositionsToKeep[indexToKeep] = hexPosition;
-                    indexToKeep++;
-                    if (indexToKeep>2) break;
-                }
+                //saving and setting up adjacent hexes
+                ExitDirection direction = entry.Key;
+                Exit exit = entry.Value;
+
+                HexPosition hexPositionFromCenter = (HexPosition)(int)(direction + 1);
+
+                Hex adjacentHex = exit.GetOtherHex(newCenter);
+
+                adjacentHex.SetHexPosition(hexPositionFromCenter);
+                newHexes[(int)hexPositionFromCenter] = adjacentHex;
+
+                hexesToKeep.Add(adjacentHex);
+
             }
-
-            HexPosition[] hexPositionsToDelete = new HexPosition[3];
-
-            int indexToDelete = 0;
-            for (int i = 1; i < 7; i++)
-            {
-                bool flagForDeletion = true;
-                HexPosition pos = (HexPosition)i;
-                if (pos == newCenter.hexPosition) continue; //doesnt set new center to be deleted
-
-                for (int k = 0; k < 3; k++)
-                {
-                    if (pos == hexPositionsToKeep[k])
-                    {
-                        flagForDeletion = false;
-                        break;
-                    }
-                }
-
-                if (flagForDeletion)
-                {
-                    Debug.Log("Flagged for deletion: " + pos);
-                    hexPositionsToDelete[indexToDelete] = pos;
-                    indexToDelete++;
-                    if (indexToDelete > 2) break;
-                }
-            }
-
+            //saving and setting up adjacent hexes
             newCenter.SetHexPosition(HexPosition.CENTER);
-            Debug.Log("MOVING CENTER");
-            for (int i = 0; i < 3; i++) //saving old hexes that need to be kept
-            {
-                ExitDirection oldDirection = directionsToHexesToKeep[i];
-                HexPosition oldHexPosition = hexPositionsToKeep[i];
-                HexPosition newHexPosition = newCenter.GetAdjacentHexPosition(oldDirection);
-                Debug.Log(oldHexPosition + "->" + newHexPosition);
 
-                hexes[(int)newHexPosition] = oldHexes[(int)oldHexPosition];
-                hexes[(int)newHexPosition].SetHexPosition(newHexPosition);
+            hexesToKeep.Add(newCenter);
+
+
+            for (int i = 0; i < hexes.Length; i++) // deleting exits
+            {
+                HexPosition hexPosition = (HexPosition)i;
+                Hex hex = hexes[i];
+
+                if (hexesToKeep.Contains(hex)) continue;
+
+                hex.gameObject.SetActive(false);
+
             }
 
-            for (int i = 0; i < 3; i++)
-            {
-                Hex hexToDelete = oldHexes[(int)hexPositionsToDelete[i]];
-                hexToDelete.ClearExits();
-                hexToDelete.gameObject.SetActive(false);
-            }
+            hexes = newHexes;
+
 
             GenerateHexes(newCenter);
             GenerateExits();
         }
-
-
 
     }
 

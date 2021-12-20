@@ -7,7 +7,9 @@ namespace Tirocinio
     public class Hex : MonoBehaviour
     {
         public Dictionary<ExitDirection, Exit> exits = new Dictionary<ExitDirection, Exit>();
-        public float hexRadius = 20f;
+
+
+        static public float hexRadius = 9f;
 
         public HexPosition hexPosition;
 
@@ -16,28 +18,41 @@ namespace Tirocinio
             hexPosition = pos;
         }
 
-        public void AddExit(ExitDirection direction, Hex otherHex)
+        public void AddExit(ExitDirection direction, Hex otherHex, bool isOpen)
         {
             Quaternion rotation = Quaternion.AngleAxis(-(int)direction * 60f, Vector3.up);
             Vector3 offset = rotation * Vector3.forward * hexRadius;
 
-            GameObject exitGO = ObjectPooler.Instance.
-                GetPooledExit(transform.position + offset / 2,rotation,transform);
+            GameObject exitGO = Locator.Instance.ObjectPooler.
+                GetPooledExit(transform.position + offset, rotation, transform);
             Exit exit = exitGO.GetComponent<Exit>();
             exit.Initialize(this, otherHex);
+
+            if (isOpen) exit.Open(); else exit.Close();
 
             exits[direction] = exit;
             ExitDirection oppositeDirection = (ExitDirection)(((int)direction + 3) % 6);
             otherHex.exits[oppositeDirection] = exit;
         }
-        
-        public void ClearExits(){
-            foreach (KeyValuePair<ExitDirection,Exit> entry in exits){
+
+        public void ClearExits()
+        {
+            foreach (KeyValuePair<ExitDirection, Exit> entry in exits)
+            {
                 Exit exit = entry.Value;
+                Hex otherHex = exit.GetOtherHex(this);
+                ExitDirection oppositeDirection = (ExitDirection)(((int)entry.Key + 3) % 6);
+                otherHex.exits.Remove(oppositeDirection);
                 exit.gameObject.SetActive(false);
             }
             exits.Clear();
         }
+
+        private void OnDisable()
+        {
+            ClearExits();
+        }
+
         public HexPosition GetAdjacentHexPosition(ExitDirection direction)
         {
             switch (hexPosition)
@@ -120,6 +135,8 @@ namespace Tirocinio
                     return HexPosition.NONE;
 
             }
+
+
         }
 
 
