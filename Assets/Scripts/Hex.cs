@@ -10,7 +10,7 @@ namespace Tirocinio
         public Dictionary<ExitDirection, Exit> exits = new Dictionary<ExitDirection, Exit>();
 
 
-        static public float hexRadius = 8f  * 3f;
+        static public float hexRadius = 8f;
 
         public HexPosition hexPosition;
 

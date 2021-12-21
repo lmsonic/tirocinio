@@ -22,6 +22,7 @@ namespace Tirocinio
 
         public void Start()
         {
+            Hex.hexRadius *= transform.localScale.x;
             Locator.Instance.ObjectPooler.AddCentralHex(centerHex.gameObject);
             GenerateHexes(centerHex);
             GenerateExits();

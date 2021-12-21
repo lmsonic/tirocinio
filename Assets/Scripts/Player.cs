@@ -32,7 +32,7 @@ public class Player : MonoBehaviour
 
     private void Update()
     {
-        bool isGrounded = Physics.CheckSphere(groundCheck.position, 0.1f, groundLayer, QueryTriggerInteraction.Ignore);
+        bool isGrounded = Physics.CheckSphere(groundCheck.position, 0.5f, groundLayer, QueryTriggerInteraction.Ignore);
         if (isGrounded && velocity.y < 0)
             velocity.y = 0f;
 
@@ -47,7 +47,8 @@ public class Player : MonoBehaviour
             isJumping = false;
         }
 
-        velocity.y += gravity * Time.deltaTime;
+        if (!isGrounded)
+            velocity.y += gravity * Time.deltaTime;
 
         controller.Move(velocity * Time.deltaTime);
 
