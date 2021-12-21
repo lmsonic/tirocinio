@@ -10,15 +10,22 @@ public class Player : MonoBehaviour
     Vector2 inputLook = Vector2.zero;
 
     bool isJumping = false;
+    bool isAccelerating = false;
+    bool isBraking = false;
 
-    Vector3 velocity = Vector3.zero;
+    float verticalVelocity = 0f;
+    Vector3 groundVelocity = Vector3.zero;
 
     Transform cameraTransform;
 
     public float gravity = -10f;
     public float jumpHeight = -10f;
+
+    public float acceleration = 10f;
+    public float deceleration = 5f;
+    public float brakeSpeed = 20f;
     public float rotationSpeed = 0.8f;
-    public float moveSpeed = 10f;
+    public float maxVelocity = 20f;
     public Transform groundCheck;
     public LayerMask groundLayer;
 
@@ -33,24 +40,35 @@ public class Player : MonoBehaviour
     private void Update()
     {
         bool isGrounded = Physics.CheckSphere(groundCheck.position, 0.5f, groundLayer, QueryTriggerInteraction.Ignore);
-        if (isGrounded && velocity.y < 0)
-            velocity.y = 0f;
+        if (isGrounded && verticalVelocity < 0)
+            verticalVelocity = 0f;
 
         Vector3 movement = new Vector3(inputMovement.x, 0f, inputMovement.y);
 
         movement = movement.x * cameraTransform.right.normalized + movement.z * cameraTransform.forward.normalized;
-        controller.Move(movement * moveSpeed * Time.deltaTime);
+
+        if (isAccelerating){
+            groundVelocity = Vector3.Lerp(groundVelocity,transform.forward * maxVelocity, acceleration * Time.deltaTime);
+        }
+        else if (isBraking){
+            groundVelocity = Vector3.Lerp(groundVelocity,Vector3.zero,brakeSpeed * Time.deltaTime);
+        }
+        else{
+            groundVelocity = Vector3.Lerp(groundVelocity,Vector3.zero,deceleration * Time.deltaTime);
+        }
+            
+        controller.Move(groundVelocity * Time.deltaTime);
 
         if (isJumping && isGrounded)
         {
-            velocity.y += Mathf.Sqrt(jumpHeight * -2f * gravity);
+            verticalVelocity += Mathf.Sqrt(jumpHeight * -2f * gravity);
             isJumping = false;
         }
 
         if (!isGrounded)
-            velocity.y += gravity * Time.deltaTime;
+            verticalVelocity += gravity * Time.deltaTime;
 
-        controller.Move(velocity * Time.deltaTime);
+        controller.Move(Vector3.up * verticalVelocity * Time.deltaTime);
 
         float targetAngle = cameraTransform.eulerAngles.y;
         Quaternion targetRotation = Quaternion.Euler(0f, targetAngle, 0f);
@@ -76,5 +94,15 @@ public class Player : MonoBehaviour
     public void Jump(InputAction.CallbackContext ctx)
     {
         isJumping = ctx.performed;
+    }
+
+    public void Accelerate(InputAction.CallbackContext ctx)
+    {
+        isAccelerating = ctx.performed;
+    }
+
+    public void Brake(InputAction.CallbackContext ctx)
+    {
+        isBraking = ctx.performed;
     }
 }
