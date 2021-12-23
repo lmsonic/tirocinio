@@ -25,9 +25,13 @@ public class Player : MonoBehaviour
     public float deceleration = 5f;
     public float brakeSpeed = 20f;
     public float rotationSpeed = 0.8f;
+    public float steerRotationSpeed = 0.8f;
+    public float maxSteerAngle = 20f;
+    public float rotationFollowBodySpeed = 0.4f;
     public float maxVelocity = 20f;
     public Transform groundCheck;
     public LayerMask groundLayer;
+    public Transform handleTransform;
 
 
     private void Start()
@@ -39,25 +43,75 @@ public class Player : MonoBehaviour
 
     private void Update()
     {
-        bool isGrounded = Physics.CheckSphere(groundCheck.position, 0.5f, groundLayer, QueryTriggerInteraction.Ignore);
-        if (isGrounded && verticalVelocity < 0)
-            verticalVelocity = 0f;
 
-        Vector3 movement = new Vector3(inputMovement.x, 0f, inputMovement.y);
+        VerticalMovement();
+        HorizontalMovement();
+
+        Rotation();
+
+
+
+
+    }
+
+    void Rotation()
+    {
+
+        float targetAngle = cameraTransform.eulerAngles.y;
+
+        float steerAngle = GetSteerAngle();
+
+        Quaternion targetRotation = Quaternion.Euler(0f, targetAngle, steerAngle);
+        handleTransform.rotation = Quaternion.Lerp(handleTransform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
+        transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, rotationFollowBodySpeed * Time.deltaTime);
+
+
+    }
+
+    float GetSteerAngle(){
+
+        Vector3 movement = GetInputMovement();
+        float targetSteerAngle = -movement.x * maxSteerAngle;
+        float steerAngle = Mathf.LerpAngle(transform.eulerAngles.z, targetSteerAngle, steerRotationSpeed);
+        
+        return steerAngle;
+    }
+
+    void HorizontalMovement()
+    {
+        Vector3 movement = GetInputMovement();
 
         movement = movement.x * cameraTransform.right.normalized + movement.z * cameraTransform.forward.normalized;
 
-        if (isAccelerating){
-            groundVelocity = Vector3.Lerp(groundVelocity,transform.forward * maxVelocity, acceleration * Time.deltaTime);
+        if (isAccelerating)
+        {
+            groundVelocity = Vector3.Lerp(groundVelocity, handleTransform.forward * maxVelocity, acceleration * Time.deltaTime);
         }
-        else if (isBraking){
-            groundVelocity = Vector3.Lerp(groundVelocity,Vector3.zero,brakeSpeed * Time.deltaTime);
+        else if (isBraking)
+        {
+            groundVelocity = Vector3.Lerp(groundVelocity, Vector3.zero, brakeSpeed * Time.deltaTime);
         }
-        else{
-            groundVelocity = Vector3.Lerp(groundVelocity,Vector3.zero,deceleration * Time.deltaTime);
+        else
+        {
+            groundVelocity = Vector3.Lerp(groundVelocity, Vector3.zero, deceleration * Time.deltaTime);
         }
-            
+
         controller.Move(groundVelocity * Time.deltaTime);
+
+
+    }
+
+    Vector3 GetInputMovement()
+    {
+
+        return new Vector3(inputMovement.x, 0f, inputMovement.y);
+    }
+
+    void VerticalMovement()
+    {
+        bool isGrounded = Physics.CheckSphere(groundCheck.position, 0.5f, groundLayer, QueryTriggerInteraction.Ignore);
+        if (isGrounded && verticalVelocity < 0)
+            verticalVelocity = 0f;
 
         if (isJumping && isGrounded)
         {
@@ -69,12 +123,6 @@ public class Player : MonoBehaviour
             verticalVelocity += gravity * Time.deltaTime;
 
         controller.Move(Vector3.up * verticalVelocity * Time.deltaTime);
-
-        float targetAngle = cameraTransform.eulerAngles.y;
-        Quaternion targetRotation = Quaternion.Euler(0f, targetAngle, 0f);
-
-        transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
-
 
     }
 

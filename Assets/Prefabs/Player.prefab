@@ -231,6 +231,14 @@ MonoBehaviour:
         m_CallState: 2
     m_ActionId: e8c304ff-aa18-42c0-8013-50c9cbedaddc
     m_ActionName: Player/Jump[/Keyboard/space,/XInputControllerWindows/buttonSouth]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 93948387-37de-4c09-9b6a-26bd18c3eb11
+    m_ActionName: Player/Accelerate
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 6c377680-0b54-4fcd-857c-abcbc81c7374
+    m_ActionName: Player/Brake
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: Gamepad
   m_DefaultActionMap: Player
@@ -250,12 +258,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gravity: -50
   jumpHeight: 10
+  acceleration: 10
+  deceleration: 5
+  brakeSpeed: 20
   rotationSpeed: 0.8
-  moveSpeed: 15
+  maxVelocity: 20
   groundCheck: {fileID: 7672785098917997614}
   groundLayer:
     serializedVersion: 2
     m_Bits: 8
+  handleTransform: {fileID: 7715027458065979353}
 --- !u!143 &6511135310461063109
 CharacterController:
   m_ObjectHideFlags: 0
@@ -318,14 +330,6 @@ PrefabInstance:
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: 0}
-    - target: {fileID: 4620905653265712195, guid: 13c721e7cea10ef46bc88d51dd3bd013, type: 3}
-      propertyPath: m_Mesh
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 4620905653621301056, guid: 13c721e7cea10ef46bc88d51dd3bd013, type: 3}
-      propertyPath: m_Mesh
-      value: 
-      objectReference: {fileID: 0}
     - target: {fileID: 4620905653621301061, guid: 13c721e7cea10ef46bc88d51dd3bd013, type: 3}
       propertyPath: m_Mesh
       value: 
@@ -342,23 +346,11 @@ PrefabInstance:
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: 0}
-    - target: {fileID: 4620905653715153845, guid: 13c721e7cea10ef46bc88d51dd3bd013, type: 3}
-      propertyPath: m_Mesh
-      value: 
-      objectReference: {fileID: 0}
     - target: {fileID: 4620905653993825993, guid: 13c721e7cea10ef46bc88d51dd3bd013, type: 3}
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: 0}
-    - target: {fileID: 4620905653993825994, guid: 13c721e7cea10ef46bc88d51dd3bd013, type: 3}
-      propertyPath: m_Mesh
-      value: 
-      objectReference: {fileID: 0}
     - target: {fileID: 4620905653993825999, guid: 13c721e7cea10ef46bc88d51dd3bd013, type: 3}
-      propertyPath: m_Mesh
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 4620905654851031472, guid: 13c721e7cea10ef46bc88d51dd3bd013, type: 3}
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: 0}
@@ -373,18 +365,6 @@ PrefabInstance:
     - target: {fileID: 4620905654889980930, guid: 13c721e7cea10ef46bc88d51dd3bd013, type: 3}
       propertyPath: m_RootOrder
       value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 4620905654889980930, guid: 13c721e7cea10ef46bc88d51dd3bd013, type: 3}
-      propertyPath: m_LocalScale.x
-      value: 0.62279
-      objectReference: {fileID: 0}
-    - target: {fileID: 4620905654889980930, guid: 13c721e7cea10ef46bc88d51dd3bd013, type: 3}
-      propertyPath: m_LocalScale.y
-      value: 0.62279
-      objectReference: {fileID: 0}
-    - target: {fileID: 4620905654889980930, guid: 13c721e7cea10ef46bc88d51dd3bd013, type: 3}
-      propertyPath: m_LocalScale.z
-      value: 0.62279
       objectReference: {fileID: 0}
     - target: {fileID: 4620905654889980930, guid: 13c721e7cea10ef46bc88d51dd3bd013, type: 3}
       propertyPath: m_LocalPosition.x
@@ -430,15 +410,15 @@ PrefabInstance:
       propertyPath: m_Name
       value: Scooter
       objectReference: {fileID: 0}
-    m_RemovedComponents:
-    - {fileID: 4620905653621301056, guid: 13c721e7cea10ef46bc88d51dd3bd013, type: 3}
-    - {fileID: 4620905653265712195, guid: 13c721e7cea10ef46bc88d51dd3bd013, type: 3}
-    - {fileID: 4620905653715153845, guid: 13c721e7cea10ef46bc88d51dd3bd013, type: 3}
-    - {fileID: 4620905653993825994, guid: 13c721e7cea10ef46bc88d51dd3bd013, type: 3}
-    - {fileID: 4620905654851031472, guid: 13c721e7cea10ef46bc88d51dd3bd013, type: 3}
+    m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 13c721e7cea10ef46bc88d51dd3bd013, type: 3}
 --- !u!4 &1391944405610084288 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4620905654889980930, guid: 13c721e7cea10ef46bc88d51dd3bd013, type: 3}
+  m_PrefabInstance: {fileID: 6012850010024350658}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &7715027458065979353 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4062431181761463323, guid: 13c721e7cea10ef46bc88d51dd3bd013, type: 3}
   m_PrefabInstance: {fileID: 6012850010024350658}
   m_PrefabAsset: {fileID: 0}
