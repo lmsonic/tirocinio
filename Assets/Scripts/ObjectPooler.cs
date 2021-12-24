@@ -20,8 +20,8 @@ namespace Tirocinio
         void Awake()
         {
 
-            pooledExits = InitializePool(pooledExits, exitPrefab, 12);
-            pooledHexes = InitializePool(pooledHexes, hexPrefab, 6);
+            pooledExits = InitializePool(pooledExits, exitPrefab, 30);
+            pooledHexes = InitializePool(pooledHexes, hexPrefab, 20);
             pooledChunks = InitializePool(pooledChunks, chunkPrefab, 6);
 
         }

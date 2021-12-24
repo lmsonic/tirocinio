@@ -10,13 +10,17 @@ namespace Tirocinio
         public Dictionary<ExitDirection, Exit> exits = new Dictionary<ExitDirection, Exit>();
 
 
-        static public float hexRadius = 8.5f;
+        static public float hexRadius = 8.75f;
 
         public HexPosition hexPosition;
 
 
         public void SetHexPosition(HexPosition pos) => hexPosition = pos;
-        
+
+        public Renderer rend;
+
+
+        public void SetColor(Color color) => rend.material.color = color;
 
         public void AddExit(ExitDirection direction, Hex otherHex, bool isOpen)
         {
@@ -28,11 +32,12 @@ namespace Tirocinio
 
             Exit exit = exitGO.GetComponent<Exit>();
             exit.Initialize(this, otherHex);
+            exit.SetColor(rend.material.color);
 
             if (isOpen) exit.Open(); else exit.Close();
 
             exits[direction] = exit;
-            ExitDirection oppositeDirection = (ExitDirection)(((int)direction + 3) % 6);
+            ExitDirection oppositeDirection = HelperEnums.GetOppositeDirection(direction);
             otherHex.exits[oppositeDirection] = exit;
         }
 
@@ -42,7 +47,7 @@ namespace Tirocinio
             {
                 Exit exit = entry.Value;
                 Hex otherHex = exit.GetOtherHex(this);
-                ExitDirection oppositeDirection = (ExitDirection)(((int)entry.Key + 3) % 6);
+                ExitDirection oppositeDirection = HelperEnums.GetOppositeDirection(entry.Key);
                 otherHex.exits.Remove(oppositeDirection);
                 exit.gameObject.SetActive(false);
             }
@@ -54,211 +59,7 @@ namespace Tirocinio
             ClearExits();
         }
 
-        public HexPosition GetAdjacentHexPosition(ExitDirection direction)
-        {
-            switch (hexPosition)
-            {
-                case HexPosition.CENTER:
-                    return (HexPosition)((int)direction + 1);
-                case HexPosition.UP:
-                    switch (direction)
-                    {
-                        case ExitDirection.SOUTHWEST:
-                            return HexPosition.UP_LEFT;
-                        case ExitDirection.SOUTH:
-                            return HexPosition.CENTER;
-                        case ExitDirection.SOUTHEAST:
-                            return HexPosition.UP_RIGHT;
-                        default:
-                            return HexPosition.NONE;
-                    }
-                case HexPosition.UP_LEFT:
-                    switch (direction)
-                    {
-                        case ExitDirection.NORTHEAST:
-                            return HexPosition.UP;
-                        case ExitDirection.SOUTHEAST:
-                            return HexPosition.CENTER;
-                        case ExitDirection.SOUTH:
-                            return HexPosition.DOWN_LEFT;
-                        default:
-                            return HexPosition.NONE;
-                    }
-                case HexPosition.DOWN_LEFT:
-                    switch (direction)
-                    {
-                        case ExitDirection.NORTH:
-                            return HexPosition.UP_LEFT;
-                        case ExitDirection.NORTHEAST:
-                            return HexPosition.CENTER;
-                        case ExitDirection.SOUTHEAST:
-                            return HexPosition.DOWN;
-                        default:
-                            return HexPosition.NONE;
-                    }
-                case HexPosition.DOWN:
-                    switch (direction)
-                    {
-                        case ExitDirection.NORTHWEST:
-                            return HexPosition.DOWN_LEFT;
-                        case ExitDirection.NORTH:
-                            return HexPosition.CENTER;
-                        case ExitDirection.NORTHEAST:
-                            return HexPosition.DOWN_RIGHT;
-                        default:
-                            return HexPosition.NONE;
-                    }
-                case HexPosition.DOWN_RIGHT:
-                    switch (direction)
-                    {
-                        case ExitDirection.SOUTHWEST:
-                            return HexPosition.DOWN;
-                        case ExitDirection.NORTHWEST:
-                            return HexPosition.CENTER;
-                        case ExitDirection.NORTH:
-                            return HexPosition.UP_RIGHT;
-                        default:
-                            return HexPosition.NONE;
-                    }
-                case HexPosition.UP_RIGHT:
-                    switch (direction)
-                    {
-                        case ExitDirection.SOUTH:
-                            return HexPosition.DOWN_RIGHT;
-                        case ExitDirection.SOUTHWEST:
-                            return HexPosition.CENTER;
-                        case ExitDirection.NORTHWEST:
-                            return HexPosition.UP;
-                        default:
-                            return HexPosition.NONE;
-                    }
-                default:
-                    return HexPosition.NONE;
 
-            }
-        }
-
-        public HexPosition GetAdjacentHexPositionWithOtherChunks(ExitDirection direction)
-        {
-            switch (hexPosition)
-            {
-                case HexPosition.CENTER:
-                    return (HexPosition)((int)direction + 1);
-                case HexPosition.UP:
-                    switch (direction)
-                    {
-                        case ExitDirection.SOUTHWEST:
-                            return HexPosition.UP_LEFT;
-                        case ExitDirection.SOUTH:
-                            return HexPosition.CENTER;
-                        case ExitDirection.SOUTHEAST:
-                            return HexPosition.UP_RIGHT;
-                        case ExitDirection.NORTHWEST:
-                            return HexPosition.DOWN;
-                        case ExitDirection.NORTH:
-                            return HexPosition.DOWN_RIGHT;
-                        case ExitDirection.NORTHEAST:
-                            return HexPosition.DOWN_LEFT;
-                        default:
-                            return HexPosition.NONE;
-                    }
-                case HexPosition.UP_LEFT:
-                    switch (direction)
-                    {
-                        case ExitDirection.NORTHEAST:
-                            return HexPosition.UP;
-                        case ExitDirection.SOUTHEAST:
-                            return HexPosition.CENTER;
-                        case ExitDirection.SOUTH:
-                            return HexPosition.DOWN_LEFT;
-                        case ExitDirection.SOUTHWEST:
-                            return HexPosition.DOWN_RIGHT;
-                        case ExitDirection.NORTHWEST:
-                            return HexPosition.UP_RIGHT;
-                        case ExitDirection.NORTH:
-                            return HexPosition.DOWN;
-                        default:
-                            return HexPosition.NONE;
-                    }
-                case HexPosition.DOWN_LEFT:
-                    switch (direction)
-                    {
-                        case ExitDirection.NORTH:
-                            return HexPosition.UP_LEFT;
-                        case ExitDirection.NORTHEAST:
-                            return HexPosition.CENTER;
-                        case ExitDirection.SOUTHEAST:
-                            return HexPosition.DOWN;
-                        case ExitDirection.SOUTH:
-                            return HexPosition.UP_RIGHT;
-                        case ExitDirection.SOUTHWEST:
-                            return HexPosition.UP;
-                        case ExitDirection.NORTHWEST:
-                            return HexPosition.DOWN_RIGHT;
-                        default:
-                            return HexPosition.NONE;
-                    }
-                case HexPosition.DOWN:
-                    switch (direction)
-                    {
-                        case ExitDirection.NORTHWEST:
-                            return HexPosition.DOWN_LEFT;
-                        case ExitDirection.NORTH:
-                            return HexPosition.CENTER;
-                        case ExitDirection.NORTHEAST:
-                            return HexPosition.DOWN_RIGHT;
-                        case ExitDirection.SOUTHEAST:
-                            return HexPosition.UP;
-                        case ExitDirection.SOUTH:
-                            return HexPosition.UP_LEFT;
-                        case ExitDirection.SOUTHWEST:
-                            return HexPosition.UP_RIGHT;
-                        default:
-                            return HexPosition.NONE;
-                    }
-                case HexPosition.DOWN_RIGHT:
-                    switch (direction)
-                    {
-                        case ExitDirection.SOUTHWEST:
-                            return HexPosition.DOWN;
-                        case ExitDirection.NORTHWEST:
-                            return HexPosition.CENTER;
-                        case ExitDirection.NORTH:
-                            return HexPosition.UP_RIGHT;
-                        case ExitDirection.SOUTH:
-                            return HexPosition.UP;
-                        case ExitDirection.SOUTHEAST:
-                            return HexPosition.DOWN_LEFT;
-                        case ExitDirection.NORTHEAST:
-                            return HexPosition.UP_LEFT;
-                        default:
-                            return HexPosition.NONE;
-                    }
-                case HexPosition.UP_RIGHT:
-                    switch (direction)
-                    {
-                        case ExitDirection.SOUTH:
-                            return HexPosition.DOWN_RIGHT;
-                        case ExitDirection.SOUTHWEST:
-                            return HexPosition.CENTER;
-                        case ExitDirection.NORTHWEST:
-                            return HexPosition.UP;
-                        case ExitDirection.SOUTHEAST:
-                            return HexPosition.UP_LEFT;
-                        case ExitDirection.NORTHEAST:
-                            return HexPosition.DOWN;
-                        case ExitDirection.NORTH:
-                            return HexPosition.DOWN_LEFT;
-                        default:
-                            return HexPosition.NONE;
-                    }
-                default:
-                    return HexPosition.NONE;
-
-            }
-
-
-        }
 
 
     }

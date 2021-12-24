@@ -21,14 +21,17 @@ namespace Tirocinio
 
         public void SetChunkPosition(ChunkPosition pos) => chunkPosition = pos;
 
-
-
+        Color randomColor;
+        private void Awake() {
+            randomColor = Random.ColorHSV();
+        }
         public void Start()
         {
             Locator.Instance.ObjectPooler.AddCentralHex(centerHex.gameObject);
         }
 
         public void GenerateChunk(){
+            centerHex.SetColor(randomColor);
             GenerateHexes(centerHex);
             GenerateExits();
         }
@@ -38,6 +41,7 @@ namespace Tirocinio
         {
             hexes[0] = newCenterHex;
             this.centerHex = newCenterHex;
+
             Transform centerHexTransform = newCenterHex.gameObject.transform;
             for (int i = 0; i < hexes.Length - 1; i++)
             {
@@ -53,6 +57,7 @@ namespace Tirocinio
 
                 Hex hex = hexGO.GetComponent<Hex>();
                 hex.SetHexPosition((HexPosition)(i + 1));
+                hex.SetColor(randomColor);
                 hexes[i + 1] = hex;
             }
         }
@@ -67,7 +72,7 @@ namespace Tirocinio
                     ExitDirection direction = (ExitDirection)j;
                     if (hex.exits.ContainsKey(direction)) continue;
 
-                    HexPosition hexPosition = hex.GetAdjacentHexPosition(direction);
+                    HexPosition hexPosition = HelperEnums.GetAdjacentHexPosition(hex.hexPosition, direction);
                     if (hexPosition == HexPosition.NONE) continue;
 
                     bool isOpen = Random.value < exitProbability;
@@ -79,90 +84,22 @@ namespace Tirocinio
             }
         }
 
-
-        public ChunkPosition GetAdjacentChunkPosition(ExitDirection direction)
-        {
-            switch (chunkPosition)
-            {
-                case ChunkPosition.CENTER:
-                    return (ChunkPosition)((int)direction + 1);
-                case ChunkPosition.UP:
-                    switch (direction)
-                    {
-                        case ExitDirection.SOUTHWEST:
-                            return ChunkPosition.UP_LEFT;
-                        case ExitDirection.SOUTH:
-                            return ChunkPosition.CENTER;
-                        case ExitDirection.SOUTHEAST:
-                            return ChunkPosition.UP_RIGHT;
-                        default:
-                            return ChunkPosition.NONE;
-                    }
-                case ChunkPosition.UP_LEFT:
-                    switch (direction)
-                    {
-                        case ExitDirection.NORTHEAST:
-                            return ChunkPosition.UP;
-                        case ExitDirection.SOUTHEAST:
-                            return ChunkPosition.CENTER;
-                        case ExitDirection.SOUTH:
-                            return ChunkPosition.DOWN_LEFT;
-                        default:
-                            return ChunkPosition.NONE;
-                    }
-                case ChunkPosition.DOWN_LEFT:
-                    switch (direction)
-                    {
-                        case ExitDirection.NORTH:
-                            return ChunkPosition.UP_LEFT;
-                        case ExitDirection.NORTHEAST:
-                            return ChunkPosition.CENTER;
-                        case ExitDirection.SOUTHEAST:
-                            return ChunkPosition.DOWN;
-                        default:
-                            return ChunkPosition.NONE;
-                    }
-                case ChunkPosition.DOWN:
-                    switch (direction)
-                    {
-                        case ExitDirection.NORTHWEST:
-                            return ChunkPosition.DOWN_LEFT;
-                        case ExitDirection.NORTH:
-                            return ChunkPosition.CENTER;
-                        case ExitDirection.NORTHEAST:
-                            return ChunkPosition.DOWN_RIGHT;
-                        default:
-                            return ChunkPosition.NONE;
-                    }
-                case ChunkPosition.DOWN_RIGHT:
-                    switch (direction)
-                    {
-                        case ExitDirection.SOUTHWEST:
-                            return ChunkPosition.DOWN;
-                        case ExitDirection.NORTHWEST:
-                            return ChunkPosition.CENTER;
-                        case ExitDirection.NORTH:
-                            return ChunkPosition.UP_RIGHT;
-                        default:
-                            return ChunkPosition.NONE;
-                    }
-                case ChunkPosition.UP_RIGHT:
-                    switch (direction)
-                    {
-                        case ExitDirection.SOUTH:
-                            return ChunkPosition.DOWN_RIGHT;
-                        case ExitDirection.SOUTHWEST:
-                            return ChunkPosition.CENTER;
-                        case ExitDirection.NORTHWEST:
-                            return ChunkPosition.UP;
-                        default:
-                            return ChunkPosition.NONE;
-                    }
-                default:
-                    return ChunkPosition.NONE;
-
-            }
+        private void OnDisable() {
+            ClearNeighbours();
         }
+
+        public void ClearNeighbours(){
+            foreach (KeyValuePair<ExitDirection, Chunk> entry in neighbours)
+            {
+                ExitDirection direction = entry.Key;
+                Chunk chunk = entry.Value;
+                ExitDirection oppositeDirection = HelperEnums.GetOppositeDirection(direction);
+                chunk.neighbours.Remove(oppositeDirection);
+            }
+            neighbours.Clear();
+        }
+
+
     }
 
 }

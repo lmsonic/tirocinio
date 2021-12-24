@@ -12,14 +12,21 @@ namespace Tirocinio
 
         public Collider coll;
 
+        bool isOpen = false;
+
+        public void SetColor(Color color) => rend.material.color = color;
+
+
         public void Open()
         {
+            isOpen=true;
             rend.enabled = false;
             coll.isTrigger = true;
         }
 
         public void Close()
         {
+            isOpen=false;
             rend.enabled = true;
             coll.isTrigger = false;
         }
@@ -39,6 +46,12 @@ namespace Tirocinio
 
             return hex1 == hex ? hex2 : hex1;
 
+        }
+
+        private void OnDrawGizmos() {
+            if (isOpen){
+                Debug.DrawLine(hex1.transform.position,hex2.transform.position,Color.magenta);
+            }
         }
 
 

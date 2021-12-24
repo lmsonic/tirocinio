@@ -21,16 +21,16 @@ namespace Tirocinio
         void GenerateChunks(Chunk center)
         {
             chunks[0] = center;
-            this.centerChunk = center;
-            center.GenerateChunk();
+            centerChunk = center;
+            centerChunk.GenerateChunk();
             Transform centerChunkTransform = center.gameObject.transform;
             for (int i = 0; i < chunks.Length - 1; i++)
             {
 
                 if (chunks[i + 1] != null) continue;
 
-                Quaternion rotation = Quaternion.AngleAxis(-i * 60f + 20f, Vector3.up);
-                Vector3 offset = Vector3.forward * Hex.hexRadius * 5.2f;
+                Quaternion rotation = Quaternion.AngleAxis(-i * 60f + 19f, Vector3.up);
+                Vector3 offset = Vector3.forward * Hex.hexRadius * 5.3f;
                 offset = rotation * offset;
 
                 GameObject chunkGO = Locator.Instance.ObjectPooler.
@@ -40,19 +40,30 @@ namespace Tirocinio
                 Chunk chunk = chunkGO.GetComponent<Chunk>();
                 chunk.SetChunkPosition((ChunkPosition)(i + 1));
                 chunk.GenerateChunk();
-                for (int j = 0; j < 6; j++)
-                {
-                    ExitDirection direction = (ExitDirection)i;
-                    ChunkPosition adjacentPosition = chunk.GetAdjacentChunkPosition(direction);
-                    if (adjacentPosition == ChunkPosition.NONE) continue;
-
-                    Chunk neighbourChunk = chunks[(int)adjacentPosition];
-
-                    chunk.neighbours[direction] = neighbourChunk;
-                    neighbourChunk.neighbours[(ExitDirection)((int)direction + 3 % 6)] = chunk;
-                }
-
                 chunks[i + 1] = chunk;
+            }
+            for (int i = 0; i < chunks.Length; i++)
+            {
+                GenerateNeighbours(chunks[i]);
+            }
+            
+
+        }
+
+        void GenerateNeighbours(Chunk chunk)
+        {
+            for (int i = 0; i < 6; i++)
+            {
+                ExitDirection direction = (ExitDirection)i;
+                ChunkPosition adjacentPosition = HelperEnums.GetAdjacentChunkPosition(chunk.chunkPosition,direction);
+                if (adjacentPosition == ChunkPosition.NONE) continue;
+
+                Chunk neighbourChunk = chunks[(int)adjacentPosition];
+
+                chunk.neighbours[direction] = neighbourChunk;
+                ExitDirection oppositeDirection = HelperEnums.GetOppositeDirection(direction);
+                Debug.Log(direction + "<->" + oppositeDirection);
+                neighbourChunk.neighbours[oppositeDirection] = chunk;
             }
 
         }
@@ -73,10 +84,9 @@ namespace Tirocinio
                 //saving and setting up adjacent hexes
                 ExitDirection direction = entry.Key;
                 Chunk neighbour = entry.Value;
+                
 
                 ChunkPosition chunkPositionFromCenter = (ChunkPosition)(int)(direction + 1);
-
-
                 neighbour.SetChunkPosition(chunkPositionFromCenter);
                 newChunks[(int)chunkPositionFromCenter] = neighbour;
 
@@ -96,6 +106,7 @@ namespace Tirocinio
 
                 if (chunksToKeep.Contains(chunk)) continue;
 
+                chunk.ClearNeighbours();
                 chunk.gameObject.SetActive(false);
 
             }

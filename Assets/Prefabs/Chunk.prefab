@@ -699,7 +699,7 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   centerHex: {fileID: 7089320375585003098}
-  exitProbability: 0.7
+  exitProbability: 0.5
   chunkPosition: 0
 --- !u!1001 &6140296541689824686
 PrefabInstance:
