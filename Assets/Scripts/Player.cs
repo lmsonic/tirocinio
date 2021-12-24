@@ -7,11 +7,20 @@ public class Player : MonoBehaviour
     // Start is called before the first frame update
     CharacterController controller;
     Vector2 inputMovement = Vector2.zero;
+    Vector3 GetInputMovement() => new Vector3(inputMovement.x, 0f, inputMovement.y);
+    public void Move(InputAction.CallbackContext ctx) => inputMovement = ctx.ReadValue<Vector2>();
+
     Vector2 inputLook = Vector2.zero;
+    public void Look(InputAction.CallbackContext ctx) => inputLook = ctx.ReadValue<Vector2>();
 
     bool isJumping = false;
+    public void Jump(InputAction.CallbackContext ctx) => isJumping = ctx.performed;
     bool isAccelerating = false;
+    public void Accelerate(InputAction.CallbackContext ctx) => isAccelerating = ctx.performed;
     bool isBraking = false;
+    public void Brake(InputAction.CallbackContext ctx) => isBraking = ctx.performed;
+
+
 
     float verticalVelocity = 0f;
     Vector3 groundVelocity = Vector3.zero;
@@ -46,12 +55,7 @@ public class Player : MonoBehaviour
 
         VerticalMovement();
         HorizontalMovement();
-
         Rotation();
-
-
-
-
     }
 
     void Rotation()
@@ -68,12 +72,13 @@ public class Player : MonoBehaviour
 
     }
 
-    float GetSteerAngle(){
+    float GetSteerAngle()
+    {
 
         Vector3 movement = GetInputMovement();
         float targetSteerAngle = -movement.x * maxSteerAngle;
         float steerAngle = Mathf.LerpAngle(transform.eulerAngles.z, targetSteerAngle, steerRotationSpeed);
-        
+
         return steerAngle;
     }
 
@@ -101,12 +106,6 @@ public class Player : MonoBehaviour
 
     }
 
-    Vector3 GetInputMovement()
-    {
-
-        return new Vector3(inputMovement.x, 0f, inputMovement.y);
-    }
-
     void VerticalMovement()
     {
         bool isGrounded = Physics.CheckSphere(groundCheck.position, 0.5f, groundLayer, QueryTriggerInteraction.Ignore);
@@ -128,29 +127,6 @@ public class Player : MonoBehaviour
 
 
 
-    public void Move(InputAction.CallbackContext ctx)
-    {
 
-        inputMovement = ctx.ReadValue<Vector2>();
 
-    }
-    public void Look(InputAction.CallbackContext ctx)
-    {
-        inputLook = ctx.ReadValue<Vector2>();
-    }
-
-    public void Jump(InputAction.CallbackContext ctx)
-    {
-        isJumping = ctx.performed;
-    }
-
-    public void Accelerate(InputAction.CallbackContext ctx)
-    {
-        isAccelerating = ctx.performed;
-    }
-
-    public void Brake(InputAction.CallbackContext ctx)
-    {
-        isBraking = ctx.performed;
-    }
 }

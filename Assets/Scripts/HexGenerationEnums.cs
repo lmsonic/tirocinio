@@ -1,6 +1,10 @@
 namespace Tirocinio
 {
 
+    public enum ChunkPosition
+    {
+        CENTER, UP, UP_LEFT, DOWN_LEFT, DOWN, DOWN_RIGHT, UP_RIGHT, NONE
+    }
     public enum HexPosition
     {
         CENTER, UP, UP_LEFT, DOWN_LEFT, DOWN, DOWN_RIGHT, UP_RIGHT, NONE

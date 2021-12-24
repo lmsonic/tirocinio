@@ -14,29 +14,35 @@ namespace Tirocinio
         public float exitProbability = 0.5f;
 
 
+        public Dictionary<ExitDirection, Chunk> neighbours = new Dictionary<ExitDirection, Chunk>();
 
-        public void PlayerNotOnCenterHex(Hex newCenter){
-            MoveChunkCenter(newCenter);
-        }
+
+        public ChunkPosition chunkPosition = ChunkPosition.CENTER;
+
+        public void SetChunkPosition(ChunkPosition pos) => chunkPosition = pos;
+
 
 
         public void Start()
         {
-            Hex.hexRadius *= transform.localScale.x;
             Locator.Instance.ObjectPooler.AddCentralHex(centerHex.gameObject);
+        }
+
+        public void GenerateChunk(){
             GenerateHexes(centerHex);
             GenerateExits();
         }
+
 
         void GenerateHexes(Hex newCenterHex)
         {
             hexes[0] = newCenterHex;
             this.centerHex = newCenterHex;
             Transform centerHexTransform = newCenterHex.gameObject.transform;
-            for (int i = 0; i < hexes.Length-1; i++)
+            for (int i = 0; i < hexes.Length - 1; i++)
             {
 
-                if (hexes[i+1] != null) continue;
+                if (hexes[i + 1] != null) continue;
 
                 Quaternion rotation = Quaternion.AngleAxis(-i * 60f, Vector3.up);
                 Vector3 offset = Vector3.forward * Hex.hexRadius * 2f;
@@ -44,7 +50,6 @@ namespace Tirocinio
 
                 GameObject hexGO = Locator.Instance.ObjectPooler.
                     GetPooledHex(newCenterHex.transform.position + offset, Quaternion.identity, centerHexTransform.parent);
-
 
                 Hex hex = hexGO.GetComponent<Hex>();
                 hex.SetHexPosition((HexPosition)(i + 1));
@@ -74,56 +79,90 @@ namespace Tirocinio
             }
         }
 
-        public void MoveChunkCenter(Hex newCenter)
+
+        public ChunkPosition GetAdjacentChunkPosition(ExitDirection direction)
         {
-            Hex[] newHexes = new Hex[7];
-            for (int i = 0; i < newHexes.Length; i++)//initialize to null
+            switch (chunkPosition)
             {
-                newHexes[i] = null;
+                case ChunkPosition.CENTER:
+                    return (ChunkPosition)((int)direction + 1);
+                case ChunkPosition.UP:
+                    switch (direction)
+                    {
+                        case ExitDirection.SOUTHWEST:
+                            return ChunkPosition.UP_LEFT;
+                        case ExitDirection.SOUTH:
+                            return ChunkPosition.CENTER;
+                        case ExitDirection.SOUTHEAST:
+                            return ChunkPosition.UP_RIGHT;
+                        default:
+                            return ChunkPosition.NONE;
+                    }
+                case ChunkPosition.UP_LEFT:
+                    switch (direction)
+                    {
+                        case ExitDirection.NORTHEAST:
+                            return ChunkPosition.UP;
+                        case ExitDirection.SOUTHEAST:
+                            return ChunkPosition.CENTER;
+                        case ExitDirection.SOUTH:
+                            return ChunkPosition.DOWN_LEFT;
+                        default:
+                            return ChunkPosition.NONE;
+                    }
+                case ChunkPosition.DOWN_LEFT:
+                    switch (direction)
+                    {
+                        case ExitDirection.NORTH:
+                            return ChunkPosition.UP_LEFT;
+                        case ExitDirection.NORTHEAST:
+                            return ChunkPosition.CENTER;
+                        case ExitDirection.SOUTHEAST:
+                            return ChunkPosition.DOWN;
+                        default:
+                            return ChunkPosition.NONE;
+                    }
+                case ChunkPosition.DOWN:
+                    switch (direction)
+                    {
+                        case ExitDirection.NORTHWEST:
+                            return ChunkPosition.DOWN_LEFT;
+                        case ExitDirection.NORTH:
+                            return ChunkPosition.CENTER;
+                        case ExitDirection.NORTHEAST:
+                            return ChunkPosition.DOWN_RIGHT;
+                        default:
+                            return ChunkPosition.NONE;
+                    }
+                case ChunkPosition.DOWN_RIGHT:
+                    switch (direction)
+                    {
+                        case ExitDirection.SOUTHWEST:
+                            return ChunkPosition.DOWN;
+                        case ExitDirection.NORTHWEST:
+                            return ChunkPosition.CENTER;
+                        case ExitDirection.NORTH:
+                            return ChunkPosition.UP_RIGHT;
+                        default:
+                            return ChunkPosition.NONE;
+                    }
+                case ChunkPosition.UP_RIGHT:
+                    switch (direction)
+                    {
+                        case ExitDirection.SOUTH:
+                            return ChunkPosition.DOWN_RIGHT;
+                        case ExitDirection.SOUTHWEST:
+                            return ChunkPosition.CENTER;
+                        case ExitDirection.NORTHWEST:
+                            return ChunkPosition.UP;
+                        default:
+                            return ChunkPosition.NONE;
+                    }
+                default:
+                    return ChunkPosition.NONE;
+
             }
-
-            List<Hex> hexesToKeep = new List<Hex>();
-
-            foreach (KeyValuePair<ExitDirection, Exit> entry in newCenter.exits)
-            {
-                //saving and setting up adjacent hexes
-                ExitDirection direction = entry.Key;
-                Exit exit = entry.Value;
-
-                HexPosition hexPositionFromCenter = (HexPosition)(int)(direction + 1);
-
-                Hex adjacentHex = exit.GetOtherHex(newCenter);
-
-                adjacentHex.SetHexPosition(hexPositionFromCenter);
-                newHexes[(int)hexPositionFromCenter] = adjacentHex;
-
-                hexesToKeep.Add(adjacentHex);
-
-            }
-            //saving and setting up adjacent hexes
-            newCenter.SetHexPosition(HexPosition.CENTER);
-
-            hexesToKeep.Add(newCenter);
-
-
-            for (int i = 0; i < hexes.Length; i++) // deleting exits
-            {
-                HexPosition hexPosition = (HexPosition)i;
-                Hex hex = hexes[i];
-
-                if (hexesToKeep.Contains(hex)) continue;
-
-                hex.gameObject.SetActive(false);
-
-            }
-
-            hexes = newHexes;
-
-
-            GenerateHexes(newCenter);
-            GenerateExits();
         }
-
     }
 
 }

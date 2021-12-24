@@ -10,9 +10,11 @@ namespace Tirocinio
 
         public GameObject exitPrefab;
         public GameObject hexPrefab;
+        public GameObject chunkPrefab;
 
         List<GameObject> pooledExits;
         List<GameObject> pooledHexes;
+        List<GameObject> pooledChunks;
 
         // Start is called before the first frame update
         void Awake()
@@ -20,14 +22,26 @@ namespace Tirocinio
 
             pooledExits = InitializePool(pooledExits, exitPrefab, 12);
             pooledHexes = InitializePool(pooledHexes, hexPrefab, 6);
+            pooledChunks = InitializePool(pooledChunks, chunkPrefab, 6);
 
         }
 
-        public void AddCentralHex(GameObject centralHex)
+        public void AddCentralHex(GameObject centralHex) => pooledHexes.Add(centralHex);
+        
+
+        public void AddCentralChunk(GameObject centralChunk) => pooledChunks.Add(centralChunk);
+        
+
+        public GameObject GetPooledChunk(Vector3 position, Quaternion rotation, Transform parent)
         {
-            pooledHexes.Add(centralHex);
+            GameObject pooledChunk = SearchObject(pooledChunks, chunkPrefab);
+            pooledChunk.SetActive(true);
+            pooledChunk.transform.position = position;
+            pooledChunk.transform.rotation = rotation;
+            pooledChunk.transform.parent = parent;
+            pooledChunk.transform.localScale = Vector3.one;
+            return pooledChunk;
         }
-
 
         public GameObject GetPooledExit(Vector3 position, Quaternion rotation, Transform parent)
         {

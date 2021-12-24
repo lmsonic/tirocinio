@@ -10,7 +10,7 @@ namespace Tirocinio
         static public Locator Instance = null;
 
         public ObjectPooler ObjectPooler;
-        public Chunk Chunk;
+        public HexGeneration HexGeneration;
         private void Awake()
         {
             if (Instance)
