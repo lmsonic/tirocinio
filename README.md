@@ -12,6 +12,7 @@
 - Jet Set Radio HD [PC] Gameplay
 - Freejack (2015) My Races (Brazil Server)
 - Arcade Longplay [242] Crazy Taxi
+- Sonic Riders
 
 ### Gameplay
 
@@ -20,8 +21,9 @@ Focus of the internship will be on the procedural generation aspect
 
 #### Gameplay verbs
 -	Throw seed bombs
--	Collect batteries to recharge scooter 
+-	Collect batteries to recharge scooter
 -	Grinding on rails
+-	Tricks on ramps to get fuel
 -	Braking
 -	Jumping to get over obstacles
 - Turbo mode for scooter, consumes more energy
