@@ -18,16 +18,17 @@
 
 Focus of the internship will be on the procedural generation aspect
 -	Procedurally generated world, in hex tiles. The generation algorithm keeps the connections between tiles consistent
+-	Saving old generated chunks so you can see the ones you sprayed in the end?
 
 #### Gameplay verbs
 -	Throw seed bombs
 -	Collect batteries to recharge scooter
 -	Grinding on rails
--	Tricks on ramps to get fuel
+-	Tricks makes you get fuel
 -	Braking
--	Jumping to get over obstacles
-- Turbo mode for scooter, consumes more energy
--	Skidding like in kart games 
+-	Jumping
+- Boost for scooter, consumes more energy
+-	Skidding like in kart games (Sonic Riders)
 -	Going to next objective to seed bomb, with an indicator like in Crazy Taxi
 -	Recharges battery once in next objective, to make the gameplay more fast paced
 -	Upgrades/Customization of escooter and character
