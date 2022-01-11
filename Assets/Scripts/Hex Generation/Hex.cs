@@ -7,6 +7,7 @@ namespace Tirocinio
 {
     public class Hex : MonoBehaviour
     {
+
         public Dictionary<ExitDirection, Exit> exits = new Dictionary<ExitDirection, Exit>();
 
 
@@ -24,6 +25,8 @@ namespace Tirocinio
 
         public void AddExit(ExitDirection direction, Hex otherHex, bool isOpen)
         {
+            //Sets the exit in the correct rotation, offset from hex, and sets it both in the hex that
+            //spawns it and in the hex that is connecting to it, in their exit dictionaries
             Quaternion rotation = Quaternion.AngleAxis(-(int)direction * 60f, Vector3.up);
             Vector3 offset = rotation * Vector3.forward * hexRadius;
 
@@ -43,6 +46,7 @@ namespace Tirocinio
 
         public void ClearExits()
         {
+            //Despawning every exit for an hex in the correct way
             foreach (KeyValuePair<ExitDirection, Exit> entry in exits)
             {
                 Exit exit = entry.Value;

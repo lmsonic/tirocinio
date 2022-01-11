@@ -18,14 +18,14 @@ namespace Tirocinio
 
 
         public void Open()
-        {
+        {//when open, the exit is invisible and the collider becomes a trigger
             isOpen=true;
             rend.enabled = false;
             coll.isTrigger = true;
         }
 
         public void Close()
-        {
+        {//when closed, the exit wall is visible and the collider blocks the player
             isOpen=false;
             rend.enabled = true;
             coll.isTrigger = false;
@@ -50,6 +50,7 @@ namespace Tirocinio
 
         private void OnDrawGizmos() {
             if (isOpen){
+                //Debug lines for open exit connections
                 Debug.DrawLine(hex1.transform.position,hex2.transform.position,Color.magenta);
             }
         }

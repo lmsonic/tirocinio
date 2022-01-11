@@ -6,7 +6,7 @@ namespace Tirocinio
 
     public class ObjectPooler : MonoBehaviour
     {
-
+        //This class is used for pooling all the objects in the hex generation (exits, hexes, and chunks)
 
         public GameObject exitPrefab;
         public GameObject hexPrefab;
@@ -16,7 +16,7 @@ namespace Tirocinio
         List<GameObject> pooledHexes;
         List<GameObject> pooledChunks;
 
-        // Start is called before the first frame update
+        
         void Awake()
         {
 
@@ -26,9 +26,10 @@ namespace Tirocinio
 
         }
 
+        //used to recycle the hex that starts the first generation
         public void AddCentralHex(GameObject centralHex) => pooledHexes.Add(centralHex);
         
-
+        //same as AddCentralHex, for chunks
         public void AddCentralChunk(GameObject centralChunk) => pooledChunks.Add(centralChunk);
         
 
@@ -84,6 +85,7 @@ namespace Tirocinio
 
         GameObject SearchObject(List<GameObject> pool, GameObject prefab)
         {
+            //searches for an inactive object, if it doesn't find it, it instantiates it
             GameObject foundObj = pool.Find(obj => !obj.activeInHierarchy);
             if (foundObj) return foundObj;
 

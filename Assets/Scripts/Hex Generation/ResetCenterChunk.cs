@@ -6,7 +6,7 @@ namespace Tirocinio
 {
     public class ResetCenterChunk : MonoBehaviour
     {
-        // Start is called before the first frame update
+        //Class is used to generate new chunks when player collides with collider attached to this class
         public Chunk chunk;
 
         public event Action<Chunk> PlayerNotOnCenterChunk;

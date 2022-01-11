@@ -1,3 +1,4 @@
+using UnityEngine;
 namespace Tirocinio
 {
 
@@ -17,7 +18,7 @@ namespace Tirocinio
 
     }
 
-    class HelperEnums
+    class HelperEnums : MonoBehaviour
     {
         static public ExitDirection GetOppositeDirection(ExitDirection dir) => (ExitDirection)(((int)dir + 3) % 6);
 
@@ -107,31 +108,82 @@ namespace Tirocinio
 
         static public HexPosition GetAdjacentHexPosition(HexPosition hexPosition, ExitDirection direction)
         {
+            //Trying to understand the modular mathematics for this problem
+            /*
+            Debug.Log("hexPosition: " + hexPosition + ", direction: " + direction);
+
+
+            if (hexPosition == HexPosition.CENTER)
+            {
+                Debug.Log("Adjacent From Center Position: " + (HexPosition)(direction + 1));
+                return (HexPosition)(direction + 1);
+            }
+
+
+
+            ExitDirection directionFromCenter = (ExitDirection)( hexPosition - 1) ;
+            ExitDirection directionToCenter = GetOppositeDirection(directionFromCenter);
+            ExitDirection directionAfterCenter = (ExitDirection)(((int)directionToCenter + 1) % 6);
+            ExitDirection directionBeforeCenter = (ExitDirection)(((int)directionToCenter - 1) % 6);
+            Debug.Log("fromCenter: " + directionFromCenter + " ,toCenter: " + directionToCenter +
+                      " ,afterCenter: " + directionAfterCenter + " ,beforeCenter: " + directionBeforeCenter);
+
+            if (direction == directionToCenter)
+            {
+                Debug.Log("Adjacent Center Position: " + HexPosition.CENTER);
+                return HexPosition.CENTER;
+            }
+            else if (direction == directionAfterCenter)
+            {
+                HexPosition nextPosition =  (HexPosition)(((int)hexPosition +1) % 7);
+                if (nextPosition == HexPosition.CENTER)
+                    nextPosition = HexPosition.UP;
+                Debug.Log("Adjacent After Position: " + nextPosition);
+                return nextPosition;
+            }
+            else if (direction == directionBeforeCenter)
+            {
+                HexPosition beforePosition =  (HexPosition)(((int)hexPosition -1) % 7);
+                if (beforePosition == HexPosition.CENTER)
+                    beforePosition = HexPosition.UP_RIGHT;
+                Debug.Log("Adjacent After Position: " + beforePosition);
+                return beforePosition;
+            }
+            else
+            {
+                Debug.Log("Adjacent Position: NOT FOUND");
+                return HexPosition.NONE;
+            }
+            */
+
+            //Brute forcing it
             switch (hexPosition)
             {
-                case HexPosition.CENTER:
+                case HexPosition.CENTER: // (0, d) -> d+1
                     return (HexPosition)((int)direction + 1);
                 case HexPosition.UP:
+
+
                     switch (direction)
                     {
                         case ExitDirection.SOUTHWEST:
-                            return HexPosition.UP_LEFT;
+                            return HexPosition.UP_LEFT; // (1, 2) -> 2
                         case ExitDirection.SOUTH:
-                            return HexPosition.CENTER;
+                            return HexPosition.CENTER; // (1, 3) -> 0
                         case ExitDirection.SOUTHEAST:
-                            return HexPosition.UP_RIGHT;
+                            return HexPosition.UP_RIGHT; // (1, 4) -> 6
                         default:
                             return HexPosition.NONE;
                     }
                 case HexPosition.UP_LEFT:
                     switch (direction)
                     {
-                        case ExitDirection.NORTHEAST:
-                            return HexPosition.UP;
-                        case ExitDirection.SOUTHEAST:
-                            return HexPosition.CENTER;
                         case ExitDirection.SOUTH:
-                            return HexPosition.DOWN_LEFT;
+                            return HexPosition.DOWN_LEFT; // (2, 3) -> 3
+                        case ExitDirection.NORTHEAST:
+                            return HexPosition.UP; // (2, 5) -> 1
+                        case ExitDirection.SOUTHEAST:
+                            return HexPosition.CENTER; // (2, 4) -> 0
                         default:
                             return HexPosition.NONE;
                     }
@@ -139,47 +191,47 @@ namespace Tirocinio
                     switch (direction)
                     {
                         case ExitDirection.NORTH:
-                            return HexPosition.UP_LEFT;
-                        case ExitDirection.NORTHEAST:
-                            return HexPosition.CENTER;
+                            return HexPosition.UP_LEFT;// (3, 0) -> 2
                         case ExitDirection.SOUTHEAST:
-                            return HexPosition.DOWN;
+                            return HexPosition.DOWN;// (3, 4) -> 4
+                        case ExitDirection.NORTHEAST:
+                            return HexPosition.CENTER;// (3, 5) -> 0
                         default:
                             return HexPosition.NONE;
                     }
                 case HexPosition.DOWN:
                     switch (direction)
                     {
-                        case ExitDirection.NORTHWEST:
-                            return HexPosition.DOWN_LEFT;
                         case ExitDirection.NORTH:
-                            return HexPosition.CENTER;
+                            return HexPosition.CENTER;// (4, 0) -> 0
+                        case ExitDirection.NORTHWEST:
+                            return HexPosition.DOWN_LEFT;// (4, 1) -> 3
                         case ExitDirection.NORTHEAST:
-                            return HexPosition.DOWN_RIGHT;
+                            return HexPosition.DOWN_RIGHT;// (4, 5) -> 5
                         default:
                             return HexPosition.NONE;
                     }
                 case HexPosition.DOWN_RIGHT:
                     switch (direction)
                     {
-                        case ExitDirection.SOUTHWEST:
-                            return HexPosition.DOWN;
-                        case ExitDirection.NORTHWEST:
-                            return HexPosition.CENTER;
                         case ExitDirection.NORTH:
-                            return HexPosition.UP_RIGHT;
+                            return HexPosition.UP_RIGHT;// (5, 0) -> 6
+                        case ExitDirection.NORTHWEST:
+                            return HexPosition.CENTER;// (5, 1) -> 0
+                        case ExitDirection.SOUTHWEST:
+                            return HexPosition.DOWN; // (5, 2) -> 4
                         default:
                             return HexPosition.NONE;
                     }
                 case HexPosition.UP_RIGHT:
                     switch (direction)
                     {
-                        case ExitDirection.SOUTH:
-                            return HexPosition.DOWN_RIGHT;
-                        case ExitDirection.SOUTHWEST:
-                            return HexPosition.CENTER;
                         case ExitDirection.NORTHWEST:
-                            return HexPosition.UP;
+                            return HexPosition.UP; // (6, 1) -> 1
+                        case ExitDirection.SOUTHWEST:
+                            return HexPosition.CENTER; // (6, 2) -> 0
+                        case ExitDirection.SOUTH:
+                            return HexPosition.DOWN_RIGHT; // (6, 3) -> 5
                         default:
                             return HexPosition.NONE;
                     }
@@ -191,15 +243,16 @@ namespace Tirocinio
 
         static public HexPosition GetAdjacentHexPositionWithOtherChunks(HexPosition hexPosition, ExitDirection direction)
         {
+            //Brute forcing it for connections with other chunks
             switch (hexPosition)
             {
-                case HexPosition.CENTER:
+                case HexPosition.CENTER: // (0, d) -> d+1
                     return (HexPosition)((int)direction + 1);
                 case HexPosition.UP:
                     switch (direction)
                     {
                         case ExitDirection.SOUTHWEST:
-                            return HexPosition.UP_LEFT;
+                            return HexPosition.UP_LEFT; // (1, d) -> d+1
                         case ExitDirection.SOUTH:
                             return HexPosition.CENTER;
                         case ExitDirection.SOUTHEAST:

@@ -13,22 +13,27 @@ namespace Tirocinio
 
         private void Start()
         {
+            //if HexGeneration is scaled, everything scales correctly
             Hex.hexRadius *= transform.localScale.x;
+
             Locator.Instance.ObjectPooler.AddCentralChunk(centerChunk.gameObject);
             GenerateChunks(centerChunk);
         }
 
         void GenerateChunks(Chunk center)
         {
+            //Setting up center chunk
             chunks[0] = center;
             centerChunk = center;
             centerChunk.GenerateChunk();
             Transform centerChunkTransform = center.gameObject.transform;
+
             for (int i = 0; i < chunks.Length - 1; i++)
             {
-
+                //if chunk has been generated, continue
                 if (chunks[i + 1] != null) continue;
 
+                //sets up chunk in correct position
                 Quaternion rotation = Quaternion.AngleAxis(-i * 60f + 19f, Vector3.up);
                 Vector3 offset = Vector3.forward * Hex.hexRadius * 5.3f;
                 offset = rotation * offset;
@@ -52,17 +57,18 @@ namespace Tirocinio
 
         void GenerateNeighbours(Chunk chunk)
         {
+            //Connects chunks neighbour dictionary correctly
             for (int i = 0; i < 6; i++)
             {
                 ExitDirection direction = (ExitDirection)i;
                 ChunkPosition adjacentPosition = HelperEnums.GetAdjacentChunkPosition(chunk.chunkPosition,direction);
+                //if adjacent position is out of the 7 chunk grid, continue
                 if (adjacentPosition == ChunkPosition.NONE) continue;
 
                 Chunk neighbourChunk = chunks[(int)adjacentPosition];
 
                 chunk.neighbours[direction] = neighbourChunk;
                 ExitDirection oppositeDirection = HelperEnums.GetOppositeDirection(direction);
-                Debug.Log(direction + "<->" + oppositeDirection);
                 neighbourChunk.neighbours[oppositeDirection] = chunk;
             }
 
@@ -70,6 +76,8 @@ namespace Tirocinio
 
         public void MoveGridCenter(Chunk newCenter)
         {
+            //Changes chunk grid center, keeeping chunks that are spawned and adjecent to the new center, and
+            //deleting old ones
 
             Chunk[] newChunks = new Chunk[7];
             for (int i = 0; i < newChunks.Length; i++)//initialize to null
@@ -99,8 +107,9 @@ namespace Tirocinio
             chunksToKeep.Add(newCenter);
 
 
-            for (int i = 0; i < chunks.Length; i++) // deleting exits
+            for (int i = 0; i < chunks.Length; i++) 
             {
+            // deleting exits of the chunks that will be deleted, and the corrisponding chunk
                 ChunkPosition hexPosition = (ChunkPosition)i;
                 Chunk chunk = chunks[i];
 

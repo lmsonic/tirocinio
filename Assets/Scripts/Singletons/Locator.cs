@@ -6,7 +6,7 @@ namespace Tirocinio
 
     public class Locator : MonoBehaviour
     {
-        // Start is called before the first frame update
+        //This class is used as a singleton to locate objects that function as singleton, as members of this class
         static public Locator Instance = null;
 
         public ObjectPooler ObjectPooler;
