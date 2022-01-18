@@ -30,8 +30,10 @@ namespace Tirocinio
             Locator.Instance.ObjectPooler.AddCentralHex(centerHex.gameObject);
         }
 
-        public void GenerateChunk(){
+        public void GenerateChunk()
+        {
             centerHex.SetColor(randomColor);
+
             GenerateHexes(centerHex);
             GenerateExits();
         }
@@ -51,7 +53,7 @@ namespace Tirocinio
 
                 //generates hex in correct position
                 Quaternion rotation = Quaternion.AngleAxis(-i * 60f, Vector3.up);
-                Vector3 offset = Vector3.forward * Hex.hexRadius * 2f;
+                Vector3 offset = Vector3.forward * Hex.hexRadius * Mathf.Sqrt(3f);
                 offset = rotation * offset;
 
                 GameObject hexGO = Locator.Instance.ObjectPooler.
@@ -90,11 +92,13 @@ namespace Tirocinio
             }
         }
 
-        private void OnDisable() {
+        private void OnDisable()
+        {
             ClearNeighbours();
         }
 
-        public void ClearNeighbours(){
+        public void ClearNeighbours()
+        {
             //Clears up neighbour dictionary correctly
             foreach (KeyValuePair<ExitDirection, Chunk> entry in neighbours)
             {

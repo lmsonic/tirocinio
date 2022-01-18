@@ -15,10 +15,13 @@ namespace Tirocinio
         {
             //if HexGeneration is scaled, everything scales correctly
             Hex.hexRadius *= transform.localScale.x;
+            Debug.Log("Hex Radius:" + Hex.hexRadius);
 
             Locator.Instance.ObjectPooler.AddCentralChunk(centerChunk.gameObject);
             GenerateChunks(centerChunk);
         }
+
+
 
         void GenerateChunks(Chunk center)
         {
@@ -34,8 +37,10 @@ namespace Tirocinio
                 if (chunks[i + 1] != null) continue;
 
                 //sets up chunk in correct position
-                Quaternion rotation = Quaternion.AngleAxis(-i * 60f + 19f, Vector3.up);
-                Vector3 offset = Vector3.forward * Hex.hexRadius * 5.3f;
+ 
+                Quaternion rotation = Quaternion.Euler(0f,-i * 60f - 40.9f,0f);
+
+                Vector3 offset = Vector3.forward * Hex.hexRadius * Mathf.Sqrt(85f) * 0.4975f;
                 offset = rotation * offset;
 
                 GameObject chunkGO = Locator.Instance.ObjectPooler.
@@ -61,7 +66,7 @@ namespace Tirocinio
             for (int i = 0; i < 6; i++)
             {
                 ExitDirection direction = (ExitDirection)i;
-                ChunkPosition adjacentPosition = HelperEnums.GetAdjacentChunkPosition(chunk.chunkPosition,direction);
+                ChunkPosition adjacentPosition = HelperEnums.GetAdjacentChunkPosition(chunk.chunkPosition, direction);
                 //if adjacent position is out of the 7 chunk grid, continue
                 if (adjacentPosition == ChunkPosition.NONE) continue;
 
@@ -92,7 +97,7 @@ namespace Tirocinio
                 //saving and setting up adjacent hexes
                 ExitDirection direction = entry.Key;
                 Chunk neighbour = entry.Value;
-                
+
 
                 ChunkPosition chunkPositionFromCenter = (ChunkPosition)(int)(direction + 1);
                 neighbour.SetChunkPosition(chunkPositionFromCenter);
@@ -107,9 +112,9 @@ namespace Tirocinio
             chunksToKeep.Add(newCenter);
 
 
-            for (int i = 0; i < chunks.Length; i++) 
+            for (int i = 0; i < chunks.Length; i++)
             {
-            // deleting exits of the chunks that will be deleted, and the corrisponding chunk
+                // deleting exits of the chunks that will be deleted, and the corrisponding chunk
                 ChunkPosition hexPosition = (ChunkPosition)i;
                 Chunk chunk = chunks[i];
 
