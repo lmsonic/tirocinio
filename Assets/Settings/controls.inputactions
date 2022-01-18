@@ -252,8 +252,19 @@
                 },
                 {
                     "name": "",
+                    "id": "f91d2d76-7b45-4550-9504-e3b0510a5587",
+                    "path": "<Keyboard>/e",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Accelerate",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
                     "id": "786b0694-0caf-4577-8061-521e0621a979",
-                    "path": "<Gamepad>/buttonEast",
+                    "path": "<Keyboard>/shift",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
