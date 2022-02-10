@@ -16,24 +16,52 @@ namespace Tirocinio
 
         public float exitProbability = 0.5f;
 
+        public int maxGenerationSteps = 4;
+
+
 
         public void Start()
         {
             hexRadius *= transform.localScale.x;
             Debug.Log("Hex Radius:" + hexRadius);
+
             Locator.Instance.ObjectPooler.AddCentralHex(centerHex.gameObject);
             hexes.Add(centerHex);
-            GenerateHexesRecursive(centerHex, 4);
+            GenerateHexesRecursive(centerHex, maxGenerationSteps);
         }
+
+        public void MoveCenterHex(Hex newCenter)
+        {
+            float distance = (centerHex.transform.position - newCenter.transform.position).magnitude;
+            float despawnDistance = hexRadius * Mathf.Sqrt(3) * maxGenerationSteps * 0.5f;
+            Debug.Log(distance  + "/" +despawnDistance);
+            if (distance > despawnDistance)
+            {
+                centerHex = newCenter;
+                for (int i = hexes.Count - 1; i >= 0; i--)
+                {
+                    GenerateHexesRecursive(newCenter, maxGenerationSteps);
+                    
+                     /*if ((hexes[i].transform.position - centerHex.transform.position).magnitude > despawnDistance*2f)
+                    {
+                        hexes[i].ClearExits();
+                        hexes[i].gameObject.SetActive(false);
+                        hexes.RemoveAt(i);
+                    } */
+                    
+                }
+
+                
+            }
+        }
+
+
 
         void GenerateHexesRecursive(Hex hexGenerationCenter, int stepsRemaining)
         {
             if (stepsRemaining > 0)
             {
-                Debug.Log("steps remaining " + stepsRemaining);
-                Color randomColor = Random.ColorHSV();
                 Transform centerHexTransform = hexGenerationCenter.gameObject.transform;
-                hexGenerationCenter.SetColor(randomColor);
                 Hex[] neighbours = new Hex[6];
                 for (int i = 0; i < 6; i++)
                 {
@@ -48,17 +76,15 @@ namespace Tirocinio
                         neighbours[i] = exit.GetOtherHex(hexGenerationCenter);
                         continue;
                     };
-                    Debug.Log(direction);
 
                     Vector3 offset = Vector3.forward * hexRadius * Mathf.Sqrt(3f);
                     offset = rotation * offset;
 
                     //sets up the hex 
                     GameObject hexGO = Locator.Instance.ObjectPooler.
-                        GetPooledHex(hexGenerationCenter.transform.position + offset, Quaternion.identity, centerHexTransform);
+                        GetPooledHex(hexGenerationCenter.transform.position + offset, Quaternion.identity, transform);
 
                     Hex hex = hexGO.GetComponent<Hex>();
-                    hex.SetColor(randomColor);
 
                     hexes.Add(hex);
                     neighbours[i] = hex;
@@ -99,19 +125,19 @@ namespace Tirocinio
             if (hex1.exits.ContainsKey(direction) && !hex2.exits.ContainsKey(oppositeDirection))
             {
                 Exit ex = hex1.exits[direction];
-                if (ex.GetOtherHex(hex1)==hex2)
+                if (ex.GetOtherHex(hex1) == hex2)
                     hex2.exits[oppositeDirection] = ex;
                 else
-                    Debug.LogError("Exit is already connected to another hex");
+                    Debug.LogError("Exit is already connected to another hex, deleting");
                 return;
             }
             if (hex2.exits.ContainsKey(oppositeDirection) && !hex1.exits.ContainsKey(direction))
             {
                 Exit ex = hex2.exits[oppositeDirection];
-                if (ex.GetOtherHex(hex2)==hex1)
+                if (ex.GetOtherHex(hex2) == hex1)
                     hex1.exits[direction] = ex;
                 else
-                    Debug.LogError("Exit is already connected to another hex");
+                    Debug.LogError("Exit is already connected to another hex,deleting");
                 return;
             }
 
@@ -123,7 +149,7 @@ namespace Tirocinio
             Vector3 offset = rotation * Vector3.forward * hexRadius * Mathf.Sqrt(3f) * 0.5f;
 
             GameObject exitGO = Locator.Instance.ObjectPooler.
-                GetPooledExit(hex1.transform.position + offset, rotation, hex1.transform);
+                GetPooledExit(hex1.transform.position + offset, rotation, transform);
 
             Exit exit = exitGO.GetComponent<Exit>();
             exit.Initialize(hex1, hex2);
@@ -136,7 +162,7 @@ namespace Tirocinio
 
             hex2.exits[oppositeDirection] = exit;
 
-            
+
         }
 
 

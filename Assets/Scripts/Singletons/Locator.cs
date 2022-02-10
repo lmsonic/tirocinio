@@ -10,6 +10,8 @@ namespace Tirocinio
         static public Locator Instance = null;
 
         public ObjectPooler ObjectPooler;
+
+        public Chunk Chunk;
         private void Awake()
         {
             if (Instance)

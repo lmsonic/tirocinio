@@ -18,6 +18,8 @@ namespace Tirocinio
 
         public void SetColor(Color color) => rend.material.color = color;
 
+        public Color GetColor() {return rend.material.color;}
+
         
 
         public void ClearExits()
@@ -35,10 +37,7 @@ namespace Tirocinio
         }
 
 
-        private void OnDisable()
-        {
-            ClearExits();
-        }
+        
 
 
 

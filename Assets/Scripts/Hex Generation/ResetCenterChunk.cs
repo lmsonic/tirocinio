@@ -6,24 +6,24 @@ namespace Tirocinio
 {
     public class ResetCenterChunk : MonoBehaviour
     {
-        /*
-        //Class is used to generate new chunks when player collides with collider attached to this class
-        public Chunk chunk;
 
-        public event Action<Chunk> PlayerNotOnCenterChunk;
-        private void Start() {
-            PlayerNotOnCenterChunk+=Locator.Instance.HexGeneration.MoveGridCenter;
+        //Class is used to generate new chunks when player collides with collider attached to this class
+        public Hex hex;
+
+        public event Action<Hex> PlayerNotOnCenterChunk;
+        private void Start()
+        {
+            PlayerNotOnCenterChunk += Locator.Instance.Chunk.MoveCenterHex;
         }
 
-        private void OnTriggerStay(Collider other) {
-            if (other.tag == "Player")
+        private void OnTriggerEnter(Collider other)
+        {
+            if (other.CompareTag("Player"))
             {
-                if (chunk.chunkPosition != ChunkPosition.CENTER)
-                {
-                    PlayerNotOnCenterChunk.Invoke(chunk);
-                }
+
+                PlayerNotOnCenterChunk.Invoke(hex);
             }
         }
-        */
+
     }
 }
