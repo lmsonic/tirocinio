@@ -7,108 +7,150 @@ namespace Tirocinio
 {
     public class Chunk : MonoBehaviour
     {
-        public Hex[] hexes = new Hex[7];
+        public List<Hex> hexes = new List<Hex>();
 
         public Hex centerHex;
+
+
+        static public float hexRadius = 10f;
 
         public float exitProbability = 0.5f;
 
 
-        public Dictionary<ExitDirection, Chunk> neighbours = new Dictionary<ExitDirection, Chunk>();
-
-
-        public ChunkPosition chunkPosition = ChunkPosition.CENTER;
-
-        public void SetChunkPosition(ChunkPosition pos) => chunkPosition = pos;
-
-        Color randomColor;
-        private void Awake() {
-            randomColor = Random.ColorHSV();
-        }
         public void Start()
         {
+            hexRadius *= transform.localScale.x;
+            Debug.Log("Hex Radius:" + hexRadius);
             Locator.Instance.ObjectPooler.AddCentralHex(centerHex.gameObject);
+            hexes.Add(centerHex);
+            GenerateHexesRecursive(centerHex, 4);
         }
 
-        public void GenerateChunk()
+        void GenerateHexesRecursive(Hex hexGenerationCenter, int stepsRemaining)
         {
-            centerHex.SetColor(randomColor);
-
-            GenerateHexes(centerHex);
-            GenerateExits();
-        }
-
-
-        void GenerateHexes(Hex newCenterHex)
-        {
-            //setting up new center hex
-            hexes[0] = newCenterHex;
-            this.centerHex = newCenterHex;
-            Transform centerHexTransform = newCenterHex.gameObject.transform;
-
-            for (int i = 0; i < hexes.Length - 1; i++)
+            if (stepsRemaining > 0)
             {
-                //if hex has been already generated, continue
-                if (hexes[i + 1] != null) continue;
-
-                //generates hex in correct position
-                Quaternion rotation = Quaternion.AngleAxis(-i * 60f, Vector3.up);
-                Vector3 offset = Vector3.forward * Hex.hexRadius * Mathf.Sqrt(3f);
-                offset = rotation * offset;
-
-                GameObject hexGO = Locator.Instance.ObjectPooler.
-                    GetPooledHex(newCenterHex.transform.position + offset, Quaternion.identity, centerHexTransform.parent);
-
-                //sets up the hex 
-                Hex hex = hexGO.GetComponent<Hex>();
-                hex.SetHexPosition((HexPosition)(i + 1));
-                hex.SetColor(randomColor);
-                hexes[i + 1] = hex;
-            }
-        }
-
-        public void GenerateExits()
-        {
-            for (int i = 0; i < hexes.Length; i++)
-            {
-                Hex hex = hexes[i];
-                for (int j = 0; j < 6; j++)
+                Debug.Log("steps remaining " + stepsRemaining);
+                Color randomColor = Random.ColorHSV();
+                Transform centerHexTransform = hexGenerationCenter.gameObject.transform;
+                hexGenerationCenter.SetColor(randomColor);
+                Hex[] neighbours = new Hex[6];
+                for (int i = 0; i < 6; i++)
                 {
-                    ExitDirection direction = (ExitDirection)j;
-                    //if hex has already exit in that direction, continue
-                    if (hex.exits.ContainsKey(direction)) continue;
+                    //generates hex in correct position
+                    Quaternion rotation = Quaternion.AngleAxis(-i * 60f, Vector3.up);
 
-                    HexPosition hexPosition = HelperEnums.GetAdjacentHexPosition(hex.hexPosition, direction);
-                    //if hex which would be connected is out the chunk, continue
-                    //TODO: make exits work with different chunks
-                    if (hexPosition == HexPosition.NONE) continue;
+                    ExitDirection direction = (ExitDirection)i;
 
-                    bool isOpen = Random.value < exitProbability;
+                    if (hexGenerationCenter.exits.ContainsKey(direction))
+                    {
+                        Exit exit = hexGenerationCenter.exits[direction];
+                        neighbours[i] = exit.GetOtherHex(hexGenerationCenter);
+                        continue;
+                    };
+                    Debug.Log(direction);
 
-                    Hex otherHex = hexes[(int)hexPosition];
-                    hex.AddExit(direction, otherHex, isOpen);
+                    Vector3 offset = Vector3.forward * hexRadius * Mathf.Sqrt(3f);
+                    offset = rotation * offset;
 
+                    //sets up the hex 
+                    GameObject hexGO = Locator.Instance.ObjectPooler.
+                        GetPooledHex(hexGenerationCenter.transform.position + offset, Quaternion.identity, centerHexTransform);
+
+                    Hex hex = hexGO.GetComponent<Hex>();
+                    hex.SetColor(randomColor);
+
+                    hexes.Add(hex);
+                    neighbours[i] = hex;
+
+                    //connect to center hex
+                    AddExit(direction, hexGenerationCenter, hex);
+
+                }
+
+                for (int i = 0; i < 6; i++)
+                {
+                    //Generates hexes in the directions where there is not an exit, in front
+                    int nextIndex = (i + 1) % 6;
+                    ExitDirection nextDirection = (ExitDirection)((i + 2) % 6);
+
+                    if (neighbours[i].exits.ContainsKey(nextDirection)) continue;
+
+                    AddExit(nextDirection, neighbours[i], neighbours[nextIndex]);
+
+                }
+
+                for (int i = 0; i < 6; i++)
+                {
+                    //Recursive step
+                    GenerateHexesRecursive(neighbours[i], stepsRemaining - 1);
                 }
             }
         }
 
-        private void OnDisable()
+
+
+
+
+        public void AddExit(ExitDirection direction, Hex hex1, Hex hex2)
         {
-            ClearNeighbours();
+            ExitDirection oppositeDirection = HelperEnums.GetOppositeDirection(direction);
+            //Checking if an exit exists already
+            if (hex1.exits.ContainsKey(direction) && !hex2.exits.ContainsKey(oppositeDirection))
+            {
+                Exit ex = hex1.exits[direction];
+                if (ex.GetOtherHex(hex1)==hex2)
+                    hex2.exits[oppositeDirection] = ex;
+                else
+                    Debug.LogError("Exit is already connected to another hex");
+                return;
+            }
+            if (hex2.exits.ContainsKey(oppositeDirection) && !hex1.exits.ContainsKey(direction))
+            {
+                Exit ex = hex2.exits[oppositeDirection];
+                if (ex.GetOtherHex(hex2)==hex1)
+                    hex1.exits[direction] = ex;
+                else
+                    Debug.LogError("Exit is already connected to another hex");
+                return;
+            }
+
+
+            //Sets the exit in the correct rotation, offset from hex, and sets it both in the hex that
+            //spawns it and in the hex that is connecting to it, in their exit dictionaries
+
+            Quaternion rotation = Quaternion.AngleAxis(-(int)direction * 60f, Vector3.up);
+            Vector3 offset = rotation * Vector3.forward * hexRadius * Mathf.Sqrt(3f) * 0.5f;
+
+            GameObject exitGO = Locator.Instance.ObjectPooler.
+                GetPooledExit(hex1.transform.position + offset, rotation, hex1.transform);
+
+            Exit exit = exitGO.GetComponent<Exit>();
+            exit.Initialize(hex1, hex2);
+            exit.SetColor(Color.black);
+
+            bool isOpen = Random.value < exitProbability;
+            if (isOpen) exit.Open(); else exit.Close();
+
+            hex1.exits[direction] = exit;
+
+            hex2.exits[oppositeDirection] = exit;
+
+            
         }
 
-        public void ClearNeighbours()
+
+
+        private void OnDisable()
         {
-            //Clears up neighbour dictionary correctly
-            foreach (KeyValuePair<ExitDirection, Chunk> entry in neighbours)
+
+            for (int i = 0; i < hexes.Count; i++)
             {
-                ExitDirection direction = entry.Key;
-                Chunk chunk = entry.Value;
-                ExitDirection oppositeDirection = HelperEnums.GetOppositeDirection(direction);
-                chunk.neighbours.Remove(oppositeDirection);
+                hexes[i].gameObject.SetActive(false);
             }
-            neighbours.Clear();
+            hexes.Clear();
         }
+
 
 
     }

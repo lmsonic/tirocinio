@@ -10,19 +10,16 @@ namespace Tirocinio
 
         public GameObject exitPrefab;
         public GameObject hexPrefab;
-        public GameObject chunkPrefab;
 
         List<GameObject> pooledExits;
         List<GameObject> pooledHexes;
-        List<GameObject> pooledChunks;
 
         
         void Awake()
         {
 
-            pooledExits = InitializePool(pooledExits, exitPrefab, 30);
-            pooledHexes = InitializePool(pooledHexes, hexPrefab, 20);
-            pooledChunks = InitializePool(pooledChunks, chunkPrefab, 6);
+            pooledExits = InitializePool(pooledExits, exitPrefab, 1);
+            pooledHexes = InitializePool(pooledHexes, hexPrefab, 1);
 
         }
 
@@ -30,19 +27,9 @@ namespace Tirocinio
         public void AddCentralHex(GameObject centralHex) => pooledHexes.Add(centralHex);
         
         //same as AddCentralHex, for chunks
-        public void AddCentralChunk(GameObject centralChunk) => pooledChunks.Add(centralChunk);
         
 
-        public GameObject GetPooledChunk(Vector3 position, Quaternion rotation, Transform parent)
-        {
-            GameObject pooledChunk = SearchObject(pooledChunks, chunkPrefab);
-            pooledChunk.SetActive(true);
-            pooledChunk.transform.position = position;
-            pooledChunk.transform.rotation = rotation;
-            pooledChunk.transform.parent = parent;
-            pooledChunk.transform.localScale = Vector3.one;
-            return pooledChunk;
-        }
+
 
         public GameObject GetPooledExit(Vector3 position, Quaternion rotation, Transform parent)
         {

@@ -34,6 +34,7 @@ namespace Tirocinio
         {
             hex1 = h1;
             hex2 = h2;
+
         }
 
         public Hex GetOtherHex(Hex hex)
