@@ -27,6 +27,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 5, y: 2, z: 5}
+  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 3781031514684872524}
   m_Father: {fileID: 0}
@@ -47,7 +48,7 @@ MonoBehaviour:
   hexes: []
   centerHex: {fileID: 7089320375585003098}
   exitProbability: 0.5
-  maxGenerationSteps: 4
+  maxGenerationSteps: 2
 --- !u!1001 &6140296541689824686
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -55,17 +56,13 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 6140296542766368193}
     m_Modifications:
-    - target: {fileID: 1324692735992100448, guid: 9b9783ae53652ae41bf65709e07f4ddd, type: 3}
-      propertyPath: m_Mesh
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 4272445950638368933, guid: 9b9783ae53652ae41bf65709e07f4ddd, type: 3}
+    - target: {fileID: 7011641781879200781, guid: 9b9783ae53652ae41bf65709e07f4ddd, type: 3}
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: 0}
     - target: {fileID: 7011641781879200781, guid: 9b9783ae53652ae41bf65709e07f4ddd, type: 3}
-      propertyPath: m_Mesh
-      value: 
+      propertyPath: m_VersionIndex
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 7011641781879200782, guid: 9b9783ae53652ae41bf65709e07f4ddd, type: 3}
       propertyPath: m_Mesh
@@ -123,13 +120,7 @@ PrefabInstance:
       propertyPath: m_Name
       value: Hex
       objectReference: {fileID: 0}
-    - target: {fileID: 8088307692402838011, guid: 9b9783ae53652ae41bf65709e07f4ddd, type: 3}
-      propertyPath: m_Mesh
-      value: 
-      objectReference: {fileID: 0}
-    m_RemovedComponents:
-    - {fileID: 4911601794316317919, guid: 9b9783ae53652ae41bf65709e07f4ddd, type: 3}
-    - {fileID: 2847595769356820173, guid: 9b9783ae53652ae41bf65709e07f4ddd, type: 3}
+    m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9b9783ae53652ae41bf65709e07f4ddd, type: 3}
 --- !u!4 &3781031514684872524 stripped
 Transform:
