@@ -27,6 +27,7 @@ namespace Tirocinio
 
             Locator.Instance.ObjectPooler.AddCentralHex(centerHex.gameObject);
             hexes.Add(centerHex);
+            //StartCoroutine(GenerateHexesRecursive(centerHex, maxGenerationSteps));
             GenerateHexesRecursive(centerHex, maxGenerationSteps);
         }
 
@@ -34,31 +35,33 @@ namespace Tirocinio
         {
             float distance = (centerHex.transform.position - newCenter.transform.position).magnitude;
             float despawnDistance = hexRadius * Mathf.Sqrt(3) * maxGenerationSteps * 0.5f;
-            Debug.Log(distance  + "/" +despawnDistance);
+            Debug.Log(distance + "/" + despawnDistance);
             if (distance > despawnDistance)
             {
                 centerHex = newCenter;
                 for (int i = hexes.Count - 1; i >= 0; i--)
                 {
                     GenerateHexesRecursive(newCenter, maxGenerationSteps);
-                    
-                     /*if ((hexes[i].transform.position - centerHex.transform.position).magnitude > despawnDistance*2f)
-                    {
-                        hexes[i].ClearExits();
-                        hexes[i].gameObject.SetActive(false);
-                        hexes.RemoveAt(i);
-                    } */
-                    
+
+                    /*if ((hexes[i].transform.position - centerHex.transform.position).magnitude > despawnDistance*2f)
+                   {
+                       hexes[i].ClearExits();
+                       hexes[i].gameObject.SetActive(false);
+                       hexes.RemoveAt(i);
+                   } */
+
                 }
 
-                
+
             }
         }
 
 
 
+
         void GenerateHexesRecursive(Hex hexGenerationCenter, int stepsRemaining)
         {
+            Debug.Log("Recursion step " + stepsRemaining);
             if (stepsRemaining > 0)
             {
                 Transform centerHexTransform = hexGenerationCenter.gameObject.transform;
@@ -99,10 +102,12 @@ namespace Tirocinio
                     //Generates hexes in the directions where there is not an exit, in front
                     int nextIndex = (i + 1) % 6;
                     ExitDirection nextDirection = (ExitDirection)((i + 2) % 6);
-
+                    ExitDirection oppositeDir = HelperEnums.GetOppositeDirection(nextDirection);
                     if (neighbours[i].exits.ContainsKey(nextDirection)) continue;
+                    if (neighbours[nextIndex].exits.ContainsKey(oppositeDir)) continue;
 
                     AddExit(nextDirection, neighbours[i], neighbours[nextIndex]);
+
 
                 }
 
@@ -110,9 +115,76 @@ namespace Tirocinio
                 {
                     //Recursive step
                     GenerateHexesRecursive(neighbours[i], stepsRemaining - 1);
+
                 }
             }
         }
+        
+        // IEnumerator GenerateHexesRecursive(Hex hexGenerationCenter, int stepsRemaining)
+        // {
+        //     Debug.Log("Recursion step " + stepsRemaining);
+        //     if (stepsRemaining > 0)
+        //     {
+        //         yield return new WaitForSeconds(0.5f);
+        //         Color randomColor = Random.ColorHSV();
+        //         Transform centerHexTransform = hexGenerationCenter.gameObject.transform;
+        //         Hex[] neighbours = new Hex[6];
+        //         for (int i = 0; i < 6; i++)
+        //         {
+        //             //generates hex in correct position
+        //             Quaternion rotation = Quaternion.AngleAxis(-i * 60f, Vector3.up);
+
+        //             ExitDirection direction = (ExitDirection)i;
+
+        //             if (hexGenerationCenter.exits.ContainsKey(direction))
+        //             {
+        //                 Exit exit = hexGenerationCenter.exits[direction];
+        //                 neighbours[i] = exit.GetOtherHex(hexGenerationCenter);
+        //                 continue;
+        //             };
+
+        //             Vector3 offset = Vector3.forward * hexRadius * Mathf.Sqrt(3f);
+        //             offset = rotation * offset;
+
+        //             //sets up the hex 
+        //             GameObject hexGO = Locator.Instance.ObjectPooler.
+        //                 GetPooledHex(hexGenerationCenter.transform.position + offset, Quaternion.identity, transform);
+
+        //             Hex hex = hexGO.GetComponent<Hex>();
+
+        //             hexes.Add(hex);
+        //             neighbours[i] = hex;
+        //             hex.SetColor(randomColor);
+
+        //             //connect to center hex
+        //             AddExit(direction, hexGenerationCenter, hex);
+
+        //         }
+
+        //         for (int i = 0; i < 6; i++)
+        //         {
+        //             yield return new WaitForSeconds(0.3f);
+        //             //Generates hexes in the directions where there is not an exit, in front
+        //             int nextIndex = (i + 1) % 6;
+        //             ExitDirection nextDirection = (ExitDirection)((i + 2) % 6);
+        //             ExitDirection oppositeDir = HelperEnums.GetOppositeDirection(nextDirection);
+        //             if (neighbours[i].exits.ContainsKey(nextDirection)) continue;
+        //             if (neighbours[nextIndex].exits.ContainsKey(oppositeDir)) continue;
+
+        //             AddExit(nextDirection, neighbours[i], neighbours[nextIndex]);
+
+
+        //         }
+
+        //         for (int i = 0; i < 6; i++)
+        //         {
+        //             yield return new WaitForSeconds(1f);
+        //             //Recursive step
+        //             StartCoroutine(GenerateHexesRecursive(neighbours[i], stepsRemaining - 1));
+
+        //         }
+        //     }
+        // }
 
 
 
@@ -128,7 +200,11 @@ namespace Tirocinio
                 if (ex.GetOtherHex(hex1) == hex2)
                     hex2.exits[oppositeDirection] = ex;
                 else
-                    Debug.LogError("Exit is already connected to another hex, deleting");
+                {
+                    Debug.LogWarning("Exit is already connected to another hex");
+
+
+                }
                 return;
             }
             if (hex2.exits.ContainsKey(oppositeDirection) && !hex1.exits.ContainsKey(direction))
@@ -137,7 +213,10 @@ namespace Tirocinio
                 if (ex.GetOtherHex(hex2) == hex1)
                     hex1.exits[direction] = ex;
                 else
-                    Debug.LogError("Exit is already connected to another hex,deleting");
+                {
+                    Debug.LogWarning("Exit is already connected to another hex");
+
+                }
                 return;
             }
 
