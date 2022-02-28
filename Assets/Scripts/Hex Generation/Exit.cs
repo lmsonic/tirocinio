@@ -22,6 +22,7 @@ namespace Tirocinio
             isOpen=true;
             rend.enabled = false;
             coll.isTrigger = true;
+            coll.enabled = false;
         }
 
         public void Close()
@@ -29,6 +30,7 @@ namespace Tirocinio
             isOpen=false;
             rend.enabled = true;
             coll.isTrigger = false;
+            coll.enabled = true;
         }
         public void Initialize(Hex h1, Hex h2)
         {

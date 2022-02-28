@@ -20,6 +20,7 @@ namespace Tirocinio
 
 
 
+
         public void Start()
         {
             hexRadius *= transform.localScale.x;
@@ -28,98 +29,133 @@ namespace Tirocinio
             Locator.Instance.ObjectPooler.AddCentralHex(centerHex.gameObject);
             hexes.Add(centerHex);
             //StartCoroutine(GenerateHexesRecursive(centerHex, maxGenerationSteps));
-            GenerateHexesRecursive(centerHex, maxGenerationSteps);
+            StartCoroutine(GenerateHexesIterative(centerHex, maxGenerationSteps));
         }
+
+
 
         public void MoveCenterHex(Hex newCenter)
         {
-            float distance = (centerHex.transform.position - newCenter.transform.position).magnitude;
-            float despawnDistance = hexRadius * Mathf.Sqrt(3) * maxGenerationSteps * 0.5f;
-            Debug.Log(distance + "/" + despawnDistance);
-            if (distance > despawnDistance)
-            {
-                centerHex = newCenter;
-                for (int i = hexes.Count - 1; i >= 0; i--)
-                {
-                    GenerateHexesRecursive(newCenter, maxGenerationSteps);
 
-                    /*if ((hexes[i].transform.position - centerHex.transform.position).magnitude > despawnDistance*2f)
-                   {
-                       hexes[i].ClearExits();
-                       hexes[i].gameObject.SetActive(false);
-                       hexes.RemoveAt(i);
-                   } */
-
-                }
-
-
-            }
         }
 
 
-
-
-        void GenerateHexesRecursive(Hex hexGenerationCenter, int stepsRemaining)
+        IEnumerator GenerateHexesIterative(Hex pivotHex, int nSteps)
         {
-            Debug.Log("Recursion step " + stepsRemaining);
-            if (stepsRemaining > 0)
+
+            
+                
+                yield return GenerateLayer(pivotHex);
+                for (int i = 0; i < 6; i++)
+                {
+                    Hex newPivot = pivotHex.neighbours[i];
+                    yield return GenerateLayer(newPivot);
+                    for (int j = 0; j < 6; j++){
+                        yield return GenerateLayer(newPivot.neighbours[j]);
+                    }
+                }
+            
+            
+            for (int i = 0; i < 6; i++)
             {
-                Transform centerHexTransform = hexGenerationCenter.gameObject.transform;
-                Hex[] neighbours = new Hex[6];
-                for (int i = 0; i < 6; i++)
+                Hex newPivot = pivotHex.neighbours[i];
+
+                yield return GenerateLayer(newPivot);
+                for (int j = 0; j < 6; j++)
                 {
-                    //generates hex in correct position
-                    Quaternion rotation = Quaternion.AngleAxis(-i * 60f, Vector3.up);
+                    Hex newPivot2 = newPivot.neighbours[j];
 
-                    ExitDirection direction = (ExitDirection)i;
-
-                    if (hexGenerationCenter.exits.ContainsKey(direction))
-                    {
-                        Exit exit = hexGenerationCenter.exits[direction];
-                        neighbours[i] = exit.GetOtherHex(hexGenerationCenter);
-                        continue;
-                    };
-
-                    Vector3 offset = Vector3.forward * hexRadius * Mathf.Sqrt(3f);
-                    offset = rotation * offset;
-
-                    //sets up the hex 
-                    GameObject hexGO = Locator.Instance.ObjectPooler.
-                        GetPooledHex(hexGenerationCenter.transform.position + offset, Quaternion.identity, transform);
-
-                    Hex hex = hexGO.GetComponent<Hex>();
-
-                    hexes.Add(hex);
-                    neighbours[i] = hex;
-
-                    //connect to center hex
-                    AddExit(direction, hexGenerationCenter, hex);
-
-                }
-
-                for (int i = 0; i < 6; i++)
-                {
-                    //Generates hexes in the directions where there is not an exit, in front
-                    int nextIndex = (i + 1) % 6;
-                    ExitDirection nextDirection = (ExitDirection)((i + 2) % 6);
-                    ExitDirection oppositeDir = HelperEnums.GetOppositeDirection(nextDirection);
-                    if (neighbours[i].exits.ContainsKey(nextDirection)) continue;
-                    if (neighbours[nextIndex].exits.ContainsKey(oppositeDir)) continue;
-
-                    AddExit(nextDirection, neighbours[i], neighbours[nextIndex]);
-
-
-                }
-
-                for (int i = 0; i < 6; i++)
-                {
-                    //Recursive step
-                    GenerateHexesRecursive(neighbours[i], stepsRemaining - 1);
-
+                    yield return GenerateLayer(newPivot2);
                 }
             }
+
+            //GenerateExits();
+
         }
-        
+
+
+
+        IEnumerator GenerateLayer(Hex pivotHex)
+        {
+            yield return new WaitForSeconds(1f);
+            pivotHex.SetColor(Color.red);
+            yield return GenerateHexes(pivotHex);
+            //yield return GenerateExits(pivotHex);
+            yield return new WaitForSeconds(1f);
+            pivotHex.SetColor(Color.white);
+            for (int i = 0; i < pivotHex.neighbours.Length; i++)
+            {
+                pivotHex.neighbours[i]?.SetColor(Color.white);
+            }
+
+
+        }
+
+
+
+        IEnumerator GenerateHexes(Hex pivotHex)
+        {
+            Transform centerHexTransform = pivotHex.gameObject.transform;
+            for (int i = 0; i < 6; i++)
+            {
+                if (pivotHex.neighbours[i] != null) continue;
+
+                yield return new WaitForSeconds(0.5f);
+                //generates hex in correct position
+                Quaternion rotation = Quaternion.AngleAxis(-i * 60f, Vector3.up);
+
+                ExitDirection direction = (ExitDirection)i;
+                ExitDirection oppositeDirection = HelperEnums.GetOppositeDirection(direction);
+
+
+
+                Hex hex = MakeHex(pivotHex.transform.position, direction);
+
+                hexes.Add(hex);
+                pivotHex.neighbours[i] = hex;
+                hex.neighbours[(int)oppositeDirection] = pivotHex;
+                hex.SetColor(Color.yellow);
+
+                AddExit(direction,pivotHex,hex);
+
+            }
+            yield return ConnectNeighbouringHexes(pivotHex);
+        }
+
+        IEnumerator ConnectNeighbouringHexes(Hex pivotHex)
+        {
+            for (int currentNeighborIndex = 0; currentNeighborIndex < 6; currentNeighborIndex++)
+            {
+                yield return new WaitForSeconds(0.5f);
+                //Generates hexes in the directions where there is not an exit, in front
+                int nextNeighbourIndex = (currentNeighborIndex + 1) % 6;
+                ExitDirection nextDirection = (ExitDirection)((currentNeighborIndex + 2) % 6);
+                ExitDirection oppositeDir = HelperEnums.GetOppositeDirection(nextDirection);
+
+                Hex currentNeighbour = pivotHex.neighbours[currentNeighborIndex];
+                Hex nextNeighbour = pivotHex.neighbours[nextNeighbourIndex];
+
+                currentNeighbour.neighbours[(int)nextDirection] = nextNeighbour;
+                nextNeighbour.neighbours[(int)oppositeDir] = currentNeighbour;
+                
+                AddExit(nextDirection,currentNeighbour,nextNeighbour);
+            }
+        }
+
+
+        Hex MakeHex(Vector3 startPosition, ExitDirection direction)
+        {
+            Quaternion rotation = Quaternion.AngleAxis(-(int)direction * 60f, Vector3.up);
+            Vector3 offset = Vector3.forward * hexRadius * Mathf.Sqrt(3f);
+            offset = rotation * offset;
+
+            //sets up the hex 
+            GameObject hexGO = Locator.Instance.ObjectPooler.
+                GetPooledHex(startPosition + offset, Quaternion.identity, transform);
+
+            return hexGO.GetComponent<Hex>();
+        }
+
         // IEnumerator GenerateHexesRecursive(Hex hexGenerationCenter, int stepsRemaining)
         // {
         //     Debug.Log("Recursion step " + stepsRemaining);
@@ -193,54 +229,46 @@ namespace Tirocinio
         public void AddExit(ExitDirection direction, Hex hex1, Hex hex2)
         {
             ExitDirection oppositeDirection = HelperEnums.GetOppositeDirection(direction);
-            //Checking if an exit exists already
-            if (hex1.exits.ContainsKey(direction) && !hex2.exits.ContainsKey(oppositeDirection))
+
+            Exit exit1 = hex1.exits[(int)direction];
+            Exit exit2 = hex2.exits[(int)oppositeDirection];
+            if (exit1 == null && exit2 != null)
             {
-                Exit ex = hex1.exits[direction];
-                if (ex.GetOtherHex(hex1) == hex2)
-                    hex2.exits[oppositeDirection] = ex;
-                else
-                {
-                    Debug.LogWarning("Exit is already connected to another hex");
-
-
-                }
+                hex1.exits[(int)direction] = exit2;
                 return;
             }
-            if (hex2.exits.ContainsKey(oppositeDirection) && !hex1.exits.ContainsKey(direction))
+            else if (exit1 != null && exit2 == null)
             {
-                Exit ex = hex2.exits[oppositeDirection];
-                if (ex.GetOtherHex(hex2) == hex1)
-                    hex1.exits[direction] = ex;
-                else
-                {
-                    Debug.LogWarning("Exit is already connected to another hex");
-
-                }
+                hex2.exits[(int)oppositeDirection] = exit1;
                 return;
             }
-
 
             //Sets the exit in the correct rotation, offset from hex, and sets it both in the hex that
             //spawns it and in the hex that is connecting to it, in their exit dictionaries
 
-            Quaternion rotation = Quaternion.AngleAxis(-(int)direction * 60f, Vector3.up);
-            Vector3 offset = rotation * Vector3.forward * hexRadius * Mathf.Sqrt(3f) * 0.5f;
-
-            GameObject exitGO = Locator.Instance.ObjectPooler.
-                GetPooledExit(hex1.transform.position + offset, rotation, transform);
-
-            Exit exit = exitGO.GetComponent<Exit>();
+            Exit exit = MakeExit(hex1.transform.position, direction);
             exit.Initialize(hex1, hex2);
             exit.SetColor(Color.black);
 
             bool isOpen = Random.value < exitProbability;
             if (isOpen) exit.Open(); else exit.Close();
 
-            hex1.exits[direction] = exit;
+            hex1.exits[(int)direction] = exit;
 
-            hex2.exits[oppositeDirection] = exit;
+            hex2.exits[(int)oppositeDirection] = exit;
 
+
+        }
+
+        Exit MakeExit(Vector3 startPos, ExitDirection direction)
+        {
+            Quaternion rotation = Quaternion.AngleAxis(-(int)direction * 60f, Vector3.up);
+            Vector3 offset = rotation * Vector3.forward * hexRadius * Mathf.Sqrt(3f) * 0.5f;
+
+            GameObject exitGO = Locator.Instance.ObjectPooler.
+                GetPooledExit(startPos + offset, rotation, transform);
+
+            return exitGO.GetComponent<Exit>();
 
         }
 

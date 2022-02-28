@@ -8,11 +8,8 @@ namespace Tirocinio
     public class Hex : MonoBehaviour
     {
 
-        public Dictionary<ExitDirection, Exit> exits = new Dictionary<ExitDirection, Exit>();
-
-        
-
-
+        public Exit[] exits = new Exit[6];
+        public Hex[] neighbours = new Hex[6];
         public Renderer rend;
 
 
@@ -24,17 +21,28 @@ namespace Tirocinio
 
         public void ClearExits()
         {
-            //Despawning every exit for an hex in the correct way
-            foreach (KeyValuePair<ExitDirection, Exit> entry in exits)
+            for (int i = 0; i < 6; i++)
             {
-                Exit exit = entry.Value;
+                Exit exit = exits[i];
                 Hex otherHex = exit.GetOtherHex(this);
-                ExitDirection oppositeDirection = HelperEnums.GetOppositeDirection(entry.Key);
-                otherHex.exits.Remove(oppositeDirection);
+                ExitDirection oppositeDirection = HelperEnums.GetOppositeDirection((ExitDirection)i);
+                otherHex.exits[(int)oppositeDirection]= null;
                 exit.gameObject.SetActive(false);
+                exits[i] = null;
             }
-            exits.Clear();
+            
         }
+
+        // private void OnDrawGizmos() {
+        //     for (int i = 0; i < neighbours.Length; i++)
+        //     {
+        //         if (neighbours[i])
+        //             Debug.DrawLine(transform.position,neighbours[i].transform.position,Color.green);
+        //     }
+
+        // }
+
+
 
 
         
