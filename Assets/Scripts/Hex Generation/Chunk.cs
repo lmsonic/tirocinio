@@ -40,11 +40,11 @@ namespace Tirocinio
         }
 
 
-        void GenerateHexesIterative(Hex pivotHex, int nSteps)
+        void GenerateHexesIterative(Hex pivotHex, int nSteps) //O( 1 + (nSteps-1)*6 + 18*n^2 )
         {
-
-            List<Hex> outerLayer = GenerateHexes(pivotHex);
-            for (int i = 0; i < nSteps-1; i++)
+            //1+ 0,6,18,36,60,90 calls of GenerateHexes()
+            List<Hex> outerLayer = GenerateHexes(pivotHex);//o(1)
+            for (int i = 0; i < nSteps-1; i++)//O((nSteps-1)*6) -> number of hexes in the outer layer
             {
                 List<Hex> generatedHexes = new List<Hex>();
                 for (int j = 0; j < outerLayer.Count; j++)
@@ -55,7 +55,7 @@ namespace Tirocinio
                 outerLayer = generatedHexes;
             }
 
-            GenerateExits();
+            GenerateExits();//O(18*n^2) where n is number of hexes
 
         }
 
@@ -63,16 +63,16 @@ namespace Tirocinio
 
 
 
-        void GenerateExits()
+        void GenerateExits()//O(18*n^2)
         {
-            for (int i = 0; i < hexes.Count; i++)
+            for (int i = 0; i < hexes.Count; i++)//O(n^2)
             {
-                for (int j = 0; j < hexes.Count; j++)
+                for (int j = 0; j < hexes.Count; j++)//O(n)
                 {
                     if (i == j) continue;
-                    if (AreNeighbours(hexes[i], hexes[j]))
+                    if (AreNeighbours(hexes[i], hexes[j]))//O(6)
                     {
-                        if (!HaveExitConnection(hexes[i], hexes[j]))
+                        if (!HaveExitConnection(hexes[i], hexes[j]))//O(12)
                         {
                             AddExit(hexes[i], hexes[j]);
 
@@ -82,7 +82,7 @@ namespace Tirocinio
             }
         }
 
-        bool HaveExitConnection(Hex hex1, Hex hex2)
+        bool HaveExitConnection(Hex hex1, Hex hex2)//O(12) worst case
         {
             foreach (Exit exit in hex1.exits)
             {
@@ -97,7 +97,7 @@ namespace Tirocinio
             return false;
         }
 
-        bool AreNeighbours(Hex hex1, Hex hex2)
+        bool AreNeighbours(Hex hex1, Hex hex2)//O(6)
         {
             for (int i = 0; i < 6; i++)
             {
@@ -108,12 +108,12 @@ namespace Tirocinio
         }
 
 
-        List<Hex> GenerateHexes(Hex pivotHex)
+        List<Hex> GenerateHexes(Hex pivotHex)//O(12)
         {
             Debug.Log("Call GenerateHexes()");
             Transform centerHexTransform = pivotHex.gameObject.transform;
             List<Hex> generatedHexes = new List<Hex>();
-            for (int i = 0; i < 6; i++)
+            for (int i = 0; i < 6; i++)//O(6)
             {
                 if (pivotHex.neighbours[i] != null) continue;
 
@@ -134,12 +134,12 @@ namespace Tirocinio
 
 
             }
-            ConnectNeighbouringHexes(pivotHex);
+            ConnectNeighbouringHexes(pivotHex);//O(6)
 
             return generatedHexes;
         }
 
-        void ConnectNeighbouringHexes(Hex pivotHex)
+        void ConnectNeighbouringHexes(Hex pivotHex)//O(6)
         {
             for (int currentNeighborIndex = 0; currentNeighborIndex < 6; currentNeighborIndex++)
             {
@@ -158,7 +158,7 @@ namespace Tirocinio
         }
 
 
-        Hex MakeHex(Vector3 startPosition, ExitDirection direction)
+        Hex MakeHex(Vector3 startPosition, ExitDirection direction)//O(1)
         {
             Quaternion rotation = Quaternion.AngleAxis(-(int)direction * 60f, Vector3.up);
             Vector3 offset = Vector3.forward * hexRadius * Mathf.Sqrt(3f);
@@ -172,7 +172,7 @@ namespace Tirocinio
         }
 
 
-        public void AddExit(Hex hex1, Hex hex2)
+        public void AddExit(Hex hex1, Hex hex2)//O(1)
         {
 
             //Sets the exit in the correct rotation, offset from hex, and sets it both in the hex that
@@ -192,8 +192,9 @@ namespace Tirocinio
 
         }
 
-        Exit MakeExit(Vector3 hex1Pos, Vector3 hex2Pos)
+        Exit MakeExit(Vector3 hex1Pos, Vector3 hex2Pos)//O(1)
         {
+            
             Vector3 middlePos = (hex1Pos + hex2Pos) * 0.5f;
             Quaternion rotation = Quaternion.LookRotation(hex1Pos - hex2Pos, Vector3.up);
 

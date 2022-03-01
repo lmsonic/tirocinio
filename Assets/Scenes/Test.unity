@@ -1806,7 +1806,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6140296542766368194, guid: 345d680cfbb3c5a4ba3b437db2088949, type: 3}
       propertyPath: maxGenerationSteps
-      value: 6
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 6140296542766368195, guid: 345d680cfbb3c5a4ba3b437db2088949, type: 3}
       propertyPath: m_Name
