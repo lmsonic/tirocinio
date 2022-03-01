@@ -43,20 +43,19 @@ namespace Tirocinio
         void GenerateHexesIterative(Hex pivotHex, int nSteps)
         {
 
-
-
-            GenerateHexes(pivotHex);
-            for (int i = 0; i < 6; i++)
+            List<Hex> outerLayer = GenerateHexes(pivotHex);
+            for (int i = 0; i < nSteps-1; i++)
             {
-                Hex newPivot = pivotHex.neighbours[i];
-                GenerateHexes(newPivot);
-                for (int j = 0; j < 6; j++)
+                List<Hex> generatedHexes = new List<Hex>();
+                for (int j = 0; j < outerLayer.Count; j++)
                 {
-                    GenerateHexes(newPivot.neighbours[j]);
+                    List<Hex> hexLayer = GenerateHexes(outerLayer[j]);
+                    generatedHexes.AddRange(hexLayer);
                 }
+                outerLayer = generatedHexes;
             }
 
-             GenerateExits();
+            GenerateExits();
 
         }
 
@@ -109,10 +108,11 @@ namespace Tirocinio
         }
 
 
-        void GenerateHexes(Hex pivotHex)
+        List<Hex> GenerateHexes(Hex pivotHex)
         {
-
+            Debug.Log("Call GenerateHexes()");
             Transform centerHexTransform = pivotHex.gameObject.transform;
+            List<Hex> generatedHexes = new List<Hex>();
             for (int i = 0; i < 6; i++)
             {
                 if (pivotHex.neighbours[i] != null) continue;
@@ -128,6 +128,7 @@ namespace Tirocinio
                 Hex hex = MakeHex(pivotHex.transform.position, direction);
 
                 hexes.Add(hex);
+                generatedHexes.Add(hex);
                 pivotHex.neighbours[i] = hex;
                 hex.neighbours[(int)oppositeDirection] = pivotHex;
 
@@ -135,7 +136,7 @@ namespace Tirocinio
             }
             ConnectNeighbouringHexes(pivotHex);
 
-
+            return generatedHexes;
         }
 
         void ConnectNeighbouringHexes(Hex pivotHex)
@@ -152,8 +153,6 @@ namespace Tirocinio
 
                 currentNeighbour.neighbours[(int)nextDirection] = nextNeighbour;
                 nextNeighbour.neighbours[(int)oppositeDir] = currentNeighbour;
-
-
 
             }
         }
