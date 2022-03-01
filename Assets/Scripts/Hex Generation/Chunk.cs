@@ -40,11 +40,13 @@ namespace Tirocinio
         }
 
 
-        void GenerateHexesIterative(Hex pivotHex, int nSteps) //O( 1 + (nSteps-1)*6 + 18*n^2 )
+        void GenerateHexesIterative(Hex pivotHex, int nSteps) // n = nSteps , N = number of hexes
+        //O( 1 + 3n^2-3n + 18*N^2 )
         {
             //1+ 0,6,18,36,60,90 calls of GenerateHexes()
             List<Hex> outerLayer = GenerateHexes(pivotHex);//o(1)
-            for (int i = 0; i < nSteps-1; i++)//O((nSteps-1)*6) -> number of hexes in the outer layer
+            for (int i = 0; i < nSteps-1; i++)// n = nSteps in this 
+            //O(6*sigma(n-1)) = O(6*n*(n-1)/2) = O(3n^2-3n)
             {
                 List<Hex> generatedHexes = new List<Hex>();
                 for (int j = 0; j < outerLayer.Count; j++)
@@ -55,7 +57,7 @@ namespace Tirocinio
                 outerLayer = generatedHexes;
             }
 
-            GenerateExits();//O(18*n^2) where n is number of hexes
+            GenerateExits();//O(18*N^2) where N is number of hexes
 
         }
 
