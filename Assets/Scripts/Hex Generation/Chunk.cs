@@ -37,14 +37,14 @@ namespace Tirocinio
 
         public void MoveCenterHex(Hex newCenter)
         {
-            Dictionary<Hex,int> previousDistances =  BFSDistances(hexes, centerHex);
-            if (previousDistances[newCenter] == 0) return;
+            
 
-            Dictionary<Hex, int> distance = BFSDistances(hexes, newCenter);
+            Dictionary<Hex, int> distances = BFSDistances(hexes, newCenter);
+            if (distances[centerHex] == 0) return;
             centerHex = newCenter;
 
-
-            foreach (var pair in distance)
+            //Deletion of far hexes
+            foreach (var pair in distances)
             {
                 if (pair.Value>=renderDistance){
                     Hex hex = pair.Key;
@@ -56,8 +56,8 @@ namespace Tirocinio
                 }
             }
 
+            //Generation of new Hexes
             List<Hex> outerLayer = new List<Hex>();
-
             foreach (Hex hex in hexes)
             {
                 foreach(Hex neighbour in hex.neighbours)
@@ -65,8 +65,6 @@ namespace Tirocinio
                         outerLayer.Add(hex);
             
             }
-            
-            
             
             for (int i = 0; i < outerLayer.Count; i++)
             {
