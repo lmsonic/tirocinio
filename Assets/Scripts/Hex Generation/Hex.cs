@@ -23,6 +23,7 @@ namespace Tirocinio
         {
             foreach (Exit exit in exits)
             {
+                
                 Hex otherHex = exit.GetOtherHex(this);
                 otherHex.exits.Remove(exit);
                 exit.gameObject.SetActive(false);
@@ -30,6 +31,21 @@ namespace Tirocinio
             exits.Clear();
             
         }
+
+        public void ClearNeighbours(){
+            for (int i = 0; i < neighbours.Length; i++)
+            {
+                ExitDirection oppositeDirection = HelperEnums.GetOppositeDirection((ExitDirection)i);
+                Hex neighbour = neighbours[i];
+                if (neighbour)
+                    neighbour.neighbours[(int)oppositeDirection] = null;
+            }
+            neighbours = new Hex[6];
+        }
+
+  
+        
+
 
         private void OnDrawGizmos() {
             for (int i = 0; i < neighbours.Length; i++)

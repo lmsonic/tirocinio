@@ -9,6 +9,7 @@ namespace Tirocinio
     {
         public List<Hex> hexes = new List<Hex>();
 
+
         public Hex centerHex;
 
 
@@ -16,7 +17,7 @@ namespace Tirocinio
 
         public float exitProbability = 0.5f;
 
-        public int maxGenerationSteps = 4;
+        public int renderDistance = 4;
 
 
 
@@ -29,15 +30,94 @@ namespace Tirocinio
             Locator.Instance.ObjectPooler.AddCentralHex(centerHex.gameObject);
             hexes.Add(centerHex);
             //StartCoroutine(GenerateHexesRecursive(centerHex, maxGenerationSteps));
-            GenerateHexesIterative(centerHex, maxGenerationSteps);
+            GenerateHexesIterative(centerHex, renderDistance);
         }
 
 
 
         public void MoveCenterHex(Hex newCenter)
         {
+            Dictionary<Hex,int> previousDistances =  BFSDistances(hexes, centerHex);
+            if (previousDistances[newCenter] == 0) return;
+
+            Dictionary<Hex, int> distance = BFSDistances(hexes, newCenter);
+            centerHex = newCenter;
+
+
+            foreach (var pair in distance)
+            {
+                if (pair.Value>=renderDistance){
+                    Hex hex = pair.Key;
+                    hex.ClearExits();
+                    hex.ClearNeighbours();
+                    hex.gameObject.SetActive(false);
+                    hexes.Remove(hex);
+                    
+                }
+            }
+
+            List<Hex> outerLayer = new List<Hex>();
+
+            foreach (Hex hex in hexes)
+            {
+                foreach(Hex neighbour in hex.neighbours)
+                    if (neighbour == null)
+                        outerLayer.Add(hex);
+            
+            }
+            
+            
+            
+            for (int i = 0; i < outerLayer.Count; i++)
+            {
+                 GenerateHexes(outerLayer[i]);
+            }
+            
+            GenerateExits();//O(18*N^2) where N is number of hexes
+            
 
         }
+
+
+
+
+
+        Dictionary<Hex, int> BFSDistances(List<Hex> graph, Hex start)
+        {
+
+            if (!graph.Contains(start))
+            {
+                Debug.LogError("Start node is not present in graph");
+                return null;
+            }
+
+
+            Dictionary<Hex, int> distances = new Dictionary<Hex, int>();
+
+
+            var queue = new Queue<Hex>();
+            queue.Enqueue(start);
+            distances[start] = 0;
+
+            while (queue.Count > 0)
+            {
+                Hex hex = queue.Dequeue();
+
+                foreach (var neighbor in hex.neighbours)
+                {
+                    if (neighbor != null && !distances.ContainsKey(neighbor))
+                    {
+                        distances[neighbor] = distances[hex]+1;
+                        queue.Enqueue(neighbor);
+                    }
+                }
+            }
+
+            return distances;
+
+        }
+
+
 
 
         void GenerateHexesIterative(Hex pivotHex, int nSteps) // n = nSteps , N = number of hexes
@@ -45,7 +125,7 @@ namespace Tirocinio
         {
             //1+ 0,6,18,36,60,90 calls of GenerateHexes()
             List<Hex> outerLayer = GenerateHexes(pivotHex);//o(1)
-            for (int i = 0; i < nSteps-1; i++)// n = nSteps in this 
+            for (int i = 0; i < nSteps - 1; i++)// n = nSteps in this 
             //O(6*sigma(n-1)) = O(6*n*(n-1)/2) = O(3n^2-3n)
             {
                 List<Hex> generatedHexes = new List<Hex>();
@@ -59,6 +139,7 @@ namespace Tirocinio
 
             GenerateExits();//O(18*N^2) where N is number of hexes
 
+            
         }
 
 
@@ -191,12 +272,11 @@ namespace Tirocinio
             hex1.exits.Add(exit);
             hex2.exits.Add(exit);
 
-
         }
 
         Exit MakeExit(Vector3 hex1Pos, Vector3 hex2Pos)//O(1)
         {
-            
+
             Vector3 middlePos = (hex1Pos + hex2Pos) * 0.5f;
             Quaternion rotation = Quaternion.LookRotation(hex1Pos - hex2Pos, Vector3.up);
 

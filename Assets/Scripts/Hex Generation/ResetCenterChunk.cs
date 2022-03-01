@@ -13,17 +13,17 @@ namespace Tirocinio
         public event Action<Hex> PlayerNotOnCenterChunk;
         private void Start()
         {
-            //PlayerNotOnCenterChunk += Locator.Instance.Chunk.MoveCenterHex;
+            PlayerNotOnCenterChunk += Locator.Instance.Chunk.MoveCenterHex;
         }
 
-        // private void OnTriggerEnter(Collider other)
-        // {
-        //     if (other.CompareTag("Player"))
-        //     {
+        private void OnTriggerEnter(Collider other)
+        {
+            if (other.CompareTag("Player"))
+            {
 
-        //         PlayerNotOnCenterChunk.Invoke(hex);
-        //     }
-        // }
+                PlayerNotOnCenterChunk.Invoke(hex);
+            }
+        }
 
     }
 }

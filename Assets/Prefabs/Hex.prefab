@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5683974693461899559}
   - component: {fileID: 2121412481257533196}
-  - component: {fileID: 6140296543624609793}
+  - component: {fileID: 5178356134696042376}
   m_Layer: 3
   m_Name: Trigger
   m_TagString: Untagged
@@ -46,8 +46,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   hex: {fileID: 3987062800405337076}
---- !u!136 &6140296543624609793
-CapsuleCollider:
+--- !u!135 &5178356134696042376
+SphereCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -56,9 +56,8 @@ CapsuleCollider:
   m_Material: {fileID: 0}
   m_IsTrigger: 1
   m_Enabled: 1
+  serializedVersion: 2
   m_Radius: 8
-  m_Height: 10
-  m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &7011641781879200776
 GameObject:
@@ -625,7 +624,7 @@ MonoBehaviour:
   m_PreserveMeshAssetOnDestroy: 0
   assetGuid: 
   m_Mesh: {fileID: 0}
-  m_VersionIndex: 0
+  m_VersionIndex: 12
   m_IsSelectable: 1
   m_SelectedFaces: 
   m_SelectedEdges: []
@@ -740,4 +739,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2dcf78cde1dd574ab4a690eb225aae5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  exits: []
+  neighbours:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
   rend: {fileID: 7011641781879200780}
