@@ -19,6 +19,8 @@ namespace Tirocinio
 
         public int renderDistance = 4;
 
+        public int regenerateHexDistance = 2;
+
 
 
 
@@ -33,47 +35,70 @@ namespace Tirocinio
             GenerateHexesIterative(centerHex, renderDistance);
         }
 
+        
+        public void RegenerateHexes(float newRenderDistance){
+            renderDistance= (int)newRenderDistance;
 
+            Dictionary<Hex, int> distances = BFSDistances(hexes, centerHex);
+
+            DeleteFarHexes(distances);
+            GenerateCloseHexes(distances);
+            GenerateExits();
+        }
 
         public void MoveCenterHex(Hex newCenter)
         {
-            
 
             Dictionary<Hex, int> distances = BFSDistances(hexes, newCenter);
-            if (distances[centerHex] == 0) return;
+            if (distances[centerHex] < regenerateHexDistance) return;
             centerHex = newCenter;
 
-            //Deletion of far hexes
+            DeleteFarHexes(distances);
+            GenerateCloseHexes(distances);
+            GenerateExits();
+
+
+        }
+
+        void GenerateCloseHexes(Dictionary<Hex, int> distances){
+            List<Hex> outerLayer = new List<Hex>();
+            do
+            {
+                distances = BFSDistances(hexes, centerHex);
+                outerLayer.Clear();
+                foreach (Hex hex in hexes)
+                {
+                    if (distances[hex] < renderDistance)
+                    {
+                        foreach (Hex neighbour in hex.neighbours)
+                            if (neighbour == null)
+                                outerLayer.Add(hex);
+                    }
+
+                }
+
+                for (int i = 0; i < outerLayer.Count; i++)
+                {
+                    GenerateHexes(outerLayer[i]);
+                }
+
+            }
+            while (outerLayer.Count > 0);
+        }
+
+        void DeleteFarHexes( Dictionary<Hex, int> distances){
             foreach (var pair in distances)
             {
-                if (pair.Value>=renderDistance){
+                if (pair.Value >= renderDistance)
+                {
                     Hex hex = pair.Key;
                     hex.ClearExits();
                     hex.ClearNeighbours();
                     hex.gameObject.SetActive(false);
                     hexes.Remove(hex);
-                    
+
                 }
             }
-
-            //Generation of new Hexes
-            List<Hex> outerLayer = new List<Hex>();
-            foreach (Hex hex in hexes)
-            {
-                foreach(Hex neighbour in hex.neighbours)
-                    if (neighbour == null)
-                        outerLayer.Add(hex);
-            
-            }
-            
-            for (int i = 0; i < outerLayer.Count; i++)
-            {
-                 GenerateHexes(outerLayer[i]);
-            }
-            
-            GenerateExits();//O(18*N^2) where N is number of hexes
-            
-
         }
 
 
@@ -105,7 +130,7 @@ namespace Tirocinio
                 {
                     if (neighbor != null && !distances.ContainsKey(neighbor))
                     {
-                        distances[neighbor] = distances[hex]+1;
+                        distances[neighbor] = distances[hex] + 1;
                         queue.Enqueue(neighbor);
                     }
                 }
@@ -137,7 +162,7 @@ namespace Tirocinio
 
             GenerateExits();//O(18*N^2) where N is number of hexes
 
-            
+
         }
 
 
