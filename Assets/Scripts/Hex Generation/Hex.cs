@@ -2,10 +2,10 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
 namespace Tirocinio
 {
-    public class Hex : MonoBehaviour
+
+    public class Hex : PoolObject
     {
 
         public List<Exit> exits;
@@ -67,5 +67,5 @@ namespace Tirocinio
 
 
     }
-
 }
+

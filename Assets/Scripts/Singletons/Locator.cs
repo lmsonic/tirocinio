@@ -9,9 +9,8 @@ namespace Tirocinio
         //This class is used as a singleton to locate objects that function as singleton, as members of this class
         static public Locator Instance = null;
 
-        public ObjectPooler ObjectPooler;
-
         public Chunk Chunk;
+        
         private void Awake()
         {
             if (Instance)

@@ -2,9 +2,11 @@ using System;
 
 using UnityEngine;
 using UnityEngine.Events;
+
 namespace Tirocinio
 {
-    public class Exit : MonoBehaviour
+
+    public class Exit : PoolObject
     {
         public Hex hex1, hex2;
 
@@ -32,7 +34,7 @@ namespace Tirocinio
             coll.isTrigger = false;
             coll.enabled = true;
         }
-        public void Initialize(Hex h1, Hex h2)
+        public void Init(Hex h1, Hex h2)
         {
             hex1 = h1;
             hex2 = h2;

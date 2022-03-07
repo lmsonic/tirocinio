@@ -1,7 +1,7 @@
 using UnityEngine;
+
 namespace Tirocinio
 {
-
 
     public enum ExitDirection
     {
@@ -15,8 +15,8 @@ namespace Tirocinio
 
         
     }
-}
 
+}
 
 
 

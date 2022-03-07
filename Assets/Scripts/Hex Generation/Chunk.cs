@@ -9,7 +9,10 @@ namespace Tirocinio
     {
         public List<Hex> hexes = new List<Hex>();
 
-
+        public GameObject exitPrefab;
+        public GameObject hexPrefab;
+        private static ObjectPool<PoolObject> exitPool;
+        private static ObjectPool<PoolObject> hexPool;
         public Hex centerHex;
 
 
@@ -26,18 +29,23 @@ namespace Tirocinio
 
         public void Start()
         {
+
             hexRadius *= transform.localScale.x;
             Debug.Log("Hex Radius:" + hexRadius);
 
-            Locator.Instance.ObjectPooler.AddCentralHex(centerHex.gameObject);
+            exitPool = new ObjectPool<PoolObject>(exitPrefab, 50);
+            hexPool = new ObjectPool<PoolObject>(hexPrefab, 50);
+            centerHex.Initialize(hexPool.Push);
+
             hexes.Add(centerHex);
             //StartCoroutine(GenerateHexesRecursive(centerHex, maxGenerationSteps));
             GenerateHexesIterative(centerHex, renderDistance);
         }
 
-        
-        public void RegenerateHexes(float newRenderDistance){
-            renderDistance= (int)newRenderDistance;
+
+        public void RegenerateHexes(float newRenderDistance)
+        {
+            renderDistance = (int)newRenderDistance;
 
             Dictionary<Hex, int> distances = BFSDistances(hexes, centerHex);
 
@@ -60,7 +68,8 @@ namespace Tirocinio
 
         }
 
-        void GenerateCloseHexes(Dictionary<Hex, int> distances){
+        void GenerateCloseHexes(Dictionary<Hex, int> distances)
+        {
             List<Hex> outerLayer = new List<Hex>();
             do
             {
@@ -86,7 +95,8 @@ namespace Tirocinio
             while (outerLayer.Count > 0);
         }
 
-        void DeleteFarHexes( Dictionary<Hex, int> distances){
+        void DeleteFarHexes(Dictionary<Hex, int> distances)
+        {
             foreach (var pair in distances)
             {
                 if (pair.Value >= renderDistance)
@@ -270,11 +280,8 @@ namespace Tirocinio
             Vector3 offset = Vector3.forward * hexRadius * Mathf.Sqrt(3f);
             offset = rotation * offset;
 
-            //sets up the hex 
-            GameObject hexGO = Locator.Instance.ObjectPooler.
-                GetPooledHex(startPosition + offset, Quaternion.identity, transform);
 
-            return hexGO.GetComponent<Hex>();
+            return (Hex)hexPool.Pull(startPosition + offset, Quaternion.identity, transform);
         }
 
 
@@ -285,7 +292,7 @@ namespace Tirocinio
             //spawns it and in the hex that is connecting to it, in their exit dictionaries
 
             Exit exit = MakeExit(hex1.transform.position, hex2.transform.position);
-            exit.Initialize(hex1, hex2);
+            exit.Init(hex1, hex2);
             exit.SetColor(Color.black);
 
             bool isOpen = Random.value < exitProbability;
@@ -303,10 +310,7 @@ namespace Tirocinio
             Vector3 middlePos = (hex1Pos + hex2Pos) * 0.5f;
             Quaternion rotation = Quaternion.LookRotation(hex1Pos - hex2Pos, Vector3.up);
 
-            GameObject exitGO = Locator.Instance.ObjectPooler.
-                GetPooledExit(middlePos, rotation, transform);
-
-            return exitGO.GetComponent<Exit>();
+            return (Exit)exitPool.Pull(middlePos, rotation, transform);
 
         }
 
