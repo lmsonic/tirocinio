@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 namespace Tirocinio
 {
+    [RequireComponent(typeof(CharacterController))]
     public class Player : MonoBehaviour
     {
 
@@ -14,18 +15,23 @@ namespace Tirocinio
         Vector3 GetInputMovement() => new Vector3(inputMovement.x, 0f, inputMovement.y);
         public void Move(InputAction.CallbackContext ctx) => inputMovement = ctx.ReadValue<Vector2>();
 
-
-        Vector2 inputLook = Vector2.zero;
-        public void Look(InputAction.CallbackContext ctx) => inputLook = ctx.ReadValue<Vector2>();
-
-
         bool isJumping = false;
         public void Jump(InputAction.CallbackContext ctx) => isJumping = ctx.performed;
 
-        bool isAccelerating = false;
-        public void Accelerate(InputAction.CallbackContext ctx) => isAccelerating = ctx.performed;
-        bool isBraking = false;
-        public void Brake(InputAction.CallbackContext ctx) => isBraking = ctx.performed;
+        private float accelerationInput = 0f;
+        public void Accelerate(InputAction.CallbackContext ctx) => accelerationInput = ctx.ReadValue<float>();
+        private float brakeInput = 0f;
+        public void Brake(InputAction.CallbackContext ctx) => brakeInput = ctx.ReadValue<float>();
+
+        private int currentVelocityIndex = 0;
+        public void RaiseGears(InputAction.CallbackContext ctx) {
+            if (ctx.performed)
+                currentVelocityIndex = Mathf.Min(currentVelocityIndex + 1, velocities.Length - 1);
+        }
+        public void LowerGears(InputAction.CallbackContext ctx) {
+            if (ctx.performed)
+                currentVelocityIndex = Mathf.Max(currentVelocityIndex - 1, 0);
+        }
 
         #endregion
 
@@ -36,6 +42,7 @@ namespace Tirocinio
 
         public float gravity = -10f;
         public float jumpHeight = -10f;
+        public float[] velocities = new float[3];
 
         public float acceleration = 10f;
         public float deceleration = 5f;
@@ -44,10 +51,11 @@ namespace Tirocinio
         public float steerRotationSpeed = 0.8f;
         public float maxSteerAngle = 20f;
         public float rotationFollowBodySpeed = 0.4f;
-        public float maxVelocity = 20f;
         public Transform groundCheck;
         public LayerMask groundLayer;
         public Transform handleTransform;
+
+
 
 
         private void Start()
@@ -59,7 +67,6 @@ namespace Tirocinio
 
         private void Update()
         {
-
             VerticalMovement();
             HorizontalMovement();
             Rotation();
@@ -96,19 +103,19 @@ namespace Tirocinio
             //Movement gets set relative to camera
             movement = movement.x * cameraTransform.right.normalized + movement.z * cameraTransform.forward.normalized;
 
-            if (isAccelerating)
-            {
-                groundVelocity = Vector3.Lerp(groundVelocity, handleTransform.forward * maxVelocity, acceleration * Time.deltaTime);
-            }
-            else if (isBraking)
-            {
-                groundVelocity = Vector3.Lerp(groundVelocity, Vector3.zero, brakeSpeed * Time.deltaTime);
-            }
-            else
-            {
-                groundVelocity = Vector3.Lerp(groundVelocity, Vector3.zero, deceleration * Time.deltaTime);
-            }
+            float maxSpeed = velocities[currentVelocityIndex];
 
+            groundVelocity.y = 0f;
+
+            if (accelerationInput > 0f)
+                groundVelocity = Vector3.Lerp(groundVelocity, 
+                        handleTransform.forward * maxSpeed, accelerationInput * acceleration * Time.deltaTime);
+            else if (brakeInput > 0f)
+                groundVelocity = Vector3.Lerp(groundVelocity, Vector3.zero, brakeInput * brakeSpeed * Time.deltaTime);
+            else
+                groundVelocity = Vector3.Lerp(groundVelocity, Vector3.zero, deceleration * Time.deltaTime);
+
+            
             controller.Move(groundVelocity * Time.deltaTime);
 
 
