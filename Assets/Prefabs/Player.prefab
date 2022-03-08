@@ -162,22 +162,6 @@ MonoBehaviour:
     m_ActionId: 92500c48-3c44-4e20-a893-da9252d0d28a
     m_ActionName: Player/Move[/Keyboard/w,/Keyboard/upArrow,/Keyboard/s,/Keyboard/downArrow,/Keyboard/a,/Keyboard/leftArrow,/Keyboard/d,/Keyboard/rightArrow]
   - m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 7672785100152902535}
-        m_TargetAssemblyTypeName: Player, Assembly-CSharp
-        m_MethodName: Look
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-    m_ActionId: cbc17b13-906d-48b0-a2f2-832fcee6e279
-    m_ActionName: Player/Look[/Mouse/delta,/Pen/delta]
-  - m_PersistentCalls:
       m_Calls: []
     m_ActionId: 6e7f3949-4e33-4068-879a-42ce0c517bb5
     m_ActionName: UI/Navigate[/Keyboard/w,/Keyboard/upArrow,/Keyboard/s,/Keyboard/downArrow,/Keyboard/a,/Keyboard/leftArrow,/Keyboard/d,/Keyboard/rightArrow]
@@ -265,6 +249,38 @@ MonoBehaviour:
         m_CallState: 2
     m_ActionId: 6c377680-0b54-4fcd-857c-abcbc81c7374
     m_ActionName: Player/Brake[/XInputControllerWindows/buttonEast]
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 7672785100152902535}
+        m_TargetAssemblyTypeName: Tirocinio.Player, Assembly-CSharp
+        m_MethodName: LowerGears
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: c9158f5f-92af-4444-9f52-d3263c767962
+    m_ActionName: Player/LowerGears[/XInputControllerWindows/leftShoulder]
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 7672785100152902535}
+        m_TargetAssemblyTypeName: Tirocinio.Player, Assembly-CSharp
+        m_MethodName: RaiseGears
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: e13a4f65-35e5-4d07-a3c3-5e1bfe418c01
+    m_ActionName: Player/RaiseGears[/XInputControllerWindows/leftStick/right]
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: Gamepad
   m_DefaultActionMap: Player
@@ -282,15 +298,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6dcf7bef84cc11745996489137cd01ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  accelerationInput: 0
+  brakeInput: 0
+  currentVelocityIndex: 0
+  groundVelocity: {x: 0, y: 0, z: 0}
+  velocities:
+  - 20
+  - 40
+  - 60
+  acceleration: 6
+  deceleration: 5
+  brakeSpeed: 10
+  cameraTransform: {fileID: 0}
   gravity: -50
   jumpHeight: 5
-  velocities:
-  - 0
-  - 0
-  - 0
-  acceleration: 3
-  deceleration: 2
-  brakeSpeed: 5
   rotationSpeed: 20
   steerRotationSpeed: 0.1
   maxSteerAngle: 30
@@ -645,7 +666,7 @@ CapsuleCollider:
   m_Radius: 0.7313536
   m_Height: 4.979957
   m_Direction: 1
-  m_Center: {x: -0.1999995, y: 1.2196306, z: 0.5313538}
+  m_Center: {x: 0, y: 1.42, z: 0}
 --- !u!1 &1391944404368728181 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 4620905653715153847, guid: 13c721e7cea10ef46bc88d51dd3bd013, type: 3}
