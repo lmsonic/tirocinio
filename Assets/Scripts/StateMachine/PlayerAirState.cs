@@ -5,6 +5,8 @@ namespace Tirocinio
     public class PlayerAirState : PlayerBaseState
     {
         public PlayerAirState(PlayerStateMachine context, PlayerStateFactory factory) : base(context, factory) { }
+        
+        float smoothDampVelocity;
         public override void EnterState()
         {
             isRootState = true;
@@ -12,6 +14,10 @@ namespace Tirocinio
         public override void UpdateState()
         {
             CheckSwitchStates();
+
+            RotateXAxis();
+            
+
             bool isFalling = ctx.Velocity.y <= 0f || !ctx.IsJumpPressed;
 
             if (isFalling)
@@ -22,6 +28,7 @@ namespace Tirocinio
             {
                 ctx.Velocity.y = ctx.Velocity.y + ctx.Gravity * Time.deltaTime;
             }
+
         }
         public override void ExitState()
         {
@@ -36,6 +43,12 @@ namespace Tirocinio
         }
 
         public override void InitializeSubState() { }
+        void RotateXAxis(){
+            Vector3 eulers = ctx.transform.localEulerAngles;
+            float targetAngle = Mathf.Atan2(ctx.Velocity.y, 1f) * Mathf.Rad2Deg;
+            eulers.x =Mathf.SmoothDampAngle(eulers.x,-targetAngle,ref smoothDampVelocity,0.15f);
 
+            ctx.transform.localEulerAngles=eulers;
+        }
     }
 }

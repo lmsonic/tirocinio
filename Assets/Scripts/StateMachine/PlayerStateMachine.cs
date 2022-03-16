@@ -31,7 +31,7 @@ namespace Tirocinio
         public Vector3 CurrentMovement;
         public float AccelerationInput { get => accelerationInput; }
         float accelerationInput;
-        public float BrakeInput { get => brakeInput;}
+        public float BrakeInput { get => brakeInput; }
         float brakeInput;
         public Vector3 Velocity;
 
@@ -142,6 +142,10 @@ namespace Tirocinio
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
 
 
+            
+            
+
+            
         }
 
 

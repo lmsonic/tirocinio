@@ -9,6 +9,7 @@ namespace Tirocinio
         public override void EnterState()
         {
             isRootState = true;
+            ResetXRotation();
             InitializeSubState();
 
         }
@@ -41,6 +42,12 @@ namespace Tirocinio
                 SetSubState(factory.Idle());
 
 
+        }
+
+        void ResetXRotation(){
+            Vector3 eulers = ctx.transform.localEulerAngles;
+            eulers.x = 0f;
+            ctx.transform.localEulerAngles = eulers;
         }
     }
 
