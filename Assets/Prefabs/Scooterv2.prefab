@@ -128,6 +128,7 @@ GameObject:
   - component: {fileID: 4344654183998134090}
   - component: {fileID: 4344654183998134095}
   - component: {fileID: 4344654183998134088}
+  - component: {fileID: 615613172}
   m_Layer: 0
   m_Name: Body
   m_TagString: Untagged
@@ -201,6 +202,20 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!136 &615613172
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4344654183998134091}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  m_Radius: 0.5000002
+  m_Height: 2.0000005
+  m_Direction: 1
+  m_Center: {x: 0.000000059604645, y: -3.1763736e-22, z: -0.00000008940698}
 --- !u!1 &4344654184189689798
 GameObject:
   m_ObjectHideFlags: 0
@@ -392,10 +407,10 @@ GameObject:
   m_Component:
   - component: {fileID: 4344654184363971642}
   - component: {fileID: 4344654184363971646}
-  - component: {fileID: 1536190572}
+  - component: {fileID: 4344654185279372375}
   m_Layer: 0
   m_Name: Scooterv2
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -428,13 +443,13 @@ CharacterController:
   m_Enabled: 1
   serializedVersion: 2
   m_Height: 3.5
-  m_Radius: 0.3
+  m_Radius: 0.7
   m_SlopeLimit: 45
   m_StepOffset: 0.3
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
-  m_Center: {x: 0, y: 1.7, z: 0.87}
---- !u!114 &1536190572
+  m_Center: {x: 0, y: 1.7, z: 0.32}
+--- !u!114 &4344654185279372375
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -443,13 +458,24 @@ MonoBehaviour:
   m_GameObject: {fileID: 4344654184363971643}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a86b868923a98ff499d85a75af3ccba9, type: 3}
+  m_Script: {fileID: 11500000, guid: d2e88ef23f5b9f144a7cde78734591c2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   handleTransform: {fileID: 4344654184642377949}
   bodyTransform: {fileID: 3641375945344933492}
-  maxTurnDegrees: 1
+  maxTurnDegrees: 20
   rotationSpeed: 30
+  MaxSpeed: 30
+  BackwardsSpeed: 10
+  CurrentMovement: {x: 0, y: 0, z: 0}
+  Velocity: {x: 0, y: 0, z: 0}
+  AccelerationMultiplier: 2
+  BrakeMultiplier: 3
+  DragMultiplier: 1.5
+  maxJumpHeight: 6
+  maxJumpTime: 0.8
+  MaxFallSpeed: -30
+  FallMultiplier: 1.5
 --- !u!1 &4344654184642377950
 GameObject:
   m_ObjectHideFlags: 0
@@ -461,6 +487,7 @@ GameObject:
   - component: {fileID: 4344654184642377949}
   - component: {fileID: 4344654184642377922}
   - component: {fileID: 4344654184642377923}
+  - component: {fileID: 328000326}
   m_Layer: 0
   m_Name: Front
   m_TagString: Untagged
@@ -535,6 +562,20 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!136 &328000326
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4344654184642377950}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  m_Radius: 0.50000006
+  m_Height: 2
+  m_Direction: 1
+  m_Center: {x: 0.000000059604645, y: 0, z: -0.00000008940696}
 --- !u!1 &4344654184726065550
 GameObject:
   m_ObjectHideFlags: 0

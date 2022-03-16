@@ -5,39 +5,63 @@ using UnityEngine.InputSystem;
 
 namespace Tirocinio
 {
-    public class PlayerController : MonoBehaviour
+    public class PlayerStateMachine : MonoBehaviour
     {
+
         PlayerInput playerInput;
+        public CharacterController CharacterController { get => characterController; }
         CharacterController characterController;
+
         Animator animator;
         Transform cameraTransform;
         public Transform handleTransform;
         public Transform bodyTransform;
         public float maxTurnDegrees = 30f;
         public float rotationSpeed = 30f;
-        public float maxSpeed = 30f;
+        public float MaxSpeed = 30f;
+        public float BackwardsSpeed = 10f;
 
+        public float GroundedGravity { get => groundedGravity; }
         float groundedGravity = -1f;
-        float gravity = -9.8f;
+        public float Gravity { get => gravity; }
+        float gravity;
 
         Vector2 currentMovementInput;
-        Vector3 currentMovement;
+        [HideInInspector]
+        public Vector3 CurrentMovement;
+        public float AccelerationInput { get => accelerationInput; }
         float accelerationInput;
+        public float BrakeInput { get => brakeInput;}
         float brakeInput;
-        Vector3 velocity;
+        public Vector3 Velocity;
 
-        public float accelerationMultiplier = 2f;
-        public float brakeMultiplier = 3f;
-        public float dragMultiplier = 1.5f;
+        public float AccelerationMultiplier = 2f;
+        public float BrakeMultiplier = 3f;
+        public float DragMultiplier = 1.5f;
 
+
+        public bool IsJumpPressed { get => isJumpPressed; }
         bool isJumpPressed = false;
+        public bool RequireNewJumpPress { set => requireNewJumpPress = value; get => requireNewJumpPress; }
+        bool requireNewJumpPress = false;
         float initialJumpVelocity;
+
+        public float InitialJumpVelocity { get => initialJumpVelocity; }
+
         public float maxJumpHeight = 1f;
         public float maxJumpTime = 0.5f;
-        public float maxFallSpeed = -30f;
-        public float fallMultiplier = 1.5f;
-        bool isJumping = false;
+        public float MaxFallSpeed = -30f;
+        public float FallMultiplier = 1.5f;
 
+        public PlayerBaseState CurrentState
+        {
+            set { currentState = value; }
+            get { return currentState; }
+        }
+
+        PlayerBaseState currentState;
+
+        PlayerStateFactory states;
 
         private void Awake()
         {
@@ -45,6 +69,11 @@ namespace Tirocinio
             characterController = GetComponent<CharacterController>();
             animator = GetComponent<Animator>();
             cameraTransform = Camera.main.transform;
+
+            states = new PlayerStateFactory(this);
+
+            currentState = states.Grounded();
+            currentState.EnterState();
 
             playerInput.Player.Move.started += OnMovementInput;
             playerInput.Player.Move.canceled += OnMovementInput;
@@ -61,8 +90,6 @@ namespace Tirocinio
             playerInput.Player.Jump.started += OnJump;
             playerInput.Player.Jump.canceled += OnJump;
 
-
-
             SetupJumpVariables();
         }
 
@@ -76,6 +103,7 @@ namespace Tirocinio
         void OnJump(InputAction.CallbackContext context)
         {
             isJumpPressed = context.ReadValueAsButton();
+            requireNewJumpPress = false;
         }
 
         void OnAccelerationInput(InputAction.CallbackContext context)
@@ -93,40 +121,20 @@ namespace Tirocinio
         void OnMovementInput(InputAction.CallbackContext context)
         {
             currentMovementInput = context.ReadValue<Vector2>();
-            currentMovement.x = currentMovementInput.x;
-            currentMovement.z = currentMovementInput.y;
-            currentMovement.y = 0f;
+            CurrentMovement.x = currentMovementInput.x;
+            CurrentMovement.z = currentMovementInput.y;
+            CurrentMovement.y = 0f;
 
         }
-
-        void HandleJump()
-        {
-
-            if (!isJumping && characterController.isGrounded && isJumpPressed)
-            {
-                isJumping = true;
-
-                velocity.y = initialJumpVelocity;
-            }
-            else if (!isJumpPressed && isJumping && characterController.isGrounded)
-            {
-                isJumping = false;
-            }
-
-
-        }
-
-
-
 
         void HandleRotation()
         {
             float targetAngle = cameraTransform.eulerAngles.y;
             //rotate handle
-            Quaternion targetRotation = Quaternion.Euler(0f, currentMovement.x * maxTurnDegrees, 0f);
+            Quaternion targetRotation = Quaternion.Euler(0f, CurrentMovement.x * maxTurnDegrees, 0f);
             handleTransform.localRotation = Quaternion.Slerp(handleTransform.localRotation, targetRotation, Time.deltaTime);
             //turn
-            targetRotation = Quaternion.Euler(0f, 0f, -currentMovement.x * maxTurnDegrees);
+            targetRotation = Quaternion.Euler(0f, 0f, -CurrentMovement.x * maxTurnDegrees);
             bodyTransform.localRotation = Quaternion.Slerp(bodyTransform.localRotation, targetRotation, Time.deltaTime);
 
             //actual rotation
@@ -136,53 +144,12 @@ namespace Tirocinio
 
         }
 
-        void HandleGravity()
-        {
-            bool isFalling = velocity.y <= 0f || !isJumpPressed;
-
-
-            if (characterController.isGrounded)
-            {
-                velocity.y = groundedGravity;
-            }
-            else if (isFalling)
-            {
-                velocity.y = Mathf.Max(velocity.y + gravity * fallMultiplier * Time.deltaTime, maxFallSpeed);
-            }
-            else
-            {
-                velocity.y = velocity.y + gravity * Time.deltaTime;
-            }
-        }
-
 
         void Update()
         {
             HandleRotation();
-            float yVelocityBefore = velocity.y;
-            if (!isJumping)
-            {
-                if (brakeInput > 0.1f)//brake
-                {
-                    velocity = Vector3.Lerp(velocity, Vector3.zero, brakeMultiplier * brakeInput * Time.deltaTime);
-                }
-                else if (accelerationInput > 0.1f)//acceleration
-                {
-                    velocity = Vector3.Lerp(velocity, transform.forward * maxSpeed, accelerationMultiplier * accelerationInput * Time.deltaTime);
-                }
-                else if (accelerationInput < 0.1f)//drag
-                {
-                    velocity = Vector3.Lerp(velocity, Vector3.zero, dragMultiplier * Time.deltaTime);
-                }
-            }
-
-
-
-            velocity.y = yVelocityBefore;
-
-            characterController.Move(velocity * Time.deltaTime);
-            HandleGravity();
-            HandleJump();
+            currentState.UpdateStates();
+            characterController.Move(Velocity * Time.deltaTime);
 
         }
 
