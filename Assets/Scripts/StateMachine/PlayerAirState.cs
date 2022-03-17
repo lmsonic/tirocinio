@@ -5,7 +5,7 @@ namespace Tirocinio
     public class PlayerAirState : PlayerBaseState
     {
         public PlayerAirState(PlayerStateMachine context, PlayerStateFactory factory) : base(context, factory) { }
-        
+
         float smoothDampVelocity;
         public override void EnterState()
         {
@@ -16,7 +16,7 @@ namespace Tirocinio
             CheckSwitchStates();
 
             RotateXAxis();
-            
+
 
             bool isFalling = ctx.Velocity.y <= 0f || !ctx.IsJumpPressed;
 
@@ -38,17 +38,21 @@ namespace Tirocinio
         }
         public override void CheckSwitchStates()
         {
-            if (ctx.CharacterController.isGrounded)
+            (bool onGround, float groundAngle) = ctx.CheckGrounded(out RaycastHit groundHit);
+            bool falling = !(onGround && groundAngle <= ctx.maxWalkingAngle);
+
+            if (!falling)
                 SwitchState(factory.Grounded());
         }
 
         public override void InitializeSubState() { }
-        void RotateXAxis(){
+        void RotateXAxis()
+        {
             Vector3 eulers = ctx.transform.localEulerAngles;
             float targetAngle = Mathf.Atan2(ctx.Velocity.y, 1f) * Mathf.Rad2Deg;
-            eulers.x =Mathf.SmoothDampAngle(eulers.x,-targetAngle,ref smoothDampVelocity,0.15f);
+            eulers.x = Mathf.SmoothDampAngle(eulers.x, -targetAngle, ref smoothDampVelocity, 0.15f);
 
-            ctx.transform.localEulerAngles=eulers;
+            ctx.transform.localEulerAngles = eulers;
         }
     }
 }
