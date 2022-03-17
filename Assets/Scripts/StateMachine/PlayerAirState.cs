@@ -38,11 +38,9 @@ namespace Tirocinio
         }
         public override void CheckSwitchStates()
         {
-            (bool onGround, float groundAngle) = ctx.CheckGrounded(out RaycastHit groundHit);
-            bool falling = !(onGround && groundAngle <= ctx.maxWalkingAngle);
-
-            if (!falling)
+            if (ctx.CharacterController.isGrounded)
                 SwitchState(factory.Grounded());
+                
         }
 
         public override void InitializeSubState() { }

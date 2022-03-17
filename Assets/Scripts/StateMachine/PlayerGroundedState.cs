@@ -15,31 +15,28 @@ namespace Tirocinio
         }
         public override void UpdateState()
         {
+            ctx.Velocity.y = ctx.GroundedGravity;
             CheckSwitchStates();
-            if (ctx.IsJumpPressed)
-                ctx.SnapPlayerDown();
-            
 
         }
         public override void ExitState() { }
         public override void CheckSwitchStates()
         {
-            (bool onGround, float groundAngle) = ctx.CheckGrounded(out RaycastHit groundHit);
-            bool falling = !(onGround && groundAngle <= ctx.maxWalkingAngle);
-
             if (ctx.IsJumpPressed && !ctx.RequireNewJumpPress)
                 SwitchState(factory.Jump());
-            else if (falling)
+            else if (!ctx.CharacterController.isGrounded)
                 SwitchState(factory.Air());
         }
         public override void InitializeSubState()
         {
+            Vector3 groundedVelocity = ctx.Velocity;
+            groundedVelocity.y = 0f;
 
             if (ctx.BrakeInput > 0.1f)
                 SetSubState(factory.Brake());
             else if (ctx.AccelerationInput > 0.1f)
                 SetSubState(factory.Acceleration());
-            else if (ctx.Velocity.magnitude > 1f)
+            else if (groundedVelocity.magnitude > 1f)
                 SetSubState(factory.Drag());
             else
                 SetSubState(factory.Idle());
