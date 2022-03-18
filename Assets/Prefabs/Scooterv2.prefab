@@ -24,7 +24,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 55158764}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0, y: 0, z: -1.04}
+  m_LocalPosition: {x: 0.38, y: 0, z: -1.31}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -55,7 +55,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 870271744}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0.67}
+  m_LocalPosition: {x: -0.46, y: 0, z: 0.32}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -87,7 +87,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1038231881}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0, y: 0.21, z: 0.47}
+  m_LocalPosition: {x: 0, y: 0.67, z: 0.82}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -110,16 +110,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   groundSlopeAngle: 0
   groundSlopeNormal: {x: 0, y: 0, z: 0}
+  isGrounded: 0
   showDebug: 1
   castingMask:
     serializedVersion: 2
     m_Bits: 63
-  sphereCastRadius: 0.3
-  sphereCastDistance: 0.3
-  raycastLength: 0.3
+  groundDistance: 1
+  sphereCastRadius: 1
+  sphereCastDistance: 2
+  raycastLength: 2
   rayOriginOffset1: {fileID: 870271745}
   rayOriginOffset2: {fileID: 55158765}
-  controller: {fileID: 526203693540732592}
 --- !u!1 &1621390025943490199
 GameObject:
   m_ObjectHideFlags: 0
@@ -550,8 +551,7 @@ MonoBehaviour:
   MaxFallSpeed: -30
   FallMultiplier: 1.5
   groundChecker: {fileID: 1038231883}
-  groundRotationMultiplier: 15
-  groundNormal: {x: 0, y: 0, z: 0}
+  groundRotationMultiplier: 90
 --- !u!143 &526203693540732592
 CharacterController:
   m_ObjectHideFlags: 0
@@ -565,11 +565,11 @@ CharacterController:
   serializedVersion: 2
   m_Height: 3.41
   m_Radius: 0.5
-  m_SlopeLimit: 80
+  m_SlopeLimit: 45
   m_StepOffset: 0.5
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
-  m_Center: {x: 0, y: 1.64, z: 0.75}
+  m_Center: {x: 0, y: 1.65, z: 0.38}
 --- !u!1 &4344654184642377950
 GameObject:
   m_ObjectHideFlags: 0

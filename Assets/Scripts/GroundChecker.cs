@@ -17,6 +17,7 @@ namespace Tirocinio
         [Header("Settings")]
         public bool showDebug = false;                  // Show debug gizmos and lines
         public LayerMask castingMask;                  // Layer mask for casts. You'll want to ignore the player.
+        public float groundDistance = 0.25f;
         public float sphereCastRadius = 0.25f;
         public float sphereCastDistance = 0.75f;       // How far spherecast moves down from origin point
 
@@ -37,6 +38,8 @@ namespace Tirocinio
         {
             checkGround = true;
         }
+
+        public bool isFrontGrounded = false;
 
         bool checkGround = true;
 
@@ -63,6 +66,8 @@ namespace Tirocinio
             // Out hit point from our cast(s)
             RaycastHit hit;
 
+            isFrontGrounded = false;
+
             // SPHERECAST
             // "Casts a sphere along a ray and returns detailed information on what was hit."
             if (Physics.SphereCast(origin, sphereCastRadius, Vector3.down, out hit, sphereCastDistance, castingMask))
@@ -77,7 +82,8 @@ namespace Tirocinio
                 //  Now use this vector and the hit normal, to find the other vector moving up and down the hit surface
                 groundSlopeNormal = hit.normal;
 
-                hitGround = true;
+                hitGround = origin.y - hit.point.y < groundDistance;
+
 
             }
 
@@ -96,6 +102,11 @@ namespace Tirocinio
                 float angleOne = Vector3.Angle(slopeHit1.normal, Vector3.up);
 
                 float distanceToHit1 = (slopeHit1.point - transform.position).magnitude;
+
+                hitGround = hitGround || rayOriginOffset1.position.y - slopeHit1.point.y < groundDistance;
+
+                isFrontGrounded = rayOriginOffset1.position.y - slopeHit1.point.y < groundDistance;
+                
                 // 2ND RAYCAST
                 if (Physics.Raycast(rayOriginOffset2.position, Vector3.down, out slopeHit2, raycastLength))
                 {
@@ -108,17 +119,20 @@ namespace Tirocinio
                     Array.Sort(tempArray);
                     groundSlopeAngle = tempArray[1];
 
-
+                    hitGround = hitGround || rayOriginOffset2.position.y - slopeHit2.point.y < groundDistance;
                 }
                 else
                 {
+
                     // 2 collision points (sphere and first raycast): AVERAGE the two
                     float average = (groundSlopeAngle + angleOne) / 2;
                     groundSlopeAngle = average;
 
+                    
+
                 }
 
-                hitGround = true;
+                
 
 
             }

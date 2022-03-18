@@ -56,7 +56,9 @@ namespace Tirocinio
         public GroundChecker groundChecker;
 
         public float groundRotationMultiplier = 3f;
-    
+
+        public float aliveAngleLimit = 30f;
+
 
 
 
@@ -151,13 +153,27 @@ namespace Tirocinio
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
 
 
-            if (groundChecker.isGrounded && groundChecker.groundSlopeAngle < characterController.slopeLimit)
+            if (groundChecker.isGrounded)
             {
-                Vector3 targetForward = Vector3.ProjectOnPlane(transform.forward, groundChecker.groundSlopeNormal);
-                transform.forward = Vector3.Slerp(transform.forward,targetForward, groundRotationMultiplier *Time.deltaTime);
-                
-                Vector3 targetVelocity = Vector3.ProjectOnPlane(Velocity,groundChecker.groundSlopeNormal);
-                Velocity = Vector3.Slerp(Velocity,targetVelocity, groundRotationMultiplier * Time.deltaTime);
+
+
+                if (groundChecker.groundSlopeAngle < characterController.slopeLimit)
+                {
+                    float deltaAngle = Vector3.Angle(transform.up, groundChecker.groundSlopeNormal);
+                    if (deltaAngle > aliveAngleLimit && Velocity.magnitude > 5f && !groundChecker.isFrontGrounded)
+                        groundChecker.SetGroundedFalseFor(0.5f);
+
+                    if (groundChecker.groundSlopeAngle > 0f)
+                    {
+                        Vector3 targetForward = Vector3.ProjectOnPlane(transform.forward, groundChecker.groundSlopeNormal);
+                        transform.forward = Vector3.Slerp(transform.forward, targetForward, groundRotationMultiplier * Time.deltaTime);
+
+                        Vector3 targetVelocity = Vector3.ProjectOnPlane(Velocity, groundChecker.groundSlopeNormal);
+                        Velocity = Vector3.Slerp(Velocity, targetVelocity, groundRotationMultiplier * Time.deltaTime);
+                    }
+                }
+
+
             }
 
         }
