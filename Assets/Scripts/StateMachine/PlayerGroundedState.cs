@@ -11,20 +11,20 @@ namespace Tirocinio
             isRootState = true;
             ResetXRotation();
             InitializeSubState();
+            ctx.Velocity.y = ctx.GroundedGravity;
 
         }
         public override void UpdateState()
         {
-            ctx.Velocity.y = ctx.GroundedGravity;
-            CheckSwitchStates();
 
+            CheckSwitchStates();
         }
         public override void ExitState() { }
         public override void CheckSwitchStates()
         {
             if (ctx.IsJumpPressed && !ctx.RequireNewJumpPress)
                 SwitchState(factory.Jump());
-            else if (!ctx.CharacterController.isGrounded)
+            else if (!ctx.groundChecker.isGrounded)
                 SwitchState(factory.Air());
         }
         public override void InitializeSubState()
@@ -44,7 +44,8 @@ namespace Tirocinio
 
         }
 
-        void ResetXRotation(){
+        void ResetXRotation()
+        {
             Vector3 eulers = ctx.transform.localEulerAngles;
             eulers.x = 0f;
             ctx.transform.localEulerAngles = eulers;
@@ -60,8 +61,9 @@ namespace Tirocinio
         {
 
             CheckSwitchStates();
-            ctx.Velocity = Vector3.Lerp(ctx.Velocity, ctx.transform.forward * ctx.MaxSpeed, ctx.AccelerationMultiplier * ctx.AccelerationInput * Time.deltaTime);
 
+            ctx.LerpGroundedVelocity(ctx.transform.forward * ctx.MaxSpeed, 
+                ctx.AccelerationMultiplier * ctx.AccelerationInput * Time.deltaTime);
 
         }
         public override void ExitState() { }
@@ -110,7 +112,8 @@ namespace Tirocinio
         {
 
             CheckSwitchStates();
-            ctx.Velocity = Vector3.Lerp(ctx.Velocity, Vector3.zero, ctx.BrakeMultiplier * ctx.BrakeInput * Time.deltaTime);
+
+            ctx.LerpGroundedVelocity(Vector3.zero, ctx.BrakeMultiplier * ctx.BrakeInput * Time.deltaTime);
 
         }
         public override void ExitState() { }
@@ -140,7 +143,9 @@ namespace Tirocinio
 
             CheckSwitchStates();
 
-            ctx.Velocity = Vector3.Lerp(ctx.Velocity, Vector3.zero, ctx.DragMultiplier * Time.deltaTime);
+
+            ctx.LerpGroundedVelocity(Vector3.zero, ctx.DragMultiplier * Time.deltaTime);
+
 
         }
         public override void ExitState() { }
@@ -170,14 +175,15 @@ namespace Tirocinio
 
             CheckSwitchStates();
 
-            ctx.Velocity = Vector3.Lerp(ctx.Velocity, ctx.transform.forward * ctx.BackwardsSpeed * ctx.CurrentMovement.z, Time.deltaTime);
+
+            ctx.LerpGroundedVelocity(ctx.transform.forward * ctx.BackwardsSpeed * ctx.CurrentMovement.z, Time.deltaTime);
 
 
         }
         public override void ExitState() { }
         public override void CheckSwitchStates()
         {
-            if (ctx.CurrentMovement.z > - 0.1f)
+            if (ctx.CurrentMovement.z > -0.1f)
             {
                 SwitchState(factory.Idle());
             }

@@ -10,6 +10,7 @@ namespace Tirocinio
         public override void EnterState()
         {
             isRootState = true;
+
         }
         public override void UpdateState()
         {
@@ -38,7 +39,7 @@ namespace Tirocinio
         }
         public override void CheckSwitchStates()
         {
-            if (ctx.CharacterController.isGrounded)
+            if (ctx.groundChecker.isGrounded)
                 SwitchState(factory.Grounded());
                 
         }

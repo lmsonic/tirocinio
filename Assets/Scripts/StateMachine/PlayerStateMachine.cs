@@ -22,7 +22,7 @@ namespace Tirocinio
         public float BackwardsSpeed = 10f;
 
         public float GroundedGravity { get => groundedGravity; }
-        float groundedGravity = -1f;
+        float groundedGravity = 0f;
         public float Gravity { get => gravity; }
         float gravity;
 
@@ -52,6 +52,13 @@ namespace Tirocinio
         public float maxJumpTime = 0.5f;
         public float MaxFallSpeed = -30f;
         public float FallMultiplier = 1.5f;
+
+        public GroundChecker groundChecker;
+
+        public float groundRotationMultiplier = 3f;
+    
+
+
 
         public PlayerBaseState CurrentState
         {
@@ -130,6 +137,8 @@ namespace Tirocinio
         void HandleRotation()
         {
             float targetAngle = cameraTransform.eulerAngles.y;
+
+
             //rotate handle
             Quaternion targetRotation = Quaternion.Euler(0f, CurrentMovement.x * maxTurnDegrees, 0f);
             handleTransform.localRotation = Quaternion.Slerp(handleTransform.localRotation, targetRotation, Time.deltaTime);
@@ -142,19 +151,46 @@ namespace Tirocinio
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
 
 
-            
-            
+            if (groundChecker.isGrounded && groundChecker.groundSlopeAngle < characterController.slopeLimit)
+            {
+                Vector3 targetForward = Vector3.ProjectOnPlane(transform.forward, groundChecker.groundSlopeNormal);
+                transform.forward = Vector3.Slerp(transform.forward,targetForward, groundRotationMultiplier *Time.deltaTime);
+                
+                Vector3 targetVelocity = Vector3.ProjectOnPlane(Velocity,groundChecker.groundSlopeNormal);
+                Velocity = Vector3.Slerp(Velocity,targetVelocity, groundRotationMultiplier * Time.deltaTime);
+            }
 
-            
+        }
+
+        public void LerpGroundedVelocity(Vector3 target, float t)
+        {
+
+            Velocity = Vector3.Lerp(Velocity, target, t);
+
         }
 
 
         void Update()
         {
-            HandleRotation();
             currentState.UpdateStates();
             characterController.Move(Velocity * Time.deltaTime);
 
+
+        }
+
+        void LateUpdate()
+        {
+            HandleRotation();
+        }
+
+
+
+        private void OnDrawGizmos()
+        {
+            Gizmos.color = Color.red;
+            Gizmos.DrawRay(transform.position, transform.forward);
+            Gizmos.color = Color.blue;
+            Gizmos.DrawRay(transform.position, Velocity);
         }
 
         private void OnEnable()
