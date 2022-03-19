@@ -9,10 +9,9 @@ namespace Tirocinio
     {
 
         PlayerInput playerInput;
-        public CharacterController CharacterController { get => characterController; }
-        CharacterController characterController;
+        public KinematicBody KinematicBody { get => kinematicBody; }
+        KinematicBody kinematicBody;
 
-        Animator animator;
         Transform cameraTransform;
         public Transform handleTransform;
         public Transform bodyTransform;
@@ -75,8 +74,7 @@ namespace Tirocinio
         private void Awake()
         {
             playerInput = new PlayerInput();
-            characterController = GetComponent<CharacterController>();
-            animator = GetComponent<Animator>();
+            kinematicBody = GetComponent<KinematicBody>();
             cameraTransform = Camera.main.transform;
 
             states = new PlayerStateFactory(this);
@@ -142,39 +140,85 @@ namespace Tirocinio
 
 
             //rotate handle
-            Quaternion targetRotation = Quaternion.Euler(0f, CurrentMovement.x * maxTurnDegrees, 0f);
-            handleTransform.localRotation = Quaternion.Slerp(handleTransform.localRotation, targetRotation, Time.deltaTime);
+            handleTransform.localRotation = FrontRotation();
             //turn
-            targetRotation = Quaternion.Euler(0f, 0f, -CurrentMovement.x * maxTurnDegrees);
-            bodyTransform.localRotation = Quaternion.Slerp(bodyTransform.localRotation, targetRotation, Time.deltaTime);
-
-            //actual rotation
-            targetRotation = Quaternion.Euler(0f, targetAngle, 0f);
-            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
+            bodyTransform.localRotation = BodyRotation();
 
 
-            if (groundChecker.isGrounded)
+
+
+        }
+
+        Quaternion FrontRotation()
+        {
+            Quaternion targetRotation = Quaternion.Euler(0f, CurrentMovement.x * maxTurnDegrees, 0f);
+            return Quaternion.Slerp(handleTransform.localRotation, targetRotation, 2f * Time.deltaTime);
+        }
+
+        Quaternion BodyRotation()
+        {
+            Quaternion targetRotation = Quaternion.Euler(0f, 0f, -CurrentMovement.x * maxTurnDegrees);
+            return Quaternion.Slerp(bodyTransform.localRotation, targetRotation, Time.deltaTime);
+        }
+
+
+
+        void HandleRotationPhysics()
+        {
+
+            Vector3 finalEulerRotation = EulerRotationOnYAxis() + EulerAirRotationOnXAxis();
+            Quaternion finalRotation = Quaternion.Euler(finalEulerRotation);
+            kinematicBody.Rotate(finalRotation);
+        }
+
+        Vector3 EulerRotationOnGround()
+        {
+            if (!kinematicBody.isGrounded) return Vector3.zero;
+
+            if (groundChecker.groundSlopeAngle < kinematicBody.slopeLimit)
             {
+                //float deltaAngle = Vector3.Angle(transform.up, groundChecker.groundSlopeNormal);
+                //if (deltaAngle > aliveAngleLimit && Velocity.magnitude > 5f && !groundChecker.isFrontGrounded)
+                //    groundChecker.SetGroundedFalseFor(0.5f);
 
-
-                if (groundChecker.groundSlopeAngle < characterController.slopeLimit)
+                if (groundChecker.groundSlopeAngle > 0f)
                 {
-                    float deltaAngle = Vector3.Angle(transform.up, groundChecker.groundSlopeNormal);
-                    if (deltaAngle > aliveAngleLimit && Velocity.magnitude > 5f && !groundChecker.isFrontGrounded)
-                        groundChecker.SetGroundedFalseFor(0.5f);
+                    Vector3 targetForward = Vector3.ProjectOnPlane(transform.forward, groundChecker.groundSlopeNormal);
+                    Vector3 deltaForward = Vector3.Slerp(transform.forward, targetForward, groundRotationMultiplier * Time.deltaTime);
 
-                    if (groundChecker.groundSlopeAngle > 0f)
-                    {
-                        Vector3 targetForward = Vector3.ProjectOnPlane(transform.forward, groundChecker.groundSlopeNormal);
-                        transform.forward = Vector3.Slerp(transform.forward, targetForward, groundRotationMultiplier * Time.deltaTime);
+                    Vector3 targetVelocity = Vector3.ProjectOnPlane(Velocity, groundChecker.groundSlopeNormal);
+                    Velocity = Vector3.Slerp(Velocity, targetVelocity, groundRotationMultiplier * Time.deltaTime);
 
-                        Vector3 targetVelocity = Vector3.ProjectOnPlane(Velocity, groundChecker.groundSlopeNormal);
-                        Velocity = Vector3.Slerp(Velocity, targetVelocity, groundRotationMultiplier * Time.deltaTime);
-                    }
+                    
                 }
-
-
             }
+
+
+            return Vector3.zero;
+        }
+
+        Vector3 EulerRotationOnYAxis()
+        {
+            float targetAngle = cameraTransform.eulerAngles.y;
+            float deltaAngle = Mathf.LerpAngle(transform.eulerAngles.y, targetAngle, rotationSpeed * Time.deltaTime);
+            return new Vector3(0f, deltaAngle, 0f);
+        }
+
+        float smoothDampVelocity;
+
+        Vector3 EulerAirRotationOnXAxis()
+        {
+            if (groundChecker.isGrounded) return Vector3.zero;
+
+            float targetAngle = Mathf.Atan2(Velocity.y, 1f) * Mathf.Rad2Deg;
+            Debug.Log(targetAngle);
+            float deltaAngle = Mathf.SmoothDampAngle(transform.eulerAngles.x, -targetAngle, ref smoothDampVelocity, 0.5f);
+            return new Vector3(deltaAngle, 0f, 0f);
+        }
+
+        private void Update()
+        {
+            HandleRotation();
 
         }
 
@@ -186,18 +230,17 @@ namespace Tirocinio
         }
 
 
-        void Update()
+
+        private void FixedUpdate()
         {
+
+            HandleRotationPhysics();
+            Velocity = kinematicBody.velocity;
             currentState.UpdateStates();
-            characterController.Move(Velocity * Time.deltaTime);
-
-
+            kinematicBody.Move(Velocity);
         }
 
-        void LateUpdate()
-        {
-            HandleRotation();
-        }
+
 
 
 
