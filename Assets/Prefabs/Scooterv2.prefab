@@ -24,7 +24,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 55158764}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.38, y: 0, z: -1.31}
+  m_LocalPosition: {x: 0.38, y: 0, z: -1.55}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -55,7 +55,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 870271744}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.46, y: 0, z: 0.32}
+  m_LocalPosition: {x: -0.46, y: 0, z: 0.696}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -87,7 +87,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1038231881}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.67, z: 0.82}
+  m_LocalPosition: {x: 0, y: 0.761, z: 0.634}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -116,11 +116,12 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 63
   groundDistance: 1
-  sphereCastRadius: 1
+  sphereCastRadius: 0.6
   sphereCastDistance: 2
   raycastLength: 2
   rayOriginOffset1: {fileID: 870271745}
   rayOriginOffset2: {fileID: 55158765}
+  isFrontGrounded: 0
 --- !u!1 &1621390025943490199
 GameObject:
   m_ObjectHideFlags: 0
@@ -498,7 +499,8 @@ GameObject:
   m_Component:
   - component: {fileID: 4344654184363971642}
   - component: {fileID: 4344654185279372375}
-  - component: {fileID: 526203693540732592}
+  - component: {fileID: 6743200379482980162}
+  - component: {fileID: 2291243114651145002}
   m_Layer: 6
   m_Name: Scooterv2
   m_TagString: Player
@@ -552,8 +554,27 @@ MonoBehaviour:
   FallMultiplier: 1.5
   groundChecker: {fileID: 1038231883}
   groundRotationMultiplier: 90
---- !u!143 &526203693540732592
-CharacterController:
+  aliveAngleLimit: 15
+--- !u!114 &6743200379482980162
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4344654184363971643}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1f2f60cf05aa9da45b047b1dcd052218, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  slopeLimit: 45
+  stepOffset: 0.3
+  skinWidth: 0.08
+  m_center: {x: 0, y: 1.65, z: 0.64}
+  m_radius: 0.5
+  m_height: 3.44
+--- !u!136 &2291243114651145002
+CapsuleCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -562,14 +583,10 @@ CharacterController:
   m_Material: {fileID: 0}
   m_IsTrigger: 0
   m_Enabled: 1
-  serializedVersion: 2
-  m_Height: 3.41
   m_Radius: 0.5
-  m_SlopeLimit: 45
-  m_StepOffset: 0.5
-  m_SkinWidth: 0.08
-  m_MinMoveDistance: 0.001
-  m_Center: {x: 0, y: 1.65, z: 0.38}
+  m_Height: 3.44
+  m_Direction: 1
+  m_Center: {x: 0, y: 1.65, z: 0.64}
 --- !u!1 &4344654184642377950
 GameObject:
   m_ObjectHideFlags: 0
