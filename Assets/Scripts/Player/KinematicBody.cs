@@ -148,7 +148,7 @@ namespace Tirocinio
         {
             if (velocity.sqrMagnitude > MinMoveDistance)
             {
-                
+
                 Vector3 localVelocity = transform.InverseTransformVector(velocity) * Time.deltaTime;
                 Vector3 lateralVelocity = new Vector3(localVelocity.x, 0, localVelocity.z);
                 Vector3 verticalVelocity = new Vector3(0, localVelocity.y, 0);
@@ -193,17 +193,20 @@ namespace Tirocinio
                 origin = m_position + m_center - direction * m_radius;
                 bottom = origin - m_upDirection * (capsuleOffset - stepOffset);
                 top = origin + m_upDirection * capsuleOffset;
-            
-                topGizmoSphere = top;
-                bottomGizmoSphere = bottom;
-                directionGizmoSphere = direction;
-                radiusGizmoSphere = m_radius;
-                distanceGizmoSphere = distance;
+                if (direction != Vector3.zero)
+                {
+                    topGizmoSphere = top;
+                    bottomGizmoSphere = bottom;
+                    directionGizmoSphere = direction;
+                    radiusGizmoSphere = m_radius;
+                    distanceGizmoSphere = distance;
+                }
 
-                if (Physics.CapsuleCast(top, bottom, m_radius, direction, out hitInfo, distance + m_radius,collisionMask))
+                if (Physics.CapsuleCast(top, bottom, m_radius, direction, out hitInfo, distance + m_radius, collisionMask))
                 {
                     slideAngle = Vector3.Angle(m_upDirection, hitInfo.normal);
                     safeDistance = hitInfo.distance - m_radius - skinWidth;
+
                     distanceGizmoSphere = safeDistance;
                     m_position += direction * safeDistance;
                     m_contacts.Add(hitInfo);
@@ -255,13 +258,15 @@ namespace Tirocinio
         {
             Gizmos.color = Color.blue;
             Gizmos.DrawWireSphere(topGizmoSphere, radiusGizmoSphere);
-            Gizmos.DrawWireSphere(topGizmoSphere + directionGizmoSphere * (distanceGizmoSphere + radiusGizmoSphere), radiusGizmoSphere);
-
             Gizmos.DrawWireSphere(bottomGizmoSphere, radiusGizmoSphere);
-            Gizmos.DrawWireSphere(bottomGizmoSphere + directionGizmoSphere * (distanceGizmoSphere + radiusGizmoSphere), radiusGizmoSphere);
+
             Gizmos.color = Color.cyan;
-            Gizmos.DrawLine(topGizmoSphere,topGizmoSphere + directionGizmoSphere * (distanceGizmoSphere + radiusGizmoSphere));
-            Gizmos.DrawLine(bottomGizmoSphere,bottomGizmoSphere + directionGizmoSphere * (distanceGizmoSphere + radiusGizmoSphere));
+            Gizmos.DrawLine(topGizmoSphere, topGizmoSphere + directionGizmoSphere * (distanceGizmoSphere + radiusGizmoSphere));
+            Gizmos.DrawLine(bottomGizmoSphere, bottomGizmoSphere + directionGizmoSphere * (distanceGizmoSphere + radiusGizmoSphere));
+
+            Gizmos.color = Color.black;
+            Gizmos.DrawWireSphere(topGizmoSphere + directionGizmoSphere * (distanceGizmoSphere + radiusGizmoSphere), radiusGizmoSphere);
+            Gizmos.DrawWireSphere(bottomGizmoSphere + directionGizmoSphere * (distanceGizmoSphere + radiusGizmoSphere), radiusGizmoSphere);
         }
     }
 

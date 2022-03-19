@@ -145,28 +145,7 @@ namespace Tirocinio
             bodyTransform.localRotation = BodyRotation();
 
 
-            // if (kinematicBody.isGrounded)
-            // {
 
-
-            //     if (groundChecker.groundSlopeAngle < kinematicBody.slopeLimit)
-            //     {
-            //         float deltaAngle = Vector3.Angle(transform.up, groundChecker.groundSlopeNormal);
-            //         if (deltaAngle > aliveAngleLimit && Velocity.magnitude > 5f && !groundChecker.isFrontGrounded)
-            //             groundChecker.SetGroundedFalseFor(0.5f);
-
-            //         if (groundChecker.groundSlopeAngle > 0f)
-            //         {
-            //             Vector3 targetForward = Vector3.ProjectOnPlane(transform.forward, groundChecker.groundSlopeNormal);
-            //             transform.forward = Vector3.Slerp(transform.forward, targetForward, groundRotationMultiplier * Time.deltaTime);
-
-            //             Vector3 targetVelocity = Vector3.ProjectOnPlane(Velocity, groundChecker.groundSlopeNormal);
-            //             Velocity = Vector3.Slerp(Velocity, targetVelocity, groundRotationMultiplier * Time.deltaTime);
-            //         }
-            //     }
-
-
-            // }
 
         }
 
@@ -190,6 +169,32 @@ namespace Tirocinio
             Vector3 finalEulerRotation = EulerRotationOnYAxis() + EulerAirRotationOnXAxis();
             Quaternion finalRotation = Quaternion.Euler(finalEulerRotation);
             kinematicBody.Rotate(finalRotation);
+        }
+
+        Vector3 EulerRotationOnGround()
+        {
+            if (!kinematicBody.isGrounded) return Vector3.zero;
+
+            if (groundChecker.groundSlopeAngle < kinematicBody.slopeLimit)
+            {
+                //float deltaAngle = Vector3.Angle(transform.up, groundChecker.groundSlopeNormal);
+                //if (deltaAngle > aliveAngleLimit && Velocity.magnitude > 5f && !groundChecker.isFrontGrounded)
+                //    groundChecker.SetGroundedFalseFor(0.5f);
+
+                if (groundChecker.groundSlopeAngle > 0f)
+                {
+                    Vector3 targetForward = Vector3.ProjectOnPlane(transform.forward, groundChecker.groundSlopeNormal);
+                    Vector3 deltaForward = Vector3.Slerp(transform.forward, targetForward, groundRotationMultiplier * Time.deltaTime);
+
+                    Vector3 targetVelocity = Vector3.ProjectOnPlane(Velocity, groundChecker.groundSlopeNormal);
+                    Velocity = Vector3.Slerp(Velocity, targetVelocity, groundRotationMultiplier * Time.deltaTime);
+
+                    
+                }
+            }
+
+
+            return Vector3.zero;
         }
 
         Vector3 EulerRotationOnYAxis()
