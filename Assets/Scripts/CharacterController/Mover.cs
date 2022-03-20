@@ -62,6 +62,30 @@ namespace Tirocinio
 
 
         }
+
+        public class CollisionInfo
+        {
+            public Vector3 position, normal, remainingVelocity;
+            public CollisionInfo(Vector3 position, Vector3 normal, Vector3 remainingVelocity)
+            {
+                this.position = position;
+                this.normal = normal;
+                this.remainingVelocity = remainingVelocity;
+            }
+
+            public float GetAngle(Vector3 upDirection)
+            {
+                return Vector3.Angle(upDirection, normal);
+            }
+
+            public float GetAngle()
+            {
+                return GetAngle(Vector3.up);
+            }
+
+
+        }
+
         public enum SensorType { Raycast, Spherecast, RaycastArray }
         [Header("Mover Options")]
         [Range(0, 1)]
@@ -88,6 +112,7 @@ namespace Tirocinio
 
         public Vector3 GetGroundPoint() => groundPoint;
         public Vector3 GetGroundNormal() => groundNormal;
+
 
         private CapsuleCollider _collider;
         private Rigidbody _rigidbody;
@@ -127,6 +152,7 @@ namespace Tirocinio
         const float sphereCastRadius = 0.4f;
         bool _isGrounded = false;
 
+
         public bool IsGrounded() => _isGrounded;
 
         public void CheckForGround()
@@ -164,6 +190,7 @@ namespace Tirocinio
 
                     break;
             }
+
 
         }
         bool RaycastArray(Vector3 center, float radius, ref Vector3 position, ref Vector3 normal)
@@ -252,14 +279,20 @@ namespace Tirocinio
             sensorRange = value ? 0.7f : 0.6f;
         }
 
-        Vector3 _velocity = Vector3.zero;
+        Vector3 _velocity;
 
         public void SetVelocity(Vector3 velocity)
         {
             _velocity = velocity;
         }
 
-        public Vector3 GetVelocity() => _velocity;
+        public Vector3 GetVelocity()
+        {
+            return _velocity;
+        }
+
+        Vector3 targetPosition;
+
 
         private void FixedUpdate()
         {
@@ -268,71 +301,117 @@ namespace Tirocinio
             Vector3 verticalVelocity = _velocity;
             verticalVelocity.x = 0f; verticalVelocity.z = 0f;
 
-            position = _rigidbody.position;
+            targetPosition = transform.position;
 
             MoveAndSlide(lateralVelocity * Time.fixedDeltaTime);
 
             MoveAndSlide(verticalVelocity * Time.fixedDeltaTime);
 
-            _rigidbody.MovePosition(position);
+            _rigidbody.MovePosition(targetPosition);
         }
 
         void MoveAndSlide(Vector3 linearVelocity, int maxSlides = 4)
         {
-            MoveAndSlide(linearVelocity, Vector3.up, maxSlides);
+            MoveAndSlide(linearVelocity, transform.up, maxSlides);
         }
 
-
-        List<Raycast> raySlides;
-
-        Vector3 position;
-
-        void MoveAndSlide(Vector3 linearVelocity, Vector3 upDirection, int maxSlides = 4)
+        CollisionInfo MoveAndCollide(Vector3 linearVelocity)
         {
-            Vector3 origin, top, bottom;
-            RaycastHit hitInfo;
-            float safeDistance;
-            float slideAngle;
 
-            raySlides = new List<Raycast>();
+            float capsuleOffset = colliderHeight * 0.5f - colliderThickness;
+
+            Vector3 origin = targetPosition + colliderOffset;
+            Vector3 top = origin + transform.up * colliderHeight;
+            Vector3 bottom = origin - transform.up * (colliderHeight - StepHeight);
+
 
             LayerMask mask = gameObject.layer;
 
-            float capsuleOffset = colliderHeight * 0.5f - colliderThickness;
+            RaycastHit hitInfo;
+
+            float safeDistance;
 
             Vector3 direction = linearVelocity.normalized;
             float distance = linearVelocity.magnitude;
 
+            if (_rigidbody.SweepTest(direction, out hitInfo, distance))
+            {
+                Vector3 closestPoint = _collider.ClosestPoint(hitInfo.point);
+                safeDistance = (closestPoint - hitInfo.point).magnitude - 0.08f;
+                targetPosition += direction * safeDistance;
+
+                direction = Vector3.ProjectOnPlane(direction, hitInfo.normal);
+                distance -= safeDistance;
+
+                KeepGrounded(linearVelocity.y);
+
+                return new CollisionInfo(hitInfo.point, hitInfo.normal, direction * distance);
+            }
+            else
+            {
+                targetPosition += linearVelocity;
+                KeepGrounded(linearVelocity.y);
+                return null;
+            }
+
+            // if (Physics.CapsuleCast(top, bottom, colliderThickness, direction, out hitInfo, distance + colliderThickness, ~mask))
+            // {
+            //     Vector3 closestPoint = _collider.ClosestPoint(hitInfo.point);
+            //     safeDistance = hitInfo.distance - colliderThickness - 0.08f;
+            //     targetPosition += direction * safeDistance;
+
+            //     direction = Vector3.ProjectOnPlane(direction, hitInfo.normal);
+            //     distance -= safeDistance;
+
+            //     KeepGrounded(linearVelocity.y);
+
+            //     return new CollisionInfo(hitInfo.point, hitInfo.normal, direction * distance);
+            // }
+            // else
+            // {
+            //     targetPosition += linearVelocity;
+
+            //     KeepGrounded(linearVelocity.y);
+
+
+            //     return null;
+            // }
+        }
+
+        void KeepGrounded(float verticalVelocity)
+        {
+            if (_isGrounded)
+            {
+                if (verticalVelocity == 0f)
+                    targetPosition.y = groundPoint.y;
+                else    
+                    targetPosition.y = Mathf.Lerp(targetPosition.y,groundPoint.y,Time.fixedDeltaTime  *10f);
+            }
+        }
+
+
+
+        void MoveAndSlide(Vector3 linearVelocity, Vector3 upDirection, int maxSlides = 4)
+        {
+
+            LayerMask mask = gameObject.layer;
+
+
 
             for (int i = 0; i < maxSlides; i++)
             {
-                origin = transform.position + colliderOffset;
-                bottom = origin - upDirection * (capsuleOffset - StepHeight);
-                top = origin + upDirection * capsuleOffset;
 
-                Raycast ray = new Raycast(origin, direction, distance + colliderThickness);
-                if (Physics.CapsuleCast(top, bottom, colliderThickness, ray.direction, out hitInfo, ray.distance, ~mask))
-                {
-                    slideAngle = Vector3.Angle(upDirection, hitInfo.normal);
-                    safeDistance = hitInfo.distance - colliderThickness - 0.08f;
-                    position += direction * safeDistance;
 
-                    ray.distance = hitInfo.distance;
+                CollisionInfo info = MoveAndCollide(linearVelocity);
+                if (info == null) break;
 
-                    direction = Vector3.ProjectOnPlane(direction, hitInfo.normal);
-                    distance -= safeDistance;
+                linearVelocity = info.remainingVelocity;
 
-                }
-                else
-                {
-                    position += direction * distance;
-                    break;
-                }
 
-                raySlides.Add(ray);
             }
 
         }
+
 
 
         private void OnDrawGizmos()
@@ -391,13 +470,9 @@ namespace Tirocinio
                 }
 
                 Gizmos.color = Color.blue;
-                foreach (var ray in raySlides)
-                {
 
-                    Gizmos.DrawRay(ray.origin, ray.direction * ray.distance);
-                    Gizmos.DrawWireMesh(capsuleMesh, ray.origin + ray.direction * ray.distance, 
-                        Quaternion.identity, new Vector3(colliderThickness * 2f, colliderHeight*0.5f, colliderThickness * 2f));
-                }
+                Gizmos.DrawRay(origin, _rigidbody.velocity);
+
             }
         }
 
