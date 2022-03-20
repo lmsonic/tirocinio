@@ -15,6 +15,7 @@ namespace Tirocinio
         SerializedProperty sensorArrayRows;
         SerializedProperty sensorArrayRayCount;
         SerializedProperty sensorArrayRowsAreOffset;
+        SerializedProperty capsuleMesh;
         CapsuleCollider collider;
 
         private void OnEnable()
@@ -32,6 +33,8 @@ namespace Tirocinio
             sensorArrayRows = serializedObject.FindProperty("sensorArrayRows");
             sensorArrayRayCount = serializedObject.FindProperty("sensorArrayRayCount");
             sensorArrayRowsAreOffset = serializedObject.FindProperty("sensorArrayRowsAreOffset");
+
+            capsuleMesh = serializedObject.FindProperty("capsuleMesh");
 
             collider = (target as MonoBehaviour).GetComponent<CapsuleCollider>();
         }
@@ -53,6 +56,8 @@ namespace Tirocinio
             EditorGUILayout.PropertyField(sensorArrayRows);
             EditorGUILayout.PropertyField(sensorArrayRayCount);
             EditorGUILayout.PropertyField(sensorArrayRowsAreOffset);
+
+            EditorGUILayout.PropertyField(capsuleMesh);
 
             collider.height = colliderHeight.floatValue;
             collider.radius = colliderThickness.floatValue;

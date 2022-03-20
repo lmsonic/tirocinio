@@ -8,54 +8,6 @@ namespace Tirocinio
     [RequireComponent(typeof(CapsuleCollider))]
     public class Mover : MonoBehaviour
     {
-        public enum SensorType { Raycast, Spherecast, RaycastArray }
-        [Header("Mover Options")]
-        [Range(0, 1)]
-        public float stepHeightRatio = 0.25f;
-        [Header("Collider Options")]
-        [SerializeField]
-        public float colliderHeight = 2f;
-        public float colliderThickness = 1f;
-        public Vector3 colliderOffset = new Vector3(0f, 0.5f, 0f);
-        [Header("Sensor Options")]
-        public SensorType sensorType = SensorType.Raycast;
-        public bool isInDebugMode = false;
-        [Header("Sensor Array Options")]
-        [Range(1, 5)]
-        public int sensorArrayRows;
-        [Range(1, 15)]
-        public int sensorArrayRayCount;
-        public bool sensorArrayRowsAreOffset;
-
-        private CapsuleCollider _collider;
-        private Rigidbody _rigidbody;
-
-        float StepHeight
-        {
-            get => stepHeightRatio * colliderHeight;
-        }
-
-        public void SetColliderHeight(float _newColliderHeight)
-        {
-            colliderHeight = _newColliderHeight;
-            _collider.height = _newColliderHeight;
-        }
-        public void SetColliderThickness(float _newColliderThickness)
-        {
-            colliderThickness = _newColliderThickness;
-            _collider.radius = _newColliderThickness;
-        }
-        public void SetStepHeightRatio(float _newStepHeightRatio)
-        {
-            stepHeightRatio = _newStepHeightRatio;
-        }
-
-        const float raySensorDistance = 0.5f;
-
-        const float sphereCastRadius = 0.4f;
-        bool _isGrounded = false;
-
-
         public struct Raycast
         {
             public Raycast(Vector3 origin, Vector3 direction, float distance)
@@ -110,10 +62,72 @@ namespace Tirocinio
 
 
         }
-        Raycast currentRaycast;
+        public enum SensorType { Raycast, Spherecast, RaycastArray }
+        [Header("Mover Options")]
+        [Range(0, 1)]
+        public float stepHeightRatio = 0.25f;
+        [Header("Collider Options")]
+        [SerializeField]
+        public float colliderHeight = 2f;
+        public float colliderThickness = 1f;
+        public Vector3 colliderOffset = new Vector3(0f, 0.5f, 0f);
+        [Header("Sensor Options")]
+        public SensorType sensorType = SensorType.Raycast;
+        public bool isInDebugMode = false;
+        [Header("Sensor Array Options")]
+        [Range(1, 5)]
+        public int sensorArrayRows;
+        [Range(1, 15)]
+        public int sensorArrayRayCount;
+        public bool sensorArrayRowsAreOffset;
+
+        public Mesh capsuleMesh;
 
         Vector3 groundPoint;
         Vector3 groundNormal;
+
+        public Vector3 GetGroundPoint() => groundPoint;
+        public Vector3 GetGroundNormal() => groundNormal;
+
+        private CapsuleCollider _collider;
+        private Rigidbody _rigidbody;
+
+        Raycast currentRaycast;
+        List<Raycast> raycastArray = new List<Raycast>();
+
+        float StepHeight
+        {
+            get => stepHeightRatio * colliderHeight;
+        }
+
+        public void SetColliderHeight(float _newColliderHeight)
+        {
+            colliderHeight = _newColliderHeight;
+            _collider.height = _newColliderHeight;
+        }
+        public void SetColliderThickness(float _newColliderThickness)
+        {
+            colliderThickness = _newColliderThickness;
+            _collider.radius = _newColliderThickness;
+        }
+        public void SetStepHeightRatio(float _newStepHeightRatio)
+        {
+            stepHeightRatio = _newStepHeightRatio;
+        }
+
+        private void Awake()
+        {
+            _collider = GetComponent<CapsuleCollider>();
+            _rigidbody = GetComponent<Rigidbody>();
+            _rigidbody.isKinematic = true;
+        }
+
+        float sensorRange = 0.6f;
+
+        const float sphereCastRadius = 0.4f;
+        bool _isGrounded = false;
+
+        public bool IsGrounded() => _isGrounded;
 
         public void CheckForGround()
         {
@@ -124,7 +138,7 @@ namespace Tirocinio
             switch (sensorType)
             {
                 case SensorType.Raycast:
-                    currentRaycast = new Raycast(origin, -transform.up, colliderHeight * 0.6f);
+                    currentRaycast = new Raycast(origin, -transform.up, colliderHeight * sensorRange);
 
                     _isGrounded = currentRaycast.Cast(mask, out hit);
                     if (_isGrounded)
@@ -135,7 +149,7 @@ namespace Tirocinio
 
                     break;
                 case SensorType.Spherecast:
-                    currentRaycast = new Raycast(origin, -transform.up, colliderHeight * 0.6f);
+                    currentRaycast = new Raycast(origin, -transform.up, colliderHeight * sensorRange);
 
                     _isGrounded = currentRaycast.SphereCast(sphereCastRadius, mask, out hit);
                     if (_isGrounded)
@@ -146,17 +160,12 @@ namespace Tirocinio
 
                     break;
                 case SensorType.RaycastArray:
-                    _isGrounded = RaycastArray(origin, colliderThickness,ref groundPoint, ref groundNormal);
+                    _isGrounded = RaycastArray(origin, colliderThickness, ref groundPoint, ref groundNormal);
 
                     break;
             }
 
         }
-
-
-
-        List<Raycast> raycastArray = new List<Raycast>();
-
         bool RaycastArray(Vector3 center, float radius, ref Vector3 position, ref Vector3 normal)
         {
             bool grounded = false;
@@ -167,7 +176,7 @@ namespace Tirocinio
             LayerMask mask = gameObject.layer;
 
 
-            Raycast ray = new Raycast(center, -transform.up, colliderHeight * 0.6f);
+            Raycast ray = new Raycast(center, -transform.up, colliderHeight * sensorRange);
             //center ray
             if (ray.Cast(mask, out RaycastHit hit))
             {
@@ -201,7 +210,7 @@ namespace Tirocinio
                     Vector3 circlePos = new Vector3(Mathf.Cos(angle), 0f, Mathf.Sin(angle));
                     Vector3 worldPos = center + circlePos * distance;
 
-                    ray = new Raycast(worldPos, -transform.up, colliderHeight * 0.6f);
+                    ray = new Raycast(worldPos, -transform.up, colliderHeight * sensorRange);
 
                     if (ray.Cast(mask, out RaycastHit hit2))
                     {
@@ -238,47 +247,99 @@ namespace Tirocinio
             return average;
         }
 
-
-
-        void DrawGreenCross(Vector3 point, float size)
-        {
-
-            Vector3 top = new Vector3(point.x, point.y + size, point.z);
-            Vector3 bottom = new Vector3(point.x, point.y - size, point.z);
-            Debug.DrawLine(top, bottom, Color.green);
-
-            Vector3 forward = new Vector3(point.x, point.y, point.z + size);
-            Vector3 backward = new Vector3(point.x, point.y, point.z - size);
-            Debug.DrawLine(forward, backward, Color.green);
-
-            Vector3 right = new Vector3(point.x + size, point.y, point.z);
-            Vector3 left = new Vector3(point.x - size, point.y, point.z);
-            Debug.DrawLine(right, left, Color.green);
-
-
-        }
-
-        public bool IsGrounded()
-        {
-            return _isGrounded;
-        }
-
         public void SetExtendSensorRange(bool value)
         {
-
+            sensorRange = value ? 0.7f : 0.6f;
         }
+
+        Vector3 _velocity = Vector3.zero;
 
         public void SetVelocity(Vector3 velocity)
         {
-
+            _velocity = velocity;
         }
 
+        public Vector3 GetVelocity() => _velocity;
+
+        private void FixedUpdate()
+        {
+            Vector3 lateralVelocity = _velocity;
+            lateralVelocity.y = 0f;
+            Vector3 verticalVelocity = _velocity;
+            verticalVelocity.x = 0f; verticalVelocity.z = 0f;
+
+            position = _rigidbody.position;
+
+            MoveAndSlide(lateralVelocity * Time.fixedDeltaTime);
+
+            MoveAndSlide(verticalVelocity * Time.fixedDeltaTime);
+
+            _rigidbody.MovePosition(position);
+        }
+
+        void MoveAndSlide(Vector3 linearVelocity, int maxSlides = 4)
+        {
+            MoveAndSlide(linearVelocity, Vector3.up, maxSlides);
+        }
+
+
+        List<Raycast> raySlides;
+
+        Vector3 position;
+
+        void MoveAndSlide(Vector3 linearVelocity, Vector3 upDirection, int maxSlides = 4)
+        {
+            Vector3 origin, top, bottom;
+            RaycastHit hitInfo;
+            float safeDistance;
+            float slideAngle;
+
+            raySlides = new List<Raycast>();
+
+            LayerMask mask = gameObject.layer;
+
+            float capsuleOffset = colliderHeight * 0.5f - colliderThickness;
+
+            Vector3 direction = linearVelocity.normalized;
+            float distance = linearVelocity.magnitude;
+
+
+            for (int i = 0; i < maxSlides; i++)
+            {
+                origin = transform.position + colliderOffset;
+                bottom = origin - upDirection * (capsuleOffset - StepHeight);
+                top = origin + upDirection * capsuleOffset;
+
+                Raycast ray = new Raycast(origin, direction, distance + colliderThickness);
+                if (Physics.CapsuleCast(top, bottom, colliderThickness, ray.direction, out hitInfo, ray.distance, ~mask))
+                {
+                    slideAngle = Vector3.Angle(upDirection, hitInfo.normal);
+                    safeDistance = hitInfo.distance - colliderThickness - 0.08f;
+                    position += direction * safeDistance;
+
+                    ray.distance = hitInfo.distance;
+
+                    direction = Vector3.ProjectOnPlane(direction, hitInfo.normal);
+                    distance -= safeDistance;
+
+                }
+                else
+                {
+                    position += direction * distance;
+                    break;
+                }
+
+                raySlides.Add(ray);
+            }
+
+        }
 
 
         private void OnDrawGizmos()
         {
             Vector3 origin = transform.position + colliderOffset;
-            if (isInDebugMode)
+
+            if (isInDebugMode && Application.isPlaying)
             {
                 switch (sensorType)
                 {
@@ -328,7 +389,34 @@ namespace Tirocinio
                         }
                         break;
                 }
+
+                Gizmos.color = Color.blue;
+                foreach (var ray in raySlides)
+                {
+
+                    Gizmos.DrawRay(ray.origin, ray.direction * ray.distance);
+                    Gizmos.DrawWireMesh(capsuleMesh, ray.origin + ray.direction * ray.distance, 
+                        Quaternion.identity, new Vector3(colliderThickness * 2f, colliderHeight*0.5f, colliderThickness * 2f));
+                }
             }
+        }
+
+        void DrawGreenCross(Vector3 point, float size)
+        {
+
+            Vector3 top = new Vector3(point.x, point.y + size, point.z);
+            Vector3 bottom = new Vector3(point.x, point.y - size, point.z);
+            Debug.DrawLine(top, bottom, Color.green);
+
+            Vector3 forward = new Vector3(point.x, point.y, point.z + size);
+            Vector3 backward = new Vector3(point.x, point.y, point.z - size);
+            Debug.DrawLine(forward, backward, Color.green);
+
+            Vector3 right = new Vector3(point.x + size, point.y, point.z);
+            Vector3 left = new Vector3(point.x - size, point.y, point.z);
+            Debug.DrawLine(right, left, Color.green);
+
+
         }
     }
 
