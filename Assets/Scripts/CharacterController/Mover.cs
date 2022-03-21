@@ -173,7 +173,7 @@ namespace Tirocinio
             switch (sensorType)
             {
                 case SensorType.Raycast:
-                    currentRaycast = new Raycast(origin, -transform.up, colliderHeight * sensorRange);
+                    currentRaycast = new Raycast(origin, -Vector3.up, colliderHeight * sensorRange);
 
                     _isGrounded = currentRaycast.Cast(mask, out hit);
                     if (_isGrounded)
@@ -184,7 +184,7 @@ namespace Tirocinio
 
                     break;
                 case SensorType.Spherecast:
-                    currentRaycast = new Raycast(origin, -transform.up, colliderHeight * sensorRange);
+                    currentRaycast = new Raycast(origin, -Vector3.up, colliderHeight * sensorRange);
 
                     _isGrounded = currentRaycast.SphereCast(sphereCastRadius, mask, out hit);
                     if (_isGrounded)
@@ -212,7 +212,7 @@ namespace Tirocinio
             LayerMask mask = gameObject.layer;
 
 
-            Raycast ray = new Raycast(center, -transform.up, colliderHeight * sensorRange);
+            Raycast ray = new Raycast(center, -Vector3.up, colliderHeight * sensorRange);
             //center ray
             if (ray.Cast(mask, out RaycastHit hit))
             {

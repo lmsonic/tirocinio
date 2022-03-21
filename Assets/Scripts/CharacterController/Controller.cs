@@ -16,6 +16,7 @@ namespace Tirocinio
         public float rotationSpeed = 10f;
         public float gravity = 20f;
         public float jumpVelocity = 20f;
+        public float rotationLerpSpeed = 20f;
 
         private void OnEnable()
         {
@@ -31,7 +32,6 @@ namespace Tirocinio
         Vector2 rotationInput;
         bool jumpInput;
 
-        float yRotation;
 
         private void Awake()
         {
@@ -48,7 +48,6 @@ namespace Tirocinio
             playerInput.BasicInput.Jump.started += ctx => jumpInput = ctx.ReadValueAsButton();
             playerInput.BasicInput.Jump.canceled += ctx => jumpInput = ctx.ReadValueAsButton();
 
-            yRotation = transform.eulerAngles.y;
         }
 
         private void FixedUpdate()
@@ -56,29 +55,28 @@ namespace Tirocinio
             mover.CheckForGround();
             bool isGrounded = mover.IsGrounded();
 
-            Vector3 groundNormal = mover.GetGroundNormal();
 
-
-            Vector2 rotation = rotationInput;
 
 
             Vector3 velocity = transform.forward * movementInput.y + transform.right * movementInput.x;
             velocity = velocity.normalized * movementSpeed;
 
-            if (isGrounded && jumpInput) {
+            if (isGrounded && jumpInput)
+            {
                 velocity.y += jumpVelocity;
             }
-            
-            if (!isGrounded){
+
+            if (!isGrounded)
+            {
                 velocity.y = mover.GetVelocity().y;
                 velocity.y -= gravity * Time.fixedDeltaTime;
             }
 
-            //transform.up = groundNormal;
 
-            
 
-            
+
+
+
 
 
             mover.SetJumping(jumpInput);
@@ -88,12 +86,17 @@ namespace Tirocinio
             mover.SetVelocity(velocity);
         }
 
-        private void LateUpdate() {
-            yRotation += rotationInput.x * rotationSpeed * Time.fixedDeltaTime;
+        private void LateUpdate()
+        {
+            Vector3 groundNormal = mover.GetGroundNormal();
 
-            Vector3 eulers = transform.eulerAngles;
-            eulers.y = yRotation;
-            transform.eulerAngles = eulers;
+            Quaternion targetRotationY = Quaternion.AngleAxis(rotationSpeed * rotationInput.x,groundNormal);
+            Quaternion targetRotationGround = Quaternion.FromToRotation(transform.up, groundNormal);
+
+            Quaternion finalRotation = targetRotationY * targetRotationGround  * transform.rotation;
+
+            transform.rotation = Quaternion.Slerp(transform.rotation, finalRotation, rotationLerpSpeed * Time.deltaTime);
+
         }
 
     }
