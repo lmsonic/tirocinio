@@ -697,6 +697,109 @@ public partial class @PlayerInput : IInputActionCollection2, IDisposable
                     ""isPartOfComposite"": false
                 }
             ]
+        },
+        {
+            ""name"": ""BasicInput"",
+            ""id"": ""10f11936-112a-4f0d-b2db-8d29c46c4d6d"",
+            ""actions"": [
+                {
+                    ""name"": ""Look"",
+                    ""type"": ""Value"",
+                    ""id"": ""33977de7-4a46-41c0-a8d1-311fc5bb43f0"",
+                    ""expectedControlType"": ""Vector2"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""Move"",
+                    ""type"": ""Value"",
+                    ""id"": ""a5a5075b-b18c-418c-a529-9b0a40697a8f"",
+                    ""expectedControlType"": ""Vector2"",
+                    ""processors"": ""NormalizeVector2"",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""383e8301-04c0-41fe-b821-5f363c8b09e8"",
+                    ""path"": ""<Gamepad>/rightStick"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Look"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""8fd97b9a-580c-44ff-a26c-606c2ca4df71"",
+                    ""path"": ""<Gamepad>/leftStick"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Gamepad"",
+                    ""action"": ""Move"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""WASD"",
+                    ""id"": ""595fe908-f9ca-4054-81db-6260c19268ec"",
+                    ""path"": ""2DVector"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Move"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""up"",
+                    ""id"": ""21f036fc-f02f-499e-90b7-cb2bb213aad3"",
+                    ""path"": ""<Keyboard>/w"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Move"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""down"",
+                    ""id"": ""bdbea893-bd3a-44a5-8523-131f7a971371"",
+                    ""path"": ""<Keyboard>/s"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Move"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""left"",
+                    ""id"": ""10e69a9f-3416-47b7-9748-a328f16d5d30"",
+                    ""path"": ""<Keyboard>/a"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Move"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""right"",
+                    ""id"": ""623bed45-ffb3-4397-aa34-efba0d875612"",
+                    ""path"": ""<Keyboard>/d"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Move"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                }
+            ]
         }
     ],
     ""controlSchemes"": [
@@ -783,6 +886,10 @@ public partial class @PlayerInput : IInputActionCollection2, IDisposable
         m_UI_RightClick = m_UI.FindAction("RightClick", throwIfNotFound: true);
         m_UI_TrackedDevicePosition = m_UI.FindAction("TrackedDevicePosition", throwIfNotFound: true);
         m_UI_TrackedDeviceOrientation = m_UI.FindAction("TrackedDeviceOrientation", throwIfNotFound: true);
+        // BasicInput
+        m_BasicInput = asset.FindActionMap("BasicInput", throwIfNotFound: true);
+        m_BasicInput_Look = m_BasicInput.FindAction("Look", throwIfNotFound: true);
+        m_BasicInput_Move = m_BasicInput.FindAction("Move", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -1024,6 +1131,47 @@ public partial class @PlayerInput : IInputActionCollection2, IDisposable
         }
     }
     public UIActions @UI => new UIActions(this);
+
+    // BasicInput
+    private readonly InputActionMap m_BasicInput;
+    private IBasicInputActions m_BasicInputActionsCallbackInterface;
+    private readonly InputAction m_BasicInput_Look;
+    private readonly InputAction m_BasicInput_Move;
+    public struct BasicInputActions
+    {
+        private @PlayerInput m_Wrapper;
+        public BasicInputActions(@PlayerInput wrapper) { m_Wrapper = wrapper; }
+        public InputAction @Look => m_Wrapper.m_BasicInput_Look;
+        public InputAction @Move => m_Wrapper.m_BasicInput_Move;
+        public InputActionMap Get() { return m_Wrapper.m_BasicInput; }
+        public void Enable() { Get().Enable(); }
+        public void Disable() { Get().Disable(); }
+        public bool enabled => Get().enabled;
+        public static implicit operator InputActionMap(BasicInputActions set) { return set.Get(); }
+        public void SetCallbacks(IBasicInputActions instance)
+        {
+            if (m_Wrapper.m_BasicInputActionsCallbackInterface != null)
+            {
+                @Look.started -= m_Wrapper.m_BasicInputActionsCallbackInterface.OnLook;
+                @Look.performed -= m_Wrapper.m_BasicInputActionsCallbackInterface.OnLook;
+                @Look.canceled -= m_Wrapper.m_BasicInputActionsCallbackInterface.OnLook;
+                @Move.started -= m_Wrapper.m_BasicInputActionsCallbackInterface.OnMove;
+                @Move.performed -= m_Wrapper.m_BasicInputActionsCallbackInterface.OnMove;
+                @Move.canceled -= m_Wrapper.m_BasicInputActionsCallbackInterface.OnMove;
+            }
+            m_Wrapper.m_BasicInputActionsCallbackInterface = instance;
+            if (instance != null)
+            {
+                @Look.started += instance.OnLook;
+                @Look.performed += instance.OnLook;
+                @Look.canceled += instance.OnLook;
+                @Move.started += instance.OnMove;
+                @Move.performed += instance.OnMove;
+                @Move.canceled += instance.OnMove;
+            }
+        }
+    }
+    public BasicInputActions @BasicInput => new BasicInputActions(this);
     private int m_KeyboardMouseSchemeIndex = -1;
     public InputControlScheme KeyboardMouseScheme
     {
@@ -1091,5 +1239,10 @@ public partial class @PlayerInput : IInputActionCollection2, IDisposable
         void OnRightClick(InputAction.CallbackContext context);
         void OnTrackedDevicePosition(InputAction.CallbackContext context);
         void OnTrackedDeviceOrientation(InputAction.CallbackContext context);
+    }
+    public interface IBasicInputActions
+    {
+        void OnLook(InputAction.CallbackContext context);
+        void OnMove(InputAction.CallbackContext context);
     }
 }

@@ -7,34 +7,62 @@ namespace Tirocinio
     public class Controller : MonoBehaviour
     {
         private Mover mover;
-        private void Awake() {
-            mover= GetComponent<Mover>();
+
+
+
+        public PlayerInput playerInput;
+
+        public float movementSpeed = 20f;
+        public float rotationSpeed = 10f;
+
+        private void OnEnable()
+        {
+            playerInput.Enable();
         }
 
-        public InputActionReference movementInput;
-
-        private void OnEnable() {
-            movementInput.action.Enable();
+        private void OnDisable()
+        {
+            playerInput.Disable();
         }
 
-        private void OnDisable() {
-            movementInput.action.Disable();
+        Vector2 movementInput;
+        Vector2 rotationInput;
+
+        private void Awake()
+        {
+            playerInput = new PlayerInput();
+            mover = GetComponent<Mover>();
+            playerInput.BasicInput.Move.started += ctx => movementInput = ctx.ReadValue<Vector2>();
+            playerInput.BasicInput.Move.performed += ctx => movementInput = ctx.ReadValue<Vector2>();
+            playerInput.BasicInput.Move.canceled += ctx => movementInput = ctx.ReadValue<Vector2>();
+            playerInput.BasicInput.Look.started += ctx => rotationInput = ctx.ReadValue<Vector2>();
+            playerInput.BasicInput.Look.performed += ctx => rotationInput = ctx.ReadValue<Vector2>();
+            playerInput.BasicInput.Look.canceled += ctx => rotationInput = ctx.ReadValue<Vector2>();
         }
 
-        private void FixedUpdate() {
+        private void FixedUpdate()
+        {
             mover.CheckForGround();
             bool isGrounded = mover.IsGrounded();
 
-            Vector3 velocity = mover.GetVelocity();
-            Vector2 movement = movementInput.action.ReadValue<Vector2>();
 
-            if (isGrounded){
-                velocity.x = movement.x * 10f;
-                velocity.z = movement.y * 10f;
+            Vector2 rotation = rotationInput;
 
-            }
-            else
+            Vector3 velocity = transform.forward * movementInput.y + transform.right * movementInput.x;
+            velocity *= movementSpeed;
+            velocity.y = mover.GetVelocity().y;
+
+
+
+            if (!isGrounded)
                 velocity.y -= 10f * Time.fixedDeltaTime;
+
+
+
+            Vector3 eulers = transform.eulerAngles;
+            eulers.y += rotationInput.x * rotationSpeed;
+            transform.eulerAngles = eulers;
+
 
             mover.SetExtendSensorRange(isGrounded);
             mover.SetVelocity(velocity);

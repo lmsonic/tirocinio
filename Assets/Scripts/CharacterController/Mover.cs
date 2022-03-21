@@ -296,16 +296,12 @@ namespace Tirocinio
 
         private void FixedUpdate()
         {
-            Vector3 lateralVelocity = _velocity;
-            lateralVelocity.y = 0f;
-            Vector3 verticalVelocity = _velocity;
-            verticalVelocity.x = 0f; verticalVelocity.z = 0f;
 
-            targetPosition = transform.position;
 
-            MoveAndSlide(lateralVelocity * Time.fixedDeltaTime);
+            targetPosition = _rigidbody.position;
 
-            MoveAndSlide(verticalVelocity * Time.fixedDeltaTime);
+            MoveAndSlide(_velocity * Time.fixedDeltaTime);
+
 
             _rigidbody.MovePosition(targetPosition);
         }
@@ -314,6 +310,9 @@ namespace Tirocinio
         {
             MoveAndSlide(linearVelocity, transform.up, maxSlides);
         }
+
+        List<Vector3> slidePositions = new List<Vector3>();
+
 
         CollisionInfo MoveAndCollide(Vector3 linearVelocity)
         {
@@ -343,14 +342,14 @@ namespace Tirocinio
                 direction = Vector3.ProjectOnPlane(direction, hitInfo.normal);
                 distance -= safeDistance;
 
-                KeepGrounded(linearVelocity.y);
+                slidePositions.Add(targetPosition);
+
 
                 return new CollisionInfo(hitInfo.point, hitInfo.normal, direction * distance);
             }
             else
             {
                 targetPosition += linearVelocity;
-                KeepGrounded(linearVelocity.y);
                 return null;
             }
 
@@ -384,8 +383,8 @@ namespace Tirocinio
             {
                 if (verticalVelocity == 0f)
                     targetPosition.y = groundPoint.y;
-                else    
-                    targetPosition.y = Mathf.Lerp(targetPosition.y,groundPoint.y,Time.fixedDeltaTime  *10f);
+                else
+                    targetPosition.y = Mathf.Lerp(targetPosition.y, groundPoint.y, Time.fixedDeltaTime * 10f);
             }
         }
 
@@ -393,7 +392,7 @@ namespace Tirocinio
 
         void MoveAndSlide(Vector3 linearVelocity, Vector3 upDirection, int maxSlides = 4)
         {
-
+            slidePositions = new List<Vector3>();
             LayerMask mask = gameObject.layer;
 
 
@@ -428,7 +427,7 @@ namespace Tirocinio
                         if (_isGrounded)
                         {
                             Gizmos.color = Color.green;
-                            DrawGreenCross(groundPoint, 0.2f);
+                            DrawCross(groundPoint, 0.2f);
                             Gizmos.color = Color.blue;
                             Gizmos.DrawRay(groundPoint, groundNormal);
                         }
@@ -461,7 +460,8 @@ namespace Tirocinio
 
                         if (_isGrounded)
                         {
-                            DrawGreenCross(groundPoint, 0.2f);
+                            Gizmos.color = Color.green;
+                            DrawCross(groundPoint, 0.2f);
 
                             Gizmos.color = Color.blue;
                             Gizmos.DrawRay(groundPoint, groundNormal);
@@ -473,23 +473,53 @@ namespace Tirocinio
 
                 Gizmos.DrawRay(origin, _rigidbody.velocity);
 
+                for (int i = 0; i < slidePositions.Count; i++)
+                {
+                    Vector3 offsetPosition = slidePositions[i] + colliderOffset;
+                    DrawCapsule(offsetPosition, colliderHeight, colliderThickness);
+                    if (i + 1 < slidePositions.Count)
+                        Gizmos.DrawLine(offsetPosition, slidePositions[i + 1] + colliderOffset);
+                }
+
+
             }
         }
 
-        void DrawGreenCross(Vector3 point, float size)
+        void DrawCapsule(Vector3 center, float height, float radius)
+        {
+
+            float sphereOffset = height / 2 - radius;
+            Vector3 centerTopSphere = center;
+            centerTopSphere.y += sphereOffset;
+
+            Vector3 centerBottomSphere = center;
+            centerBottomSphere.y -= sphereOffset;
+
+            Gizmos.DrawWireSphere(centerTopSphere, radius);
+            Gizmos.DrawWireSphere(centerBottomSphere, radius);
+
+            Gizmos.DrawLine(centerTopSphere + Vector3.forward * radius, centerBottomSphere + Vector3.forward * radius);
+            Gizmos.DrawLine(centerTopSphere + Vector3.back * radius, centerBottomSphere + Vector3.back * radius);
+            Gizmos.DrawLine(centerTopSphere + Vector3.right * radius, centerBottomSphere + Vector3.right * radius);
+            Gizmos.DrawLine(centerTopSphere + Vector3.left * radius, centerBottomSphere + Vector3.left * radius);
+
+
+        }
+
+        void DrawCross(Vector3 point, float size)
         {
 
             Vector3 top = new Vector3(point.x, point.y + size, point.z);
             Vector3 bottom = new Vector3(point.x, point.y - size, point.z);
-            Debug.DrawLine(top, bottom, Color.green);
+            Gizmos.DrawLine(top, bottom);
 
             Vector3 forward = new Vector3(point.x, point.y, point.z + size);
             Vector3 backward = new Vector3(point.x, point.y, point.z - size);
-            Debug.DrawLine(forward, backward, Color.green);
+            Gizmos.DrawLine(forward, backward);
 
             Vector3 right = new Vector3(point.x + size, point.y, point.z);
             Vector3 left = new Vector3(point.x - size, point.y, point.z);
-            Debug.DrawLine(right, left, Color.green);
+            Gizmos.DrawLine(right, left);
 
 
         }
