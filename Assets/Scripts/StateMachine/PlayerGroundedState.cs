@@ -11,6 +11,7 @@ namespace Tirocinio
             isRootState = true;
             ResetXRotation();
             InitializeSubState();
+            ctx.Mover.SetJumping(false);
             ctx.Velocity.y = ctx.GroundedGravity;
 
         }
@@ -24,7 +25,7 @@ namespace Tirocinio
         {
             if (ctx.IsJumpPressed && !ctx.RequireNewJumpPress)
                 SwitchState(factory.Jump());
-            else if (!ctx.groundChecker.isGrounded)
+            else if (!ctx.Mover.IsGrounded())
                 SwitchState(factory.Air());
         }
         public override void InitializeSubState()
@@ -62,7 +63,7 @@ namespace Tirocinio
 
             CheckSwitchStates();
 
-            ctx.LerpGroundedVelocity(ctx.transform.forward * ctx.MaxSpeed, 
+            ctx.LerpGroundedVelocity(ctx.transform.forward * ctx.MaxSpeed,
                 ctx.AccelerationMultiplier * ctx.AccelerationInput * Time.deltaTime);
 
         }

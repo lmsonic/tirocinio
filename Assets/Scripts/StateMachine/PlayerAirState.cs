@@ -11,6 +11,10 @@ namespace Tirocinio
             isRootState = true;
 
         }
+
+        void ResetJump() => ctx.Mover.SetJumping(false);
+            
+        
         public override void UpdateState()
         {
             CheckSwitchStates();
@@ -37,7 +41,7 @@ namespace Tirocinio
         }
         public override void CheckSwitchStates()
         {
-            if (ctx.groundChecker.isGrounded)
+            if (ctx.Mover.IsGrounded())
                 SwitchState(factory.Grounded());
                 
         }

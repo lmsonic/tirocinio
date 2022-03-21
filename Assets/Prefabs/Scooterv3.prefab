@@ -212,7 +212,7 @@ GameObject:
   - component: {fileID: 1536190572}
   - component: {fileID: 1536190570}
   - component: {fileID: 1536190571}
-  - component: {fileID: 1536190573}
+  - component: {fileID: 8740392723001654576}
   m_Layer: 6
   m_Name: Scooterv3
   m_TagString: Player
@@ -262,7 +262,7 @@ CapsuleCollider:
   m_Material: {fileID: 0}
   m_IsTrigger: 0
   m_Enabled: 1
-  m_Radius: 1
+  m_Radius: 0.8
   m_Height: 3.5
   m_Direction: 1
   m_Center: {x: 0, y: 1.75, z: 0}
@@ -279,8 +279,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   stepHeight: 0.2
+  slopeLimit: 45
   colliderHeight: 3.5
-  colliderThickness: 1
+  colliderThickness: 0.8
   colliderOffset: {x: 0, y: 1.75, z: 0}
   sensorType: 1
   isInDebugMode: 1
@@ -288,7 +289,7 @@ MonoBehaviour:
   sensorArrayRayCount: 4
   sensorArrayRowsAreOffset: 1
   capsuleMesh: {fileID: 10208, guid: 0000000000000000e000000000000000, type: 0}
---- !u!114 &1536190573
+--- !u!114 &8740392723001654576
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -297,13 +298,27 @@ MonoBehaviour:
   m_GameObject: {fileID: 9143775345407581415}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bcb8530f7cfc84b4eb88db0cd83ee7ed, type: 3}
+  m_Script: {fileID: 11500000, guid: d2e88ef23f5b9f144a7cde78734591c2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  movementSpeed: 20
-  rotationSpeed: 10
-  gravity: 20
-  jumpVelocity: 20
+  handleTransform: {fileID: 4344654184642377949, guid: 17aa9157b910c2d4fa24f48f9a206e62, type: 3}
+  bodyTransform: {fileID: 3641375945344933492, guid: 17aa9157b910c2d4fa24f48f9a206e62, type: 3}
+  maxTurnDegrees: 20
+  rotationSpeed: 30
+  rotationLerpSpeed: 30
+  MaxSpeed: 30
+  BackwardsSpeed: 10
+  CurrentMovement: {x: 0, y: 0, z: 0}
+  Velocity: {x: 0, y: 0, z: 0}
+  AccelerationMultiplier: 2
+  BrakeMultiplier: 3
+  DragMultiplier: 2
+  maxJumpHeight: 6
+  maxJumpTime: 0.8
+  MaxFallSpeed: -30
+  FallMultiplier: 1.5
+  groundRotationMultiplier: 90
+  aliveAngleLimit: 15
 --- !u!1 &9143775345840500072
 GameObject:
   m_ObjectHideFlags: 0

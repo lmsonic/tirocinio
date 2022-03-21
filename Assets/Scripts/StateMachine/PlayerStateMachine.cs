@@ -9,14 +9,15 @@ namespace Tirocinio
     {
 
         PlayerInput playerInput;
-        public KinematicBody KinematicBody { get => kinematicBody; }
-        KinematicBody kinematicBody;
+        public Mover Mover { get => mover; }
+        Mover mover;
 
         Transform cameraTransform;
         public Transform handleTransform;
         public Transform bodyTransform;
         public float maxTurnDegrees = 30f;
         public float rotationSpeed = 30f;
+        public float rotationLerpSpeed = 30f;
         public float MaxSpeed = 30f;
         public float BackwardsSpeed = 10f;
 
@@ -52,8 +53,6 @@ namespace Tirocinio
         public float MaxFallSpeed = -30f;
         public float FallMultiplier = 1.5f;
 
-        public GroundChecker groundChecker;
-
         public float groundRotationMultiplier = 3f;
 
         public float aliveAngleLimit = 30f;
@@ -74,7 +73,7 @@ namespace Tirocinio
         private void Awake()
         {
             playerInput = new PlayerInput();
-            kinematicBody = GetComponent<KinematicBody>();
+            mover = GetComponent<Mover>();
             cameraTransform = Camera.main.transform;
 
             states = new PlayerStateFactory(this);
@@ -138,15 +137,38 @@ namespace Tirocinio
         {
             float targetAngle = cameraTransform.eulerAngles.y;
 
-
             //rotate handle
-            handleTransform.localRotation = FrontRotation();
+            //handleTransform.localRotation = FrontRotation();
             //turn
-            bodyTransform.localRotation = BodyRotation();
+            //bodyTransform.localRotation = BodyRotation();
+
+            Vector3 normal = Vector3.up;
+            if (mover.IsGrounded())
+
+                normal = mover.GetGroundNormal();
+
+
+            Quaternion targetRotationY = Quaternion.AngleAxis(targetAngle - transform.eulerAngles.y, normal);
+
+
+            Quaternion targetRotationGround = Quaternion.FromToRotation(transform.up, normal);
+
+            Quaternion finalRotation = targetRotationY * targetRotationGround * transform.rotation;
+
+            transform.rotation = Quaternion.Slerp(transform.rotation, finalRotation, rotationLerpSpeed * Time.deltaTime);
 
 
 
+        }
 
+        public void ResetJumpIn(float seconds)
+        {
+            Invoke("ResetJump", seconds);
+        }
+
+        void ResetJump()
+        {
+            Mover.SetJumping(false);
         }
 
         Quaternion FrontRotation()
@@ -163,63 +185,10 @@ namespace Tirocinio
 
 
 
-        void HandleRotationPhysics()
-        {
 
-            Vector3 finalEulerRotation = EulerRotationOnYAxis() + EulerAirRotationOnXAxis();
-            Quaternion finalRotation = Quaternion.Euler(finalEulerRotation);
-            kinematicBody.Rotate(finalRotation);
-        }
-
-        Vector3 EulerRotationOnGround()
-        {
-            if (!kinematicBody.isGrounded) return Vector3.zero;
-
-            if (groundChecker.groundSlopeAngle < kinematicBody.slopeLimit)
-            {
-                //float deltaAngle = Vector3.Angle(transform.up, groundChecker.groundSlopeNormal);
-                //if (deltaAngle > aliveAngleLimit && Velocity.magnitude > 5f && !groundChecker.isFrontGrounded)
-                //    groundChecker.SetGroundedFalseFor(0.5f);
-
-                if (groundChecker.groundSlopeAngle > 0f)
-                {
-                    Vector3 targetForward = Vector3.ProjectOnPlane(transform.forward, groundChecker.groundSlopeNormal);
-                    Vector3 deltaForward = Vector3.Slerp(transform.forward, targetForward, groundRotationMultiplier * Time.deltaTime);
-
-                    Vector3 targetVelocity = Vector3.ProjectOnPlane(Velocity, groundChecker.groundSlopeNormal);
-                    Velocity = Vector3.Slerp(Velocity, targetVelocity, groundRotationMultiplier * Time.deltaTime);
-
-                    
-                }
-            }
-
-
-            return Vector3.zero;
-        }
-
-        Vector3 EulerRotationOnYAxis()
-        {
-            float targetAngle = cameraTransform.eulerAngles.y;
-            float deltaAngle = Mathf.LerpAngle(transform.eulerAngles.y, targetAngle, rotationSpeed * Time.deltaTime);
-            return new Vector3(0f, deltaAngle, 0f);
-        }
-
-        float smoothDampVelocity;
-
-        Vector3 EulerAirRotationOnXAxis()
-        {
-            if (groundChecker.isGrounded) return Vector3.zero;
-
-            float targetAngle = Mathf.Atan2(Velocity.y, 1f) * Mathf.Rad2Deg;
-            Debug.Log(targetAngle);
-            float deltaAngle = Mathf.SmoothDampAngle(transform.eulerAngles.x, -targetAngle, ref smoothDampVelocity, 0.5f);
-            return new Vector3(deltaAngle, 0f, 0f);
-        }
-
-        private void Update()
+        private void LateUpdate()
         {
             HandleRotation();
-
         }
 
         public void LerpGroundedVelocity(Vector3 target, float t)
@@ -234,10 +203,12 @@ namespace Tirocinio
         private void FixedUpdate()
         {
 
-            HandleRotationPhysics();
-            Velocity = kinematicBody.velocity;
+            mover.CheckForGround();
             currentState.UpdateStates();
-            kinematicBody.Move(Velocity);
+
+            mover.SetExtendSensorRange(mover.IsGrounded());
+
+            mover.SetVelocity(Velocity);
         }
 
 

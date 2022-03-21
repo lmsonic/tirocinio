@@ -90,6 +90,8 @@ namespace Tirocinio
         [Header("Mover Options")]
         [Range(0, 2)]
         public float stepHeight = 0.25f;
+        [Range(0,90f)]
+        public float slopeLimit = 45f;
         [Header("Collider Options")]
         [SerializeField]
         public float colliderHeight = 2f;
@@ -347,7 +349,7 @@ namespace Tirocinio
 
         void MoveAndSlide(Vector3 linearVelocity, int maxSlides = 4)
         {
-            MoveAndSlide(linearVelocity, transform.up, maxSlides);
+            MoveAndSlide(linearVelocity, Vector3.up, maxSlides);
         }
 
         List<Vector3> slidePositions = new List<Vector3>();
@@ -399,7 +401,7 @@ namespace Tirocinio
 
 
 
-        void MoveAndSlide(Vector3 linearVelocity, Vector3 upDirection, int maxSlides = 4, float slopeLimit = 45f)
+        void MoveAndSlide(Vector3 linearVelocity, Vector3 upDirection, int maxSlides = 4, float slopeLimit = 90f)
         {
             slidePositions = new List<Vector3>();
             LayerMask mask = gameObject.layer;
