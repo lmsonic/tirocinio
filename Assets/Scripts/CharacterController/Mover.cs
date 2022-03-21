@@ -88,8 +88,8 @@ namespace Tirocinio
 
         public enum SensorType { Raycast, Spherecast, RaycastArray }
         [Header("Mover Options")]
-        [Range(0, 1)]
-        public float stepHeightRatio = 0.25f;
+        [Range(0, 2)]
+        public float stepHeight = 0.25f;
         [Header("Collider Options")]
         [SerializeField]
         public float colliderHeight = 2f;
@@ -120,11 +120,6 @@ namespace Tirocinio
         Raycast currentRaycast;
         List<Raycast> raycastArray = new List<Raycast>();
 
-        float StepHeight
-        {
-            get => stepHeightRatio * colliderHeight;
-        }
-
         public void SetColliderHeight(float _newColliderHeight)
         {
             colliderHeight = _newColliderHeight;
@@ -135,9 +130,9 @@ namespace Tirocinio
             colliderThickness = _newColliderThickness;
             _collider.radius = _newColliderThickness;
         }
-        public void SetStepHeightRatio(float _newStepHeightRatio)
+        public void SetStepHeight(float _newStepHeight)
         {
-            stepHeightRatio = _newStepHeightRatio;
+            stepHeight = _newStepHeight;
         }
 
         private void Awake()
@@ -147,7 +142,12 @@ namespace Tirocinio
             _rigidbody.isKinematic = true;
         }
 
-        float sensorRange = 0.6f;
+        float sensorRange = 0.55f;
+
+        public void SetExtendSensorRange(bool value)
+        {
+            sensorRange = (value) ? 0.7f : 0.55f;
+        }
 
         const float sphereCastRadius = 0.4f;
         bool _isGrounded = false;
@@ -274,10 +274,6 @@ namespace Tirocinio
             return average;
         }
 
-        public void SetExtendSensorRange(bool value)
-        {
-            sensorRange = value ? 0.7f : 0.6f;
-        }
 
         Vector3 _velocity;
 
@@ -302,8 +298,42 @@ namespace Tirocinio
 
             MoveAndSlide(_velocity * Time.fixedDeltaTime);
 
+            
 
             _rigidbody.MovePosition(targetPosition);
+        }
+
+        void Depenetrate()
+        {
+
+            Collider[] neighbours = new Collider[5];
+            float max = Mathf.Max(colliderHeight, colliderThickness);
+            int count = Physics.OverlapSphereNonAlloc(transform.position, max, neighbours);
+
+
+            for (int i = 0; i < count; ++i)
+            {
+                var collider = neighbours[i];
+
+                if (collider == _collider)
+                    continue; // skip ourself
+
+                Vector3 otherPosition = collider.gameObject.transform.position;
+                Quaternion otherRotation = collider.gameObject.transform.rotation;
+
+                Vector3 direction;
+                float distance;
+
+                bool overlapped = Physics.ComputePenetration(
+                    _collider, transform.position, transform.rotation,
+                    collider, otherPosition, otherRotation,
+                    out direction, out distance
+                );
+
+                targetPosition += direction * distance*1.1f;
+
+
+            }
         }
 
         void MoveAndSlide(Vector3 linearVelocity, int maxSlides = 4)
@@ -317,11 +347,13 @@ namespace Tirocinio
         CollisionInfo MoveAndCollide(Vector3 linearVelocity)
         {
 
-            float capsuleOffset = colliderHeight * 0.5f - colliderThickness;
+            float sphereOffset = colliderHeight * 0.5f - colliderThickness;
+
+
 
             Vector3 origin = targetPosition + colliderOffset;
-            Vector3 top = origin + transform.up * colliderHeight;
-            Vector3 bottom = origin - transform.up * (colliderHeight - StepHeight);
+            Vector3 top = origin + transform.up * sphereOffset;
+            Vector3 bottom = origin - transform.up * (sphereOffset - stepHeight);
 
 
             LayerMask mask = gameObject.layer;
@@ -333,8 +365,9 @@ namespace Tirocinio
             Vector3 direction = linearVelocity.normalized;
             float distance = linearVelocity.magnitude;
 
-            if (_rigidbody.SweepTest(direction, out hitInfo, distance))
+            if (Physics.CapsuleCast(top, bottom, colliderThickness, direction, out hitInfo, distance, ~mask))
             {
+
                 Vector3 closestPoint = _collider.ClosestPoint(hitInfo.point);
                 safeDistance = (closestPoint - hitInfo.point).magnitude - 0.08f;
                 targetPosition += direction * safeDistance;
@@ -353,44 +386,11 @@ namespace Tirocinio
                 return null;
             }
 
-            // if (Physics.CapsuleCast(top, bottom, colliderThickness, direction, out hitInfo, distance + colliderThickness, ~mask))
-            // {
-            //     Vector3 closestPoint = _collider.ClosestPoint(hitInfo.point);
-            //     safeDistance = hitInfo.distance - colliderThickness - 0.08f;
-            //     targetPosition += direction * safeDistance;
-
-            //     direction = Vector3.ProjectOnPlane(direction, hitInfo.normal);
-            //     distance -= safeDistance;
-
-            //     KeepGrounded(linearVelocity.y);
-
-            //     return new CollisionInfo(hitInfo.point, hitInfo.normal, direction * distance);
-            // }
-            // else
-            // {
-            //     targetPosition += linearVelocity;
-
-            //     KeepGrounded(linearVelocity.y);
-
-
-            //     return null;
-            // }
-        }
-
-        void KeepGrounded(float verticalVelocity)
-        {
-            if (_isGrounded)
-            {
-                if (verticalVelocity == 0f)
-                    targetPosition.y = groundPoint.y;
-                else
-                    targetPosition.y = Mathf.Lerp(targetPosition.y, groundPoint.y, Time.fixedDeltaTime * 10f);
-            }
         }
 
 
 
-        void MoveAndSlide(Vector3 linearVelocity, Vector3 upDirection, int maxSlides = 4)
+        void MoveAndSlide(Vector3 linearVelocity, Vector3 upDirection, int maxSlides = 4, float slopeLimit = 45f)
         {
             slidePositions = new List<Vector3>();
             LayerMask mask = gameObject.layer;
@@ -399,17 +399,38 @@ namespace Tirocinio
 
             for (int i = 0; i < maxSlides; i++)
             {
-
+                CheckForGround();
+                float angle = Vector3.Angle(upDirection, groundNormal);
+                if (_isGrounded && angle < slopeLimit)
+                {
+                    linearVelocity.y = 0f;
+                    targetPosition.y = groundPoint.y;
+                    linearVelocity = Vector3.ProjectOnPlane(linearVelocity, groundNormal);
+                }
 
                 CollisionInfo info = MoveAndCollide(linearVelocity);
                 if (info == null) break;
+                
+                
 
-                linearVelocity = info.remainingVelocity;
+                angle = Vector3.Angle(upDirection, info.normal);
+                if (angle > slopeLimit) // wall
+                {
+                    Vector3 perpendicularVector = Vector3.ProjectOnPlane(info.normal,upDirection);
+                    linearVelocity = Vector3.ProjectOnPlane(linearVelocity, perpendicularVector);
+                }
+                else{
+                    linearVelocity = info.remainingVelocity;
+                }
+
+                Depenetrate();
+
 
 
             }
 
         }
+
 
 
 
@@ -488,20 +509,19 @@ namespace Tirocinio
         void DrawCapsule(Vector3 center, float height, float radius)
         {
 
-            float sphereOffset = height / 2 - radius;
-            Vector3 centerTopSphere = center;
-            centerTopSphere.y += sphereOffset;
+            float sphereOffset = height * 0.5f - radius;
 
-            Vector3 centerBottomSphere = center;
-            centerBottomSphere.y -= sphereOffset;
+            Vector3 top = center + transform.up * (sphereOffset);
+            Vector3 bottom = center - transform.up * (sphereOffset - stepHeight);
 
-            Gizmos.DrawWireSphere(centerTopSphere, radius);
-            Gizmos.DrawWireSphere(centerBottomSphere, radius);
 
-            Gizmos.DrawLine(centerTopSphere + Vector3.forward * radius, centerBottomSphere + Vector3.forward * radius);
-            Gizmos.DrawLine(centerTopSphere + Vector3.back * radius, centerBottomSphere + Vector3.back * radius);
-            Gizmos.DrawLine(centerTopSphere + Vector3.right * radius, centerBottomSphere + Vector3.right * radius);
-            Gizmos.DrawLine(centerTopSphere + Vector3.left * radius, centerBottomSphere + Vector3.left * radius);
+            Gizmos.DrawWireSphere(top, radius);
+            Gizmos.DrawWireSphere(bottom, radius);
+
+            Gizmos.DrawLine(top + Vector3.forward * radius, bottom + Vector3.forward * radius);
+            Gizmos.DrawLine(top + Vector3.back * radius, bottom + Vector3.back * radius);
+            Gizmos.DrawLine(top + Vector3.right * radius, bottom + Vector3.right * radius);
+            Gizmos.DrawLine(top + Vector3.left * radius, bottom + Vector3.left * radius);
 
 
         }

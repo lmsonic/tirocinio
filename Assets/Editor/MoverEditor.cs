@@ -6,7 +6,7 @@ namespace Tirocinio
     [CustomEditor(typeof(Mover))]
     public class MoverEditor : Editor
     {
-        SerializedProperty stepHeightRatio;
+        SerializedProperty stepHeight;
         SerializedProperty colliderHeight;
         SerializedProperty colliderThickness;
         SerializedProperty colliderOffset;
@@ -21,7 +21,7 @@ namespace Tirocinio
         private void OnEnable()
         {
 
-            stepHeightRatio = serializedObject.FindProperty("stepHeightRatio");
+            stepHeight = serializedObject.FindProperty("stepHeight");
 
             colliderHeight = serializedObject.FindProperty("colliderHeight");
             colliderThickness = serializedObject.FindProperty("colliderThickness");
@@ -42,7 +42,7 @@ namespace Tirocinio
         {
 
             serializedObject.Update();
-            EditorGUILayout.PropertyField(stepHeightRatio);
+            EditorGUILayout.PropertyField(stepHeight);
 
 
             EditorGUILayout.LabelField("Collider Options", EditorStyles.boldLabel);

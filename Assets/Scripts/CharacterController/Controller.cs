@@ -14,6 +14,7 @@ namespace Tirocinio
 
         public float movementSpeed = 20f;
         public float rotationSpeed = 10f;
+        public float gravity = 20f;
 
         private void OnEnable()
         {
@@ -48,14 +49,14 @@ namespace Tirocinio
 
             Vector2 rotation = rotationInput;
 
+
             Vector3 velocity = transform.forward * movementInput.y + transform.right * movementInput.x;
-            velocity *= movementSpeed;
-            velocity.y = mover.GetVelocity().y;
+            velocity = velocity.normalized * movementSpeed;
 
-
-
-            if (!isGrounded)
-                velocity.y -= 10f * Time.fixedDeltaTime;
+            if (!isGrounded){
+                velocity.y = mover.GetVelocity().y;
+                velocity.y -= gravity * Time.fixedDeltaTime;
+            }
 
 
 
