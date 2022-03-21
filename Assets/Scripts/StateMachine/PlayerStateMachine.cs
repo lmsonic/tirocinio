@@ -162,7 +162,7 @@ namespace Tirocinio
                 angle = Vector3.Angle(transform.up, normal);
                 if (!mover.CheckFrontGround())
                 {
-                    StopCheckingGroundFor(0.5f);
+                    //StopCheckingGroundFor(0.5f);
                 }
             }
 
