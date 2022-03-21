@@ -149,6 +149,12 @@ namespace Tirocinio
             sensorRange = (value) ? 0.7f : 0.55f;
         }
 
+        bool isJumping = false;
+
+        public void SetJumping(bool value){
+            isJumping = value;
+        }
+
         const float sphereCastRadius = 0.4f;
         bool _isGrounded = false;
 
@@ -157,6 +163,9 @@ namespace Tirocinio
 
         public void CheckForGround()
         {
+            _isGrounded = false;
+
+            if (isJumping) return;
 
             Vector3 origin = transform.position + colliderOffset;
             LayerMask mask = gameObject.layer;

@@ -719,6 +719,15 @@ public partial class @PlayerInput : IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""Jump"",
+                    ""type"": ""Button"",
+                    ""id"": ""3fb1e2b8-7f1a-4017-b020-44932240ab16"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -798,6 +807,28 @@ public partial class @PlayerInput : IInputActionCollection2, IDisposable
                     ""action"": ""Move"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""7997eac1-a745-4c9b-9a76-5129e12ef1bc"",
+                    ""path"": ""<Gamepad>/buttonSouth"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Gamepad"",
+                    ""action"": ""Jump"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""acbdf91a-9a95-4ff6-ba1d-792793ad29c5"",
+                    ""path"": ""<Keyboard>/space"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Jump"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -890,6 +921,7 @@ public partial class @PlayerInput : IInputActionCollection2, IDisposable
         m_BasicInput = asset.FindActionMap("BasicInput", throwIfNotFound: true);
         m_BasicInput_Look = m_BasicInput.FindAction("Look", throwIfNotFound: true);
         m_BasicInput_Move = m_BasicInput.FindAction("Move", throwIfNotFound: true);
+        m_BasicInput_Jump = m_BasicInput.FindAction("Jump", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -1137,12 +1169,14 @@ public partial class @PlayerInput : IInputActionCollection2, IDisposable
     private IBasicInputActions m_BasicInputActionsCallbackInterface;
     private readonly InputAction m_BasicInput_Look;
     private readonly InputAction m_BasicInput_Move;
+    private readonly InputAction m_BasicInput_Jump;
     public struct BasicInputActions
     {
         private @PlayerInput m_Wrapper;
         public BasicInputActions(@PlayerInput wrapper) { m_Wrapper = wrapper; }
         public InputAction @Look => m_Wrapper.m_BasicInput_Look;
         public InputAction @Move => m_Wrapper.m_BasicInput_Move;
+        public InputAction @Jump => m_Wrapper.m_BasicInput_Jump;
         public InputActionMap Get() { return m_Wrapper.m_BasicInput; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -1158,6 +1192,9 @@ public partial class @PlayerInput : IInputActionCollection2, IDisposable
                 @Move.started -= m_Wrapper.m_BasicInputActionsCallbackInterface.OnMove;
                 @Move.performed -= m_Wrapper.m_BasicInputActionsCallbackInterface.OnMove;
                 @Move.canceled -= m_Wrapper.m_BasicInputActionsCallbackInterface.OnMove;
+                @Jump.started -= m_Wrapper.m_BasicInputActionsCallbackInterface.OnJump;
+                @Jump.performed -= m_Wrapper.m_BasicInputActionsCallbackInterface.OnJump;
+                @Jump.canceled -= m_Wrapper.m_BasicInputActionsCallbackInterface.OnJump;
             }
             m_Wrapper.m_BasicInputActionsCallbackInterface = instance;
             if (instance != null)
@@ -1168,6 +1205,9 @@ public partial class @PlayerInput : IInputActionCollection2, IDisposable
                 @Move.started += instance.OnMove;
                 @Move.performed += instance.OnMove;
                 @Move.canceled += instance.OnMove;
+                @Jump.started += instance.OnJump;
+                @Jump.performed += instance.OnJump;
+                @Jump.canceled += instance.OnJump;
             }
         }
     }
@@ -1244,5 +1284,6 @@ public partial class @PlayerInput : IInputActionCollection2, IDisposable
     {
         void OnLook(InputAction.CallbackContext context);
         void OnMove(InputAction.CallbackContext context);
+        void OnJump(InputAction.CallbackContext context);
     }
 }

@@ -14969,8 +14969,20 @@ PrefabInstance:
       value: 0.2
       objectReference: {fileID: 0}
     - target: {fileID: 1536190571, guid: 3f780a04d1bfe814caa13679e7db040c, type: 3}
+      propertyPath: sensorArrayRows
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1536190571, guid: 3f780a04d1bfe814caa13679e7db040c, type: 3}
       propertyPath: stepHeightRatio
       value: 0.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 1536190571, guid: 3f780a04d1bfe814caa13679e7db040c, type: 3}
+      propertyPath: sensorArrayRayCount
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 1536190571, guid: 3f780a04d1bfe814caa13679e7db040c, type: 3}
+      propertyPath: sensorArrayRowsAreOffset
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1536190572, guid: 3f780a04d1bfe814caa13679e7db040c, type: 3}
       propertyPath: m_Interpolate
