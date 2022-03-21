@@ -11,7 +11,7 @@ namespace Tirocinio
             isRootState = true;
             ResetXRotation();
             InitializeSubState();
-            ctx.Mover.SetJumping(false);
+            ctx.Mover.SetCheckGround(true);
             ctx.Velocity.y = ctx.GroundedGravity;
 
         }

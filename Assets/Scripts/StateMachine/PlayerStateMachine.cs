@@ -15,6 +15,7 @@ namespace Tirocinio
         Transform cameraTransform;
         public Transform handleTransform;
         public Transform bodyTransform;
+        public Transform modelTransform;
         public float maxTurnDegrees = 30f;
         public float rotationSpeed = 30f;
         public float rotationLerpSpeed = 30f;
@@ -138,18 +139,34 @@ namespace Tirocinio
             float targetAngle = cameraTransform.eulerAngles.y;
 
             //rotate handle
-            //handleTransform.localRotation = FrontRotation();
+            Quaternion targetRotation = Quaternion.Euler(0f, CurrentMovement.x * maxTurnDegrees * 1.5f, 0f);
+            handleTransform.localRotation = Quaternion.Slerp(handleTransform.localRotation, targetRotation, 2f * Time.deltaTime);
             //turn
-            //bodyTransform.localRotation = BodyRotation();
+            targetRotation = Quaternion.Euler(0f, 0f, -CurrentMovement.x * maxTurnDegrees);
+            bodyTransform.localRotation = Quaternion.Slerp(bodyTransform.localRotation, targetRotation, Time.deltaTime);
+
+            targetRotation = Quaternion.Euler(0f, 0f, -CurrentMovement.x * maxTurnDegrees);
+            modelTransform.localRotation = Quaternion.Slerp(modelTransform.localRotation, targetRotation, Time.deltaTime);
 
             Vector3 normal = Vector3.up;
+
             if (mover.IsGrounded())
-
+            {
                 normal = mover.GetGroundNormal();
+                float angle = Vector3.Angle(Vector3.up, normal);
+                if (angle > mover.slopeLimit && angle < mover.wallAngle)
+                {
+                    normal = transform.up;
+                }
 
+                angle = Vector3.Angle(transform.up, normal);
+                if (!mover.CheckFrontGround())
+                {
+                    StopCheckingGroundFor(0.5f);
+                }
+            }
 
             Quaternion targetRotationY = Quaternion.AngleAxis(targetAngle - transform.eulerAngles.y, normal);
-
 
             Quaternion targetRotationGround = Quaternion.FromToRotation(transform.up, normal);
 
@@ -161,32 +178,19 @@ namespace Tirocinio
 
         }
 
-        public void ResetJumpIn(float seconds)
+        public void StopCheckingGroundFor(float seconds)
         {
-            Invoke("ResetJump", seconds);
+            mover.SetCheckGround(false);
+            Invoke("ResetCheckGround", seconds);
         }
 
-        void ResetJump()
+        void ResetCheckGround()
         {
-            Mover.SetJumping(false);
-        }
-
-        Quaternion FrontRotation()
-        {
-            Quaternion targetRotation = Quaternion.Euler(0f, CurrentMovement.x * maxTurnDegrees, 0f);
-            return Quaternion.Slerp(handleTransform.localRotation, targetRotation, 2f * Time.deltaTime);
-        }
-
-        Quaternion BodyRotation()
-        {
-            Quaternion targetRotation = Quaternion.Euler(0f, 0f, -CurrentMovement.x * maxTurnDegrees);
-            return Quaternion.Slerp(bodyTransform.localRotation, targetRotation, Time.deltaTime);
+            Mover.SetCheckGround(true);
         }
 
 
-
-
-        private void LateUpdate()
+        private void Update()
         {
             HandleRotation();
         }

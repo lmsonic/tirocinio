@@ -11,8 +11,6 @@ namespace Tirocinio
             isRootState = true;
 
         }
-
-        void ResetJump() => ctx.Mover.SetJumping(false);
             
         
         public override void UpdateState()

@@ -79,7 +79,7 @@ namespace Tirocinio
 
 
 
-            mover.SetJumping(jumpInput);
+            mover.SetCheckGround(jumpInput);
 
 
             mover.SetExtendSensorRange(isGrounded);

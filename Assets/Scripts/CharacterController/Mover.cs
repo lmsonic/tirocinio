@@ -90,8 +90,9 @@ namespace Tirocinio
         [Header("Mover Options")]
         [Range(0, 2)]
         public float stepHeight = 0.25f;
-        [Range(0,90f)]
+        [Range(0, 90f)]
         public float slopeLimit = 45f;
+        public float wallAngle = 80f;
         [Header("Collider Options")]
         [SerializeField]
         public float colliderHeight = 2f;
@@ -151,11 +152,14 @@ namespace Tirocinio
             sensorRange = (value) ? 0.7f : 0.55f;
         }
 
-        bool isJumping = false;
+        bool checkGround = true;
 
-        public void SetJumping(bool value){
-            isJumping = value;
+        public void SetCheckGround(bool value)
+        {
+            checkGround = value;
         }
+
+
 
         const float sphereCastRadius = 0.4f;
         bool _isGrounded = false;
@@ -163,11 +167,24 @@ namespace Tirocinio
 
         public bool IsGrounded() => _isGrounded;
 
+        Raycast frontGroundRay;
+
+        public bool CheckFrontGround()
+        {
+            LayerMask mask = gameObject.layer;
+            RaycastHit hit;
+            Vector3 origin = transform.position + colliderOffset + transform.forward * colliderThickness * 1.5f;
+
+            frontGroundRay = new Raycast(origin, -transform.up, colliderHeight * sensorRange);
+
+            return frontGroundRay.Cast(mask, out hit);
+        }
+
         public void CheckForGround()
         {
             _isGrounded = false;
 
-            if (isJumping) return;
+            if (!checkGround) return;
 
             Vector3 origin = transform.position + colliderOffset;
             LayerMask mask = gameObject.layer;
@@ -309,7 +326,7 @@ namespace Tirocinio
 
             MoveAndSlide(_velocity * Time.fixedDeltaTime);
 
-            
+
 
             _rigidbody.MovePosition(targetPosition);
         }
@@ -341,7 +358,7 @@ namespace Tirocinio
                     out direction, out distance
                 );
 
-                targetPosition += direction * distance*1.1f;
+                targetPosition += direction * distance * 1.1f;
 
 
             }
@@ -349,7 +366,7 @@ namespace Tirocinio
 
         void MoveAndSlide(Vector3 linearVelocity, int maxSlides = 4)
         {
-            MoveAndSlide(linearVelocity, Vector3.up, maxSlides);
+            MoveAndSlide(linearVelocity, Vector3.up, maxSlides, slopeLimit);
         }
 
         List<Vector3> slidePositions = new List<Vector3>();
@@ -401,40 +418,55 @@ namespace Tirocinio
 
 
 
-        void MoveAndSlide(Vector3 linearVelocity, Vector3 upDirection, int maxSlides = 4, float slopeLimit = 90f)
+        void MoveAndSlide(Vector3 linearVelocity, Vector3 upDirection, int maxSlides = 4, float slopeLimit = 45f)
         {
             slidePositions = new List<Vector3>();
-            LayerMask mask = gameObject.layer;
 
-
+            Vector3 previousGroundNormal = groundNormal;
+            Vector3 previousGroundPoint = groundPoint;
 
             for (int i = 0; i < maxSlides; i++)
             {
                 CheckForGround();
                 float angle = Vector3.Angle(upDirection, groundNormal);
-                if (_isGrounded && angle < slopeLimit)
+                if (_isGrounded)
                 {
-                    linearVelocity.y = 0f;
-                    targetPosition.y = groundPoint.y;
-                    linearVelocity = Vector3.ProjectOnPlane(linearVelocity, groundNormal);
+                    if (angle < slopeLimit)
+                    {
+                        linearVelocity.y = 0f;
+                        targetPosition.y = groundPoint.y;
+                        linearVelocity = Vector3.ProjectOnPlane(linearVelocity, groundNormal);
+                    }
+                    else if (Vector3.Dot(linearVelocity, groundNormal) < 0)
+                    {
+
+                        Vector3 perpendicularVector = Vector3.ProjectOnPlane(groundNormal, upDirection);
+                        linearVelocity = Vector3.ProjectOnPlane(linearVelocity, perpendicularVector);
+                        linearVelocity.y = 0f;
+
+                    }
+
                 }
+
 
                 CollisionInfo info = MoveAndCollide(linearVelocity);
                 if (info == null) break;
-                
-                
+
+
 
                 angle = Vector3.Angle(upDirection, info.normal);
-                if (angle > slopeLimit) // wall
+                if (angle > wallAngle) // wall
                 {
-                    Vector3 perpendicularVector = Vector3.ProjectOnPlane(info.normal,upDirection);
+                    Vector3 perpendicularVector = Vector3.ProjectOnPlane(info.normal, upDirection);
                     linearVelocity = Vector3.ProjectOnPlane(linearVelocity, perpendicularVector);
                 }
-                else{
+                else
+                {
                     linearVelocity = info.remainingVelocity;
                 }
 
                 Depenetrate();
+
 
 
 
@@ -512,6 +544,9 @@ namespace Tirocinio
                     if (i + 1 < slidePositions.Count)
                         Gizmos.DrawLine(offsetPosition, slidePositions[i + 1] + colliderOffset);
                 }
+
+                Gizmos.color = Color.red;
+                Gizmos.DrawRay(frontGroundRay.origin, frontGroundRay.direction * frontGroundRay.distance);
 
 
             }

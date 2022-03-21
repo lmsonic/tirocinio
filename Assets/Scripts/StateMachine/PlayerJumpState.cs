@@ -10,8 +10,7 @@ namespace Tirocinio
         {
             isRootState = true;
             ctx.Velocity.y = ctx.InitialJumpVelocity;
-            ctx.Mover.SetJumping(true);
-            ctx.ResetJumpIn(0.5f);
+            ctx.StopCheckingGroundFor(0.5f);
 
         }
         public override void UpdateState()

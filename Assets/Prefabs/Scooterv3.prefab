@@ -303,6 +303,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   handleTransform: {fileID: 4344654184642377949, guid: 17aa9157b910c2d4fa24f48f9a206e62, type: 3}
   bodyTransform: {fileID: 3641375945344933492, guid: 17aa9157b910c2d4fa24f48f9a206e62, type: 3}
+  modelTransform: {fileID: 8081354303328769704}
   maxTurnDegrees: 20
   rotationSpeed: 30
   rotationLerpSpeed: 30
