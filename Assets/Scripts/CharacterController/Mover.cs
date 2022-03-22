@@ -22,7 +22,7 @@ namespace Tirocinio
 
             public bool Cast(LayerMask mask)
             {
-                if (Physics.Raycast(origin, direction, out RaycastHit hit, distance, ~mask))
+                if (Physics.Raycast(origin, direction, out RaycastHit hit, distance, ~mask, QueryTriggerInteraction.Ignore))
                 {
                     distance = hit.distance;
                     return true;
@@ -32,7 +32,7 @@ namespace Tirocinio
 
             public bool Cast(LayerMask mask, out RaycastHit hit)
             {
-                if (Physics.Raycast(origin, direction, out hit, distance, ~mask))
+                if (Physics.Raycast(origin, direction, out hit, distance, ~mask, QueryTriggerInteraction.Ignore))
                 {
                     distance = hit.distance;
                     return true;
@@ -42,7 +42,7 @@ namespace Tirocinio
 
             public bool SphereCast(float radius, LayerMask mask)
             {
-                if (Physics.SphereCast(origin, radius, direction, out RaycastHit hit, distance, ~mask))
+                if (Physics.SphereCast(origin, radius, direction, out RaycastHit hit, distance, ~mask, QueryTriggerInteraction.Ignore))
                 {
                     distance = hit.distance;
                     return true;
@@ -52,7 +52,7 @@ namespace Tirocinio
 
             public bool SphereCast(float radius, LayerMask mask, out RaycastHit hit)
             {
-                if (Physics.SphereCast(origin, radius, direction, out hit, distance, ~mask))
+                if (Physics.SphereCast(origin, radius, direction, out hit, distance, ~mask, QueryTriggerInteraction.Ignore))
                 {
                     distance = hit.distance;
                     return true;
@@ -167,18 +167,7 @@ namespace Tirocinio
 
         public bool IsGrounded() => _isGrounded;
 
-        Raycast frontGroundRay;
 
-        public bool CheckFrontGround()
-        {
-            LayerMask mask = gameObject.layer;
-            RaycastHit hit;
-            Vector3 origin = transform.position + colliderOffset + transform.forward * colliderThickness * 1.5f;
-
-            frontGroundRay = new Raycast(origin, -transform.up, colliderHeight * sensorRange);
-
-            return frontGroundRay.Cast(mask, out hit);
-        }
 
         public void CheckForGround()
         {
@@ -333,10 +322,10 @@ namespace Tirocinio
 
         void Depenetrate()
         {
-
+            LayerMask mask = gameObject.layer;
             Collider[] neighbours = new Collider[5];
             float max = Mathf.Max(colliderHeight, colliderThickness);
-            int count = Physics.OverlapSphereNonAlloc(transform.position, max, neighbours);
+            int count = Physics.OverlapSphereNonAlloc(transform.position, max, neighbours, ~mask, QueryTriggerInteraction.Ignore);
 
 
             for (int i = 0; i < count; ++i)
@@ -393,7 +382,7 @@ namespace Tirocinio
             Vector3 direction = linearVelocity.normalized;
             float distance = linearVelocity.magnitude;
 
-            if (Physics.CapsuleCast(top, bottom, colliderThickness, direction, out hitInfo, distance, ~mask))
+            if (Physics.CapsuleCast(top, bottom, colliderThickness, direction, out hitInfo, distance, ~mask, QueryTriggerInteraction.Ignore))
             {
 
                 Vector3 closestPoint = _collider.ClosestPoint(hitInfo.point);
@@ -545,8 +534,6 @@ namespace Tirocinio
                         Gizmos.DrawLine(offsetPosition, slidePositions[i + 1] + colliderOffset);
                 }
 
-                Gizmos.color = Color.red;
-                Gizmos.DrawRay(frontGroundRay.origin, frontGroundRay.direction * frontGroundRay.distance);
 
 
             }

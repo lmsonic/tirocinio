@@ -12,7 +12,6 @@ namespace Tirocinio
             this.prefab = pooledObject;
             Spawn(numToSpawn);
         }
-
         private Stack<T> pooledObjects = new Stack<T>();
         private GameObject prefab;
         public int pooledCount

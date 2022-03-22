@@ -11,8 +11,10 @@ namespace Tirocinio
 
         public GameObject exitPrefab;
         public GameObject hexPrefab;
-        private static ObjectPool<PoolObject> exitPool;
-        private static ObjectPool<PoolObject> hexPool;
+
+        private ObjectPool<PoolObject> exitPool;
+
+        private ObjectPool<PoolObject> hexPool;
         public Hex centerHex;
 
 

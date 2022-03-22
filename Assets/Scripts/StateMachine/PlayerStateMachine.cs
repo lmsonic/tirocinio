@@ -148,7 +148,7 @@ namespace Tirocinio
             targetRotation = Quaternion.Euler(0f, 0f, -CurrentMovement.x * maxTurnDegrees);
             modelTransform.localRotation = Quaternion.Slerp(modelTransform.localRotation, targetRotation, Time.deltaTime);
 
-            Vector3 normal = Vector3.up;
+            Vector3 normal = transform.up;
 
             if (mover.IsGrounded())
             {
@@ -157,12 +157,6 @@ namespace Tirocinio
                 if (angle > mover.slopeLimit && angle < mover.wallAngle)
                 {
                     normal = transform.up;
-                }
-
-                angle = Vector3.Angle(transform.up, normal);
-                if (!mover.CheckFrontGround())
-                {
-                    //StopCheckingGroundFor(0.5f);
                 }
             }
 
@@ -215,17 +209,6 @@ namespace Tirocinio
             mover.SetVelocity(Velocity);
         }
 
-
-
-
-
-        private void OnDrawGizmos()
-        {
-            Gizmos.color = Color.red;
-            Gizmos.DrawRay(transform.position, transform.forward);
-            Gizmos.color = Color.blue;
-            Gizmos.DrawRay(transform.position, Velocity);
-        }
 
         private void OnEnable()
         {
