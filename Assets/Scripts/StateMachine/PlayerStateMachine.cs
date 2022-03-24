@@ -19,6 +19,7 @@ namespace Tirocinio
         public float maxTurnDegrees = 30f;
         public float rotationSpeed = 30f;
         public float rotationLerpSpeed = 30f;
+        public float returnToNormalLerpSpeed = 10f;
         public float MaxSpeed = 30f;
         public float BackwardsSpeed = 10f;
 
@@ -54,7 +55,6 @@ namespace Tirocinio
         public float MaxFallSpeed = -30f;
         public float FallMultiplier = 1.5f;
 
-        public float groundRotationMultiplier = 3f;
 
         public float aliveAngleLimit = 30f;
 
@@ -106,12 +106,13 @@ namespace Tirocinio
             gravity = (-2 * maxJumpHeight) / Mathf.Pow(timeToApex, 2);
             initialJumpVelocity = 2 * maxJumpHeight / timeToApex;
         }
-
         void OnJump(InputAction.CallbackContext context)
-        {
+        {   
             isJumpPressed = context.ReadValueAsButton();
             requireNewJumpPress = false;
         }
+
+        
 
         void OnAccelerationInput(InputAction.CallbackContext context)
         {
@@ -148,7 +149,7 @@ namespace Tirocinio
             targetRotation = Quaternion.Euler(0f, 0f, -CurrentMovement.x * maxTurnDegrees);
             modelTransform.localRotation = Quaternion.Slerp(modelTransform.localRotation, targetRotation, Time.deltaTime);
 
-            Vector3 normal = Vector3.up;
+            Vector3 normal = Vector3.Lerp(transform.up, Vector3.up,returnToNormalLerpSpeed);
 
             if (mover.IsGrounded())
             {
@@ -174,14 +175,15 @@ namespace Tirocinio
 
 
         }
+        
 
-        public void StopCheckingGroundFor(float seconds)
+        public void DisableKeepOnGroundFor(float seconds)
         {
             mover.SetKeepOnGround(false);
-            Invoke("ResetCheckGround", seconds);
+            Invoke("ResetKeepOnGround", seconds);
         }
 
-        void ResetCheckGround()
+        void ResetKeepOnGround()
         {
             Mover.SetKeepOnGround(true);
         }
@@ -197,12 +199,13 @@ namespace Tirocinio
             Velocity = Vector3.Lerp(Velocity, target, t);
         }
 
-
+        
 
         private void FixedUpdate()
         {
 
             mover.CheckForGround();
+            Velocity = mover.GetVelocity();
             currentState.UpdateStates();
             mover.SetVelocity(Velocity);
         }

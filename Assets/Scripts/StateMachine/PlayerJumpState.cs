@@ -6,12 +6,12 @@ namespace Tirocinio
     {
         public PlayerJumpState(PlayerStateMachine context, PlayerStateFactory factory) : base(context, factory) { }
 
+
         public override void EnterState()
         {
             isRootState = true;
             ctx.Velocity.y = ctx.InitialJumpVelocity;
-            ctx.StopCheckingGroundFor(0.1f);
-
+            ctx.DisableKeepOnGroundFor(0.1f);
         }
         public override void UpdateState()
         {

@@ -84,6 +84,7 @@ namespace Tirocinio
         public override void EnterState()
         {
             ctx.Velocity = Vector3.zero;
+            
         }
         public override void UpdateState()
         {

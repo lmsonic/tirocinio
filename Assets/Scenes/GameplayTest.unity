@@ -2237,7 +2237,7 @@ MonoBehaviour:
     ModeOverride: 0
     LensShift: {x: 0, y: 0}
     GateFit: 2
-    m_SensorSize: {x: 1.7773019, y: 1}
+    m_SensorSize: {x: 1.7776823, y: 1}
   m_Transitions:
     m_BlendHint: 0
     m_InheritPosition: 0
@@ -2254,7 +2254,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 324760189}
   m_LocalRotation: {x: 0.1736482, y: 0, z: 0, w: 0.9848078}
-  m_LocalPosition: {x: -0.21147111, y: 4.1725645, z: -7.8075576}
+  m_LocalPosition: {x: -0.21151637, y: 4.1725645, z: -7.8075576}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -15269,7 +15269,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1999379827}
   m_LocalRotation: {x: 0.1736482, y: 0, z: 0, w: 0.9848078}
-  m_LocalPosition: {x: -0.21147111, y: 4.1725645, z: -7.8075576}
+  m_LocalPosition: {x: -0.21151637, y: 4.1725645, z: -7.8075576}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -15377,16 +15377,36 @@ PrefabInstance:
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 1536190571, guid: 3f780a04d1bfe814caa13679e7db040c, type: 3}
+      propertyPath: steepSlopeForce
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1536190571, guid: 3f780a04d1bfe814caa13679e7db040c, type: 3}
       propertyPath: steepSlopeLimit
       value: 30
+      objectReference: {fileID: 0}
+    - target: {fileID: 1536190572, guid: 3f780a04d1bfe814caa13679e7db040c, type: 3}
+      propertyPath: m_Interpolate
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1536190572, guid: 3f780a04d1bfe814caa13679e7db040c, type: 3}
       propertyPath: m_CollisionDetection
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8740392723001654576, guid: 3f780a04d1bfe814caa13679e7db040c, type: 3}
+      propertyPath: FallMultiplier
+      value: 1.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 8740392723001654576, guid: 3f780a04d1bfe814caa13679e7db040c, type: 3}
+      propertyPath: rotationLerpSpeed
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 8740392723001654576, guid: 3f780a04d1bfe814caa13679e7db040c, type: 3}
+      propertyPath: returnToNormalLerpSpeed
+      value: 0.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 8740392723001654576, guid: 3f780a04d1bfe814caa13679e7db040c, type: 3}
       propertyPath: groundRotationMultiplier
-      value: 30
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 9143775345407581414, guid: 3f780a04d1bfe814caa13679e7db040c, type: 3}
       propertyPath: m_RootOrder

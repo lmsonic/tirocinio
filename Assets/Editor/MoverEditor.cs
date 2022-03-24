@@ -10,6 +10,7 @@ namespace Tirocinio
         SerializedProperty steepSlopeLimit;
         SerializedProperty steepSlopeForce;
         SerializedProperty wallAngle;
+        SerializedProperty ceilingAngle;
         SerializedProperty colliderHeight;
         SerializedProperty colliderThickness;
         SerializedProperty colliderOffset;
@@ -29,6 +30,7 @@ namespace Tirocinio
             steepSlopeLimit = serializedObject.FindProperty("steepSlopeLimit");
             steepSlopeForce = serializedObject.FindProperty("steepSlopeForce");
             wallAngle = serializedObject.FindProperty("wallAngle");
+            ceilingAngle = serializedObject.FindProperty("ceilingAngle");
 
             colliderHeight = serializedObject.FindProperty("colliderHeight");
             colliderThickness = serializedObject.FindProperty("colliderThickness");
@@ -54,6 +56,7 @@ namespace Tirocinio
             EditorGUILayout.PropertyField(steepSlopeLimit);
             EditorGUILayout.PropertyField(steepSlopeForce);
             EditorGUILayout.PropertyField(wallAngle);
+            EditorGUILayout.PropertyField(ceilingAngle);
 
 
             EditorGUILayout.LabelField("Collider Options", EditorStyles.boldLabel);

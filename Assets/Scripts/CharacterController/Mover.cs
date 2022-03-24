@@ -93,7 +93,10 @@ namespace Tirocinio
         [Range(0, 90f)]
         public float steepSlopeLimit = 45f;
         public float steepSlopeForce = 15f;
+        [Range(0,180f)]
         public float wallAngle = 80f;
+        [Range(0,180f)]
+        public float ceilingAngle = 120f;
 
 
         [Header("Collider Options")]
@@ -293,7 +296,7 @@ namespace Tirocinio
         }
 
 
-        Vector3 _velocity;
+        Vector3 _velocity = Vector3.zero;
 
         public void SetVelocity(Vector3 velocity)
         {
@@ -304,7 +307,6 @@ namespace Tirocinio
         {
             return _velocity;
         }
-
         Vector3 targetPosition;
 
 
@@ -346,16 +348,13 @@ namespace Tirocinio
                     out direction, out distance
                 );
 
-                targetPosition += direction * distance;
-
+                targetPosition += direction * distance * 1.5f;
 
             }
         }
 
-        void MoveAndSlide(Vector3 linearVelocity, int maxSlides = 4)
-        {
-            MoveAndSlide(linearVelocity, Vector3.up, maxSlides, steepSlopeLimit);
-        }
+
+
 
         List<Vector3> slidePositions = new List<Vector3>();
 
@@ -393,7 +392,7 @@ namespace Tirocinio
 
 
 
-        void MoveAndSlide(Vector3 linearVelocity, Vector3 upDirection, int maxSlides = 4, float slopeLimit = 45f)
+        void MoveAndSlide(Vector3 linearVelocity, int maxSlides = 4, float slopeLimit = 45f)
         {
             slidePositions = new List<Vector3>();
 
@@ -406,36 +405,47 @@ namespace Tirocinio
                 {
                     Vector3 slopeDirection = Vector3.up - groundNormal * Vector3.Dot(Vector3.up, groundNormal);
                     float slopeSpeed = steepSlopeForce * Time.fixedDeltaTime;
-
-                    linearVelocity += -slopeDirection * slopeSpeed;
-
+                    Vector3 slopeVector = slopeDirection * slopeSpeed;
+                    linearVelocity = -slopeVector;
+                    linearVelocity.y -= groundPoint.y;
                 }
                 if (_isGrounded && keepOnGround)
                 {
-                    if (GetGroundAngle() == 0f)
-                        linearVelocity.y = 0f;
                     targetPosition.y = groundPoint.y;
                 }
 
                 CollisionInfo info = MoveAndCollide(linearVelocity);
                 if (info == null) break;
 
+
+
                 float angle = Vector3.Angle(Vector3.up, info.normal);
-                if (angle > wallAngle) // wall
-                {
-                    Vector3 perpendicularVector = Vector3.ProjectOnPlane(info.normal, Vector3.up);
-                    linearVelocity = Vector3.ProjectOnPlane(info.remainingVelocity, perpendicularVector);
-                }
-                else
-                {
+                if (angle < wallAngle)
+                {//ground
                     linearVelocity = info.remainingVelocity;
                 }
+                else if (angle > wallAngle && angle < ceilingAngle)
+                {//wall
+                    Vector3 perpendicularNormal = Vector3.ProjectOnPlane(info.normal, Vector3.up);
+                    linearVelocity = Vector3.ProjectOnPlane(linearVelocity, perpendicularNormal);
+                }
+                else
+                {//ceiling
+                    Vector3 perpendicularNormal = Vector3.ProjectOnPlane(info.normal, Vector3.up);
+                    linearVelocity = Vector3.ProjectOnPlane(linearVelocity, perpendicularNormal);
+                    linearVelocity.y = 0f;
+                }
+
+
 
                 Depenetrate();
 
 
             }
             Depenetrate();
+
+            float inverseDeltaTime = 1f / Time.fixedDeltaTime;
+            _velocity = linearVelocity * inverseDeltaTime;
 
         }
 
