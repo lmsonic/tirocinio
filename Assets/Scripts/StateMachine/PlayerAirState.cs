@@ -23,11 +23,11 @@ namespace Tirocinio
 
             if (isFalling)
             {
-                ctx.Velocity.y = Mathf.Max(ctx.Velocity.y + ctx.Gravity * ctx.FallMultiplier * Time.deltaTime, ctx.MaxFallSpeed);
+                ctx.Velocity.y = Mathf.Max(ctx.Velocity.y + ctx.Gravity * ctx.FallMultiplier * Time.fixedDeltaTime, ctx.MaxFallSpeed);
             }
             else
             {
-                ctx.Velocity.y = ctx.Velocity.y + ctx.Gravity * Time.deltaTime;
+                ctx.Velocity.y = ctx.Velocity.y + ctx.Gravity * Time.fixedDeltaTime;
             }
 
         }

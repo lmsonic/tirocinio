@@ -11,13 +11,11 @@ namespace Tirocinio
             isRootState = true;
             ResetXRotation();
             InitializeSubState();
-            ctx.Mover.SetCheckGround(true);
+            ctx.Mover.SetKeepOnGround(true);
             ctx.Velocity.y = ctx.GroundedGravity;
-
         }
         public override void UpdateState()
         {
-
             CheckSwitchStates();
         }
         public override void ExitState() { }
@@ -64,7 +62,7 @@ namespace Tirocinio
             CheckSwitchStates();
 
             ctx.LerpGroundedVelocity(ctx.transform.forward * ctx.MaxSpeed,
-                ctx.AccelerationMultiplier * ctx.AccelerationInput * Time.deltaTime);
+                ctx.AccelerationMultiplier * ctx.AccelerationInput * Time.fixedDeltaTime);
 
         }
         public override void ExitState() { }
@@ -114,7 +112,7 @@ namespace Tirocinio
 
             CheckSwitchStates();
 
-            ctx.LerpGroundedVelocity(Vector3.zero, ctx.BrakeMultiplier * ctx.BrakeInput * Time.deltaTime);
+            ctx.LerpGroundedVelocity(Vector3.zero, ctx.BrakeMultiplier * ctx.BrakeInput * Time.fixedDeltaTime);
 
         }
         public override void ExitState() { }
@@ -145,7 +143,7 @@ namespace Tirocinio
             CheckSwitchStates();
 
 
-            ctx.LerpGroundedVelocity(Vector3.zero, ctx.DragMultiplier * Time.deltaTime);
+            ctx.LerpGroundedVelocity(Vector3.zero, ctx.DragMultiplier * Time.fixedDeltaTime);
 
 
         }
@@ -177,7 +175,7 @@ namespace Tirocinio
             CheckSwitchStates();
 
 
-            ctx.LerpGroundedVelocity(ctx.transform.forward * ctx.BackwardsSpeed * ctx.CurrentMovement.z, Time.deltaTime);
+            ctx.LerpGroundedVelocity(ctx.transform.forward * ctx.BackwardsSpeed * ctx.CurrentMovement.z, Time.fixedDeltaTime);
 
 
         }

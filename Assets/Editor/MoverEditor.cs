@@ -7,12 +7,14 @@ namespace Tirocinio
     public class MoverEditor : Editor
     {
         SerializedProperty stepHeight;
-        SerializedProperty slopeLimit;
+        SerializedProperty steepSlopeLimit;
+        SerializedProperty steepSlopeForce;
         SerializedProperty wallAngle;
         SerializedProperty colliderHeight;
         SerializedProperty colliderThickness;
         SerializedProperty colliderOffset;
         SerializedProperty sensorType;
+        SerializedProperty sensorRange;
         SerializedProperty isInDebugMode;
         SerializedProperty sensorArrayRows;
         SerializedProperty sensorArrayRayCount;
@@ -24,7 +26,8 @@ namespace Tirocinio
         {
 
             stepHeight = serializedObject.FindProperty("stepHeight");
-            slopeLimit = serializedObject.FindProperty("slopeLimit");
+            steepSlopeLimit = serializedObject.FindProperty("steepSlopeLimit");
+            steepSlopeForce = serializedObject.FindProperty("steepSlopeForce");
             wallAngle = serializedObject.FindProperty("wallAngle");
 
             colliderHeight = serializedObject.FindProperty("colliderHeight");
@@ -32,6 +35,7 @@ namespace Tirocinio
             colliderOffset = serializedObject.FindProperty("colliderOffset");
 
             sensorType = serializedObject.FindProperty("sensorType");
+            sensorRange = serializedObject.FindProperty("sensorRange");
             isInDebugMode = serializedObject.FindProperty("isInDebugMode");
 
             sensorArrayRows = serializedObject.FindProperty("sensorArrayRows");
@@ -47,7 +51,8 @@ namespace Tirocinio
 
             serializedObject.Update();
             EditorGUILayout.PropertyField(stepHeight);
-            EditorGUILayout.PropertyField(slopeLimit);
+            EditorGUILayout.PropertyField(steepSlopeLimit);
+            EditorGUILayout.PropertyField(steepSlopeForce);
             EditorGUILayout.PropertyField(wallAngle);
 
 
@@ -57,6 +62,7 @@ namespace Tirocinio
             colliderOffset.vector3Value = EditorGUILayout.Vector3Field("Collider Offset", colliderOffset.vector3Value);
 
             EditorGUILayout.PropertyField(sensorType);
+            EditorGUILayout.PropertyField(sensorRange);
             EditorGUILayout.PropertyField(isInDebugMode);
 
             EditorGUILayout.PropertyField(sensorArrayRows);

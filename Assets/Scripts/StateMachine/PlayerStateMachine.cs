@@ -148,14 +148,17 @@ namespace Tirocinio
             targetRotation = Quaternion.Euler(0f, 0f, -CurrentMovement.x * maxTurnDegrees);
             modelTransform.localRotation = Quaternion.Slerp(modelTransform.localRotation, targetRotation, Time.deltaTime);
 
-            Vector3 normal = transform.up;
+            Vector3 normal = Vector3.up;
 
             if (mover.IsGrounded())
             {
-                normal = mover.GetGroundNormal();
+                Vector3 groundNormal = mover.GetGroundNormal();
                 float angle = Vector3.Angle(Vector3.up, normal);
-                if (angle > mover.slopeLimit && angle < mover.wallAngle)
+                if (angle < mover.wallAngle)
                 {
+                    normal = groundNormal;
+                }
+                else{
                     normal = transform.up;
                 }
             }
@@ -174,13 +177,13 @@ namespace Tirocinio
 
         public void StopCheckingGroundFor(float seconds)
         {
-            mover.SetCheckGround(false);
+            mover.SetKeepOnGround(false);
             Invoke("ResetCheckGround", seconds);
         }
 
         void ResetCheckGround()
         {
-            Mover.SetCheckGround(true);
+            Mover.SetKeepOnGround(true);
         }
 
 
@@ -191,9 +194,7 @@ namespace Tirocinio
 
         public void LerpGroundedVelocity(Vector3 target, float t)
         {
-
             Velocity = Vector3.Lerp(Velocity, target, t);
-
         }
 
 
@@ -203,10 +204,12 @@ namespace Tirocinio
 
             mover.CheckForGround();
             currentState.UpdateStates();
-
-            mover.SetExtendSensorRange(mover.IsGrounded());
-
             mover.SetVelocity(Velocity);
+        }
+
+        private void OnDrawGizmos() {
+            Gizmos.color = Color.blue;
+            Gizmos.DrawRay(transform.position, Velocity);
         }
 
 

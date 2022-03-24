@@ -73,16 +73,8 @@ namespace Tirocinio
             }
 
 
+            mover.SetKeepOnGround(jumpInput);
 
-
-
-
-
-
-            mover.SetCheckGround(jumpInput);
-
-
-            mover.SetExtendSensorRange(isGrounded);
             mover.SetVelocity(velocity);
         }
 

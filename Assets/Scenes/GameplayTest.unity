@@ -2855,7 +2855,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh24960
+  m_Name: pb_Mesh26334
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -15365,8 +15365,28 @@ PrefabInstance:
       value: 45
       objectReference: {fileID: 0}
     - target: {fileID: 1536190571, guid: 3f780a04d1bfe814caa13679e7db040c, type: 3}
+      propertyPath: stepHeight
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1536190571, guid: 3f780a04d1bfe814caa13679e7db040c, type: 3}
+      propertyPath: sensorRange
+      value: 0.6
+      objectReference: {fileID: 0}
+    - target: {fileID: 1536190571, guid: 3f780a04d1bfe814caa13679e7db040c, type: 3}
       propertyPath: sensorArrayRows
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1536190571, guid: 3f780a04d1bfe814caa13679e7db040c, type: 3}
+      propertyPath: steepSlopeLimit
+      value: 30
+      objectReference: {fileID: 0}
+    - target: {fileID: 1536190572, guid: 3f780a04d1bfe814caa13679e7db040c, type: 3}
+      propertyPath: m_CollisionDetection
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8740392723001654576, guid: 3f780a04d1bfe814caa13679e7db040c, type: 3}
+      propertyPath: groundRotationMultiplier
+      value: 30
       objectReference: {fileID: 0}
     - target: {fileID: 9143775345407581414, guid: 3f780a04d1bfe814caa13679e7db040c, type: 3}
       propertyPath: m_RootOrder
