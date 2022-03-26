@@ -16,8 +16,29 @@ namespace Tirocinio
         }
         public override void UpdateState()
         {
+            SteepSlopeMovement();
             CheckSwitchStates();
         }
+
+
+
+        void SteepSlopeMovement()
+        {
+            if (ctx.OnSteepSlope())
+            {
+                Vector3 groundNormal = ctx.Mover.GetGroundNormal();
+                float groundAngle = ctx.Mover.GetGroundAngle();
+                Vector3 groundPoint = ctx.Mover.GetGroundPoint();
+
+                Vector3 slopeDirection = Vector3.up - groundNormal * Vector3.Dot(Vector3.up, groundNormal);
+                float slideSpeed = ctx.steepSlopeForce * Time.fixedDeltaTime;
+                Vector3 slopeVector = -slopeDirection * slideSpeed;
+                ctx.Velocity += slopeVector;
+            }
+        }
+
+        
+
         public override void ExitState() { }
         public override void CheckSwitchStates()
         {
@@ -25,17 +46,16 @@ namespace Tirocinio
                 SwitchState(factory.Jump());
             else if (!ctx.Mover.IsGrounded())
                 SwitchState(factory.Air());
+
         }
         public override void InitializeSubState()
         {
-            Vector3 groundedVelocity = ctx.Velocity;
-            groundedVelocity.y = 0f;
 
             if (ctx.BrakeInput > 0.1f)
                 SetSubState(factory.Brake());
             else if (ctx.AccelerationInput > 0.1f)
                 SetSubState(factory.Acceleration());
-            else if (groundedVelocity.magnitude > 1f)
+            else if (ctx.Velocity.magnitude > 1f)
                 SetSubState(factory.Drag());
             else
                 SetSubState(factory.Idle());
@@ -84,7 +104,7 @@ namespace Tirocinio
         public override void EnterState()
         {
             ctx.Velocity = Vector3.zero;
-            
+
         }
         public override void UpdateState()
         {
@@ -98,6 +118,8 @@ namespace Tirocinio
                 SwitchState(factory.Acceleration());
             else if (ctx.CurrentMovement.z < -0.1f)
                 SwitchState(factory.Backwards());
+            else if (ctx.Velocity.magnitude > 1f)
+                SwitchState(factory.Drag());
 
         }
         public override void InitializeSubState() { }
@@ -121,10 +143,8 @@ namespace Tirocinio
         {
             if (ctx.BrakeInput < 0.1f)
             {
-                Vector3 groundedVelocity = ctx.Velocity;
-                groundedVelocity.y = 0f;
-
-                if (groundedVelocity.magnitude > 1f)
+                
+                if (ctx.Velocity.magnitude > 1f)
                     SwitchState(factory.Drag());
                 else
                     SwitchState(factory.Idle());
@@ -151,14 +171,13 @@ namespace Tirocinio
         public override void ExitState() { }
         public override void CheckSwitchStates()
         {
-            Vector3 groundedVelocity = ctx.Velocity;
-            groundedVelocity.y = 0f;
+
 
             if (ctx.BrakeInput > 0.1f)
                 SwitchState(factory.Brake());
             else if (ctx.AccelerationInput > 0.1f)
                 SwitchState(factory.Acceleration());
-            else if (groundedVelocity.magnitude < 1f)
+            else if (ctx.Velocity.magnitude < 1f)
                 SwitchState(factory.Idle());
 
         }

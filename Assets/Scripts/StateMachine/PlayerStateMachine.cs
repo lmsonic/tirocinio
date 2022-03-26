@@ -13,13 +13,18 @@ namespace Tirocinio
         Mover mover;
 
         Transform cameraTransform;
+        [Header("Transform References")]
         public Transform handleTransform;
         public Transform bodyTransform;
         public Transform modelTransform;
+
+        [Header("Rotation Variables")]
         public float maxTurnDegrees = 30f;
         public float rotationSpeed = 30f;
         public float rotationLerpSpeed = 30f;
         public float returnToNormalLerpSpeed = 10f;
+
+        [Header("Ground Movement Variables")]
         public float MaxSpeed = 30f;
         public float BackwardsSpeed = 10f;
 
@@ -50,13 +55,17 @@ namespace Tirocinio
 
         public float InitialJumpVelocity { get => initialJumpVelocity; }
 
+        [Header("Air Movement Variables")]
         public float maxJumpHeight = 1f;
         public float maxJumpTime = 0.5f;
         public float MaxFallSpeed = -30f;
         public float FallMultiplier = 1.5f;
 
+        [Header("Slope Variables")]
 
-        public float aliveAngleLimit = 30f;
+        [Range(0, 90f)]
+        public float steepSlopeLimit = 45f;
+        public float steepSlopeForce = 15f;
 
 
 
@@ -107,12 +116,12 @@ namespace Tirocinio
             initialJumpVelocity = 2 * maxJumpHeight / timeToApex;
         }
         void OnJump(InputAction.CallbackContext context)
-        {   
+        {
             isJumpPressed = context.ReadValueAsButton();
             requireNewJumpPress = false;
         }
 
-        
+
 
         void OnAccelerationInput(InputAction.CallbackContext context)
         {
@@ -149,19 +158,12 @@ namespace Tirocinio
             targetRotation = Quaternion.Euler(0f, 0f, -CurrentMovement.x * maxTurnDegrees);
             modelTransform.localRotation = Quaternion.Slerp(modelTransform.localRotation, targetRotation, Time.deltaTime);
 
-            Vector3 normal = Vector3.Lerp(transform.up, Vector3.up,returnToNormalLerpSpeed);
+            Vector3 normal = Vector3.Lerp(transform.up, Vector3.up, returnToNormalLerpSpeed);
 
             if (mover.IsGrounded())
             {
                 Vector3 groundNormal = mover.GetGroundNormal();
-                float angle = Vector3.Angle(Vector3.up, normal);
-                if (angle < mover.wallAngle)
-                {
-                    normal = groundNormal;
-                }
-                else{
-                    normal = transform.up;
-                }
+                normal = groundNormal;
             }
 
             Quaternion targetRotationY = Quaternion.AngleAxis(targetAngle - transform.eulerAngles.y, normal);
@@ -175,7 +177,7 @@ namespace Tirocinio
 
 
         }
-        
+
 
         public void DisableKeepOnGroundFor(float seconds)
         {
@@ -196,10 +198,12 @@ namespace Tirocinio
 
         public void LerpGroundedVelocity(Vector3 target, float t)
         {
-            Velocity = Vector3.Lerp(Velocity, target, t);
+            Vector3 groundedDirection = target;
+            groundedDirection.y= 0f;
+            Velocity = Vector3.Lerp(Velocity, groundedDirection, t);
         }
 
-        
+
 
         private void FixedUpdate()
         {
@@ -210,7 +214,19 @@ namespace Tirocinio
             mover.SetVelocity(Velocity);
         }
 
-        private void OnDrawGizmos() {
+        public bool OnSteepSlope()
+        {
+            if (!mover.IsGrounded()) return false;
+
+            float angle = Vector3.Angle(Vector3.up, mover.GetGroundNormal());
+            if (angle > steepSlopeLimit)
+                return true;
+
+            return false;
+        }
+
+        private void OnDrawGizmos()
+        {
             Gizmos.color = Color.blue;
             Gizmos.DrawRay(transform.position, Velocity);
         }

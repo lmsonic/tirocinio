@@ -17,7 +17,7 @@ namespace Tirocinio
         {
             CheckSwitchStates();
 
-
+            
 
             bool isFalling = ctx.Velocity.y <= 0f || !ctx.IsJumpPressed;
 

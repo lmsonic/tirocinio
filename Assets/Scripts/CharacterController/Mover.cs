@@ -90,12 +90,10 @@ namespace Tirocinio
         [Header("Mover Options")]
         [Range(0, 2)]
         public float stepHeight = 0.25f;
-        [Range(0, 90f)]
-        public float steepSlopeLimit = 45f;
-        public float steepSlopeForce = 15f;
-        [Range(0,180f)]
+
+        [Range(0, 180f)]
         public float wallAngle = 80f;
-        [Range(0,180f)]
+        [Range(0, 180f)]
         public float ceilingAngle = 120f;
 
 
@@ -108,6 +106,7 @@ namespace Tirocinio
         public SensorType sensorType = SensorType.Raycast;
         [Range(0.5f, 1f)]
         public float sensorRange = 0.55f;
+        public float sphereCastRadius = 0.5f;
         public bool isInDebugMode = false;
         [Header("Sensor Array Options")]
         [Range(1, 5)]
@@ -166,7 +165,7 @@ namespace Tirocinio
 
 
 
-        const float sphereCastRadius = 0.4f;
+
         bool _isGrounded = false;
 
 
@@ -224,7 +223,7 @@ namespace Tirocinio
             LayerMask mask = gameObject.layer;
 
 
-            Raycast ray = new Raycast(center, -Vector3.up, colliderHeight * sensorRange);
+            Raycast ray = new Raycast(center, -transform.up, colliderHeight * sensorRange);
             //center ray
             if (ray.Cast(mask, out RaycastHit hit))
             {
@@ -400,23 +399,9 @@ namespace Tirocinio
 
             for (int i = 0; i < maxSlides; i++)
             {
-                CheckForGround();
-                if (OnSteepSlope())
-                {
-                    Vector3 slopeDirection = Vector3.up - groundNormal * Vector3.Dot(Vector3.up, groundNormal);
-                    float slopeSpeed = steepSlopeForce * Time.fixedDeltaTime;
-                    Vector3 slopeVector = slopeDirection * slopeSpeed;
-                    linearVelocity = -slopeVector;
-                    linearVelocity.y -= groundPoint.y;
-                }
-                if (_isGrounded && keepOnGround)
-                {
-                    targetPosition.y = groundPoint.y;
-                }
 
                 CollisionInfo info = MoveAndCollide(linearVelocity);
                 if (info == null) break;
-
 
 
                 float angle = Vector3.Angle(Vector3.up, info.normal);
@@ -449,16 +434,8 @@ namespace Tirocinio
 
         }
 
-        bool OnSteepSlope()
-        {
-            if (!_isGrounded) return false;
 
-            float angle = Vector3.Angle(Vector3.up, groundNormal);
-            if (angle > steepSlopeLimit)
-                return true;
 
-            return false;
-        }
 
 
 

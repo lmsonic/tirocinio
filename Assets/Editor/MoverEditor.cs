@@ -7,8 +7,7 @@ namespace Tirocinio
     public class MoverEditor : Editor
     {
         SerializedProperty stepHeight;
-        SerializedProperty steepSlopeLimit;
-        SerializedProperty steepSlopeForce;
+
         SerializedProperty wallAngle;
         SerializedProperty ceilingAngle;
         SerializedProperty colliderHeight;
@@ -16,6 +15,7 @@ namespace Tirocinio
         SerializedProperty colliderOffset;
         SerializedProperty sensorType;
         SerializedProperty sensorRange;
+        SerializedProperty sphereCastRadius;
         SerializedProperty isInDebugMode;
         SerializedProperty sensorArrayRows;
         SerializedProperty sensorArrayRayCount;
@@ -27,8 +27,7 @@ namespace Tirocinio
         {
 
             stepHeight = serializedObject.FindProperty("stepHeight");
-            steepSlopeLimit = serializedObject.FindProperty("steepSlopeLimit");
-            steepSlopeForce = serializedObject.FindProperty("steepSlopeForce");
+
             wallAngle = serializedObject.FindProperty("wallAngle");
             ceilingAngle = serializedObject.FindProperty("ceilingAngle");
 
@@ -38,6 +37,7 @@ namespace Tirocinio
 
             sensorType = serializedObject.FindProperty("sensorType");
             sensorRange = serializedObject.FindProperty("sensorRange");
+            sphereCastRadius = serializedObject.FindProperty("sphereCastRadius");
             isInDebugMode = serializedObject.FindProperty("isInDebugMode");
 
             sensorArrayRows = serializedObject.FindProperty("sensorArrayRows");
@@ -53,8 +53,6 @@ namespace Tirocinio
 
             serializedObject.Update();
             EditorGUILayout.PropertyField(stepHeight);
-            EditorGUILayout.PropertyField(steepSlopeLimit);
-            EditorGUILayout.PropertyField(steepSlopeForce);
             EditorGUILayout.PropertyField(wallAngle);
             EditorGUILayout.PropertyField(ceilingAngle);
 
@@ -66,6 +64,7 @@ namespace Tirocinio
 
             EditorGUILayout.PropertyField(sensorType);
             EditorGUILayout.PropertyField(sensorRange);
+            EditorGUILayout.PropertyField(sphereCastRadius);
             EditorGUILayout.PropertyField(isInDebugMode);
 
             EditorGUILayout.PropertyField(sensorArrayRows);
