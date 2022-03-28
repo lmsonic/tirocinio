@@ -8,7 +8,7 @@ namespace Tirocinio
     public class SeedBomb : PoolObject
     {
         public GameObject grassDecal;
-        public float timeToDisappear = 5f;
+        public float timeToDisappear = 10f;
         Rigidbody rb;
 
         private void Awake() {

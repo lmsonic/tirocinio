@@ -42,7 +42,7 @@ namespace Tirocinio
             GameObject go = seedBombPool.PullGameObject(shootingOrigin.position);
             Rigidbody rb = go.GetComponent<Rigidbody>();
 
-            Vector3 force = (transform.forward + transform.up).normalized * forceMultiplier;
+            Vector3 force = (2f*transform.forward + transform.up).normalized * forceMultiplier;
             rb.AddForce(force, ForceMode.VelocityChange);
 
 
