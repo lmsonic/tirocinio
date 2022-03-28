@@ -282,8 +282,10 @@ namespace Tirocinio
             Vector3 offset = Vector3.forward * hexRadius * Mathf.Sqrt(3f);
             offset = rotation * offset;
 
+            Hex hex =(Hex)hexPool.Pull(startPosition + offset, Quaternion.identity, transform);
+            hex.transform.localScale = Vector3.one;
 
-            return (Hex)hexPool.Pull(startPosition + offset, Quaternion.identity, transform);
+            return hex;
         }
 
 
@@ -312,7 +314,10 @@ namespace Tirocinio
             Vector3 middlePos = (hex1Pos + hex2Pos) * 0.5f;
             Quaternion rotation = Quaternion.LookRotation(hex1Pos - hex2Pos, Vector3.up);
 
-            return (Exit)exitPool.Pull(middlePos, rotation, transform);
+            Exit exit = (Exit)exitPool.Pull(middlePos, rotation, transform);
+            exit.transform.localScale = Vector3.one;
+
+            return exit;
 
         }
 

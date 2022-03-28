@@ -51,18 +51,9 @@
                     "initialStateCheck": true
                 },
                 {
-                    "name": "LowerGears",
+                    "name": "Shoot",
                     "type": "Button",
-                    "id": "c9158f5f-92af-4444-9f52-d3263c767962",
-                    "expectedControlType": "Button",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
-                },
-                {
-                    "name": "RaiseGears",
-                    "type": "Button",
-                    "id": "e13a4f65-35e5-4d07-a3c3-5e1bfe418c01",
+                    "id": "abf1e1e0-b973-47fe-adbc-6105dad6570a",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
@@ -116,28 +107,6 @@
                 },
                 {
                     "name": "",
-                    "id": "a4be8edd-753d-4e2c-9233-06f5bc653c5c",
-                    "path": "<Gamepad>/rightShoulder",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "Gamepad",
-                    "action": "RaiseGears",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "fce885bc-13f1-4bbd-a1cc-27e3595734a8",
-                    "path": "<Gamepad>/leftShoulder",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "Gamepad",
-                    "action": "LowerGears",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
                     "id": "38af0795-0c61-4844-a2aa-e796e7ffaec7",
                     "path": "<Gamepad>/rightStick",
                     "interactions": "",
@@ -155,6 +124,17 @@
                     "processors": "ScaleVector2(y=0.1)",
                     "groups": "Gamepad",
                     "action": "Look",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "34d202d9-7736-43a2-bc2e-7105895d0539",
+                    "path": "<Gamepad>/buttonWest",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Shoot",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

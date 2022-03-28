@@ -42,7 +42,6 @@ namespace Tirocinio
         {
             T t = Pull();
             t.transform.position = position;
-            t.transform.localScale = Vector3.one;
 
             return t;
         }
@@ -52,7 +51,6 @@ namespace Tirocinio
             T t = Pull();
             t.transform.position = position;
             t.transform.rotation = rotation;
-            t.transform.localScale = Vector3.one;            
             return t;
         }
 
@@ -62,7 +60,6 @@ namespace Tirocinio
             t.transform.position = position;
             t.transform.rotation = rotation;
             t.transform.parent = parent;
-            t.transform.localScale = Vector3.one;
             return t;
         }
 
@@ -76,7 +73,6 @@ namespace Tirocinio
         {
             GameObject go = Pull().gameObject;
             go.transform.position = position;
-            go.transform.localScale = Vector3.one;
             return go;
         }
 
@@ -85,7 +81,6 @@ namespace Tirocinio
             GameObject go = Pull().gameObject;
             go.transform.position = position;
             go.transform.rotation = rotation;
-            go.transform.localScale = Vector3.one;
             return go;
         }
         public GameObject PullGameObject(Vector3 position, Quaternion rotation,Transform parent)
@@ -94,7 +89,6 @@ namespace Tirocinio
             go.transform.position = position;
             go.transform.rotation = rotation;
             go.transform.parent = parent;
-            go.transform.localScale = Vector3.one;
             return go;
         }
 

@@ -1,5 +1,36 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &1496802510
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1496802511}
+  m_Layer: 6
+  m_Name: ShootingOrigin
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1496802511
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1496802510}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 2.5, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 9143775345407581414}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &6065835700474517067
 GameObject:
   m_ObjectHideFlags: 0
@@ -213,6 +244,7 @@ GameObject:
   - component: {fileID: 1536190570}
   - component: {fileID: 1536190571}
   - component: {fileID: 8740392723001654576}
+  - component: {fileID: 1764405909}
   m_Layer: 6
   m_Name: Scooterv3
   m_TagString: Player
@@ -233,6 +265,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 8081354303328769704}
+  - {fileID: 1496802511}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -262,7 +295,7 @@ CapsuleCollider:
   m_Material: {fileID: 0}
   m_IsTrigger: 0
   m_Enabled: 1
-  m_Radius: 0.8
+  m_Radius: 0.5
   m_Height: 3.5
   m_Direction: 1
   m_Center: {x: 0, y: 1.75, z: 0}
@@ -282,9 +315,12 @@ MonoBehaviour:
   wallAngle: 89
   ceilingAngle: 120
   colliderHeight: 3.5
-  colliderThickness: 0.8
+  colliderThickness: 0.5
   colliderOffset: {x: 0, y: 1.75, z: 0}
   sensorType: 2
+  collisionLayers:
+    serializedVersion: 2
+    m_Bits: 63
   sensorRange: 0.6
   sphereCastRadius: 0.5
   isInDebugMode: 1
@@ -304,8 +340,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2e88ef23f5b9f144a7cde78734591c2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  handleTransform: {fileID: 4344654184642377949, guid: 17aa9157b910c2d4fa24f48f9a206e62, type: 3}
-  bodyTransform: {fileID: 3641375945344933492, guid: 17aa9157b910c2d4fa24f48f9a206e62, type: 3}
+  handleTransform: {fileID: 9143775346759725057}
+  bodyTransform: {fileID: 9143775345911799702}
   modelTransform: {fileID: 8081354303328769704}
   maxTurnDegrees: 20
   rotationSpeed: 30
@@ -324,6 +360,21 @@ MonoBehaviour:
   FallMultiplier: 1.3
   steepSlopeLimit: 55
   steepSlopeForce: 50
+--- !u!114 &1764405909
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9143775345407581415}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7ce101a4429221c49b0090b27c863a55, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  seedBombPrefab: {fileID: 1843189571761026303, guid: d4059fcd7dd9f6f4699e3fcea600ff7a, type: 3}
+  shootingOrigin: {fileID: 1496802511}
+  forceMultiplier: 10
 --- !u!1 &9143775345840500072
 GameObject:
   m_ObjectHideFlags: 0

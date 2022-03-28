@@ -73,18 +73,9 @@ public partial class @PlayerInput : IInputActionCollection2, IDisposable
                     ""initialStateCheck"": true
                 },
                 {
-                    ""name"": ""LowerGears"",
+                    ""name"": ""Shoot"",
                     ""type"": ""Button"",
-                    ""id"": ""c9158f5f-92af-4444-9f52-d3263c767962"",
-                    ""expectedControlType"": ""Button"",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": false
-                },
-                {
-                    ""name"": ""RaiseGears"",
-                    ""type"": ""Button"",
-                    ""id"": ""e13a4f65-35e5-4d07-a3c3-5e1bfe418c01"",
+                    ""id"": ""abf1e1e0-b973-47fe-adbc-6105dad6570a"",
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": """",
@@ -138,28 +129,6 @@ public partial class @PlayerInput : IInputActionCollection2, IDisposable
                 },
                 {
                     ""name"": """",
-                    ""id"": ""a4be8edd-753d-4e2c-9233-06f5bc653c5c"",
-                    ""path"": ""<Gamepad>/rightShoulder"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": ""Gamepad"",
-                    ""action"": ""RaiseGears"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""fce885bc-13f1-4bbd-a1cc-27e3595734a8"",
-                    ""path"": ""<Gamepad>/leftShoulder"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": ""Gamepad"",
-                    ""action"": ""LowerGears"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
                     ""id"": ""38af0795-0c61-4844-a2aa-e796e7ffaec7"",
                     ""path"": ""<Gamepad>/rightStick"",
                     ""interactions"": """",
@@ -177,6 +146,17 @@ public partial class @PlayerInput : IInputActionCollection2, IDisposable
                     ""processors"": ""ScaleVector2(y=0.1)"",
                     ""groups"": ""Gamepad"",
                     ""action"": ""Look"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""34d202d9-7736-43a2-bc2e-7105895d0539"",
+                    ""path"": ""<Gamepad>/buttonWest"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Shoot"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -903,8 +883,7 @@ public partial class @PlayerInput : IInputActionCollection2, IDisposable
         m_Player_Jump = m_Player.FindAction("Jump", throwIfNotFound: true);
         m_Player_Accelerate = m_Player.FindAction("Accelerate", throwIfNotFound: true);
         m_Player_Brake = m_Player.FindAction("Brake", throwIfNotFound: true);
-        m_Player_LowerGears = m_Player.FindAction("LowerGears", throwIfNotFound: true);
-        m_Player_RaiseGears = m_Player.FindAction("RaiseGears", throwIfNotFound: true);
+        m_Player_Shoot = m_Player.FindAction("Shoot", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -986,8 +965,7 @@ public partial class @PlayerInput : IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_Jump;
     private readonly InputAction m_Player_Accelerate;
     private readonly InputAction m_Player_Brake;
-    private readonly InputAction m_Player_LowerGears;
-    private readonly InputAction m_Player_RaiseGears;
+    private readonly InputAction m_Player_Shoot;
     public struct PlayerActions
     {
         private @PlayerInput m_Wrapper;
@@ -997,8 +975,7 @@ public partial class @PlayerInput : IInputActionCollection2, IDisposable
         public InputAction @Jump => m_Wrapper.m_Player_Jump;
         public InputAction @Accelerate => m_Wrapper.m_Player_Accelerate;
         public InputAction @Brake => m_Wrapper.m_Player_Brake;
-        public InputAction @LowerGears => m_Wrapper.m_Player_LowerGears;
-        public InputAction @RaiseGears => m_Wrapper.m_Player_RaiseGears;
+        public InputAction @Shoot => m_Wrapper.m_Player_Shoot;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -1023,12 +1000,9 @@ public partial class @PlayerInput : IInputActionCollection2, IDisposable
                 @Brake.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnBrake;
                 @Brake.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnBrake;
                 @Brake.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnBrake;
-                @LowerGears.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnLowerGears;
-                @LowerGears.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnLowerGears;
-                @LowerGears.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnLowerGears;
-                @RaiseGears.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnRaiseGears;
-                @RaiseGears.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnRaiseGears;
-                @RaiseGears.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnRaiseGears;
+                @Shoot.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnShoot;
+                @Shoot.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnShoot;
+                @Shoot.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnShoot;
             }
             m_Wrapper.m_PlayerActionsCallbackInterface = instance;
             if (instance != null)
@@ -1048,12 +1022,9 @@ public partial class @PlayerInput : IInputActionCollection2, IDisposable
                 @Brake.started += instance.OnBrake;
                 @Brake.performed += instance.OnBrake;
                 @Brake.canceled += instance.OnBrake;
-                @LowerGears.started += instance.OnLowerGears;
-                @LowerGears.performed += instance.OnLowerGears;
-                @LowerGears.canceled += instance.OnLowerGears;
-                @RaiseGears.started += instance.OnRaiseGears;
-                @RaiseGears.performed += instance.OnRaiseGears;
-                @RaiseGears.canceled += instance.OnRaiseGears;
+                @Shoot.started += instance.OnShoot;
+                @Shoot.performed += instance.OnShoot;
+                @Shoot.canceled += instance.OnShoot;
             }
         }
     }
@@ -1264,8 +1235,7 @@ public partial class @PlayerInput : IInputActionCollection2, IDisposable
         void OnJump(InputAction.CallbackContext context);
         void OnAccelerate(InputAction.CallbackContext context);
         void OnBrake(InputAction.CallbackContext context);
-        void OnLowerGears(InputAction.CallbackContext context);
-        void OnRaiseGears(InputAction.CallbackContext context);
+        void OnShoot(InputAction.CallbackContext context);
     }
     public interface IUIActions
     {

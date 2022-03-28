@@ -149,10 +149,10 @@ namespace Tirocinio
             float targetAngle = cameraTransform.eulerAngles.y;
 
             //rotate handle
-            Quaternion targetRotation = Quaternion.Euler(0f, CurrentMovement.x * maxTurnDegrees * 1.5f, 0f);
+            Quaternion targetRotation = Quaternion.Euler(0f, CurrentMovement.x * maxTurnDegrees, 0f);
             handleTransform.localRotation = Quaternion.Slerp(handleTransform.localRotation, targetRotation, 2f * Time.deltaTime);
             //turn
-            targetRotation = Quaternion.Euler(0f, 0f, -CurrentMovement.x * maxTurnDegrees);
+            targetRotation = Quaternion.Euler(-90f, 0f, -CurrentMovement.x * maxTurnDegrees);
             bodyTransform.localRotation = Quaternion.Slerp(bodyTransform.localRotation, targetRotation, Time.deltaTime);
 
             targetRotation = Quaternion.Euler(0f, 0f, -CurrentMovement.x * maxTurnDegrees);

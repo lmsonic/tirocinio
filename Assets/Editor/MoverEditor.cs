@@ -15,6 +15,7 @@ namespace Tirocinio
         SerializedProperty colliderOffset;
         SerializedProperty sensorType;
         SerializedProperty sensorRange;
+        SerializedProperty collisionLayers;
         SerializedProperty sphereCastRadius;
         SerializedProperty isInDebugMode;
         SerializedProperty sensorArrayRows;
@@ -37,6 +38,7 @@ namespace Tirocinio
 
             sensorType = serializedObject.FindProperty("sensorType");
             sensorRange = serializedObject.FindProperty("sensorRange");
+            collisionLayers = serializedObject.FindProperty("collisionLayers");
             sphereCastRadius = serializedObject.FindProperty("sphereCastRadius");
             isInDebugMode = serializedObject.FindProperty("isInDebugMode");
 
@@ -64,6 +66,7 @@ namespace Tirocinio
 
             EditorGUILayout.PropertyField(sensorType);
             EditorGUILayout.PropertyField(sensorRange);
+            EditorGUILayout.PropertyField(collisionLayers);
             EditorGUILayout.PropertyField(sphereCastRadius);
             EditorGUILayout.PropertyField(isInDebugMode);
 

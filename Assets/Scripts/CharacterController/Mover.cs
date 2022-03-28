@@ -22,7 +22,7 @@ namespace Tirocinio
 
             public bool Cast(LayerMask mask)
             {
-                if (Physics.Raycast(origin, direction, out RaycastHit hit, distance, ~mask, QueryTriggerInteraction.Ignore))
+                if (Physics.Raycast(origin, direction, out RaycastHit hit, distance, mask, QueryTriggerInteraction.Ignore))
                 {
                     distance = hit.distance;
                     return true;
@@ -32,7 +32,7 @@ namespace Tirocinio
 
             public bool Cast(LayerMask mask, out RaycastHit hit)
             {
-                if (Physics.Raycast(origin, direction, out hit, distance, ~mask, QueryTriggerInteraction.Ignore))
+                if (Physics.Raycast(origin, direction, out hit, distance, mask, QueryTriggerInteraction.Ignore))
                 {
                     distance = hit.distance;
                     return true;
@@ -42,7 +42,7 @@ namespace Tirocinio
 
             public bool SphereCast(float radius, LayerMask mask)
             {
-                if (Physics.SphereCast(origin, radius, direction, out RaycastHit hit, distance, ~mask, QueryTriggerInteraction.Ignore))
+                if (Physics.SphereCast(origin, radius, direction, out RaycastHit hit, distance, mask, QueryTriggerInteraction.Ignore))
                 {
                     distance = hit.distance;
                     return true;
@@ -52,7 +52,7 @@ namespace Tirocinio
 
             public bool SphereCast(float radius, LayerMask mask, out RaycastHit hit)
             {
-                if (Physics.SphereCast(origin, radius, direction, out hit, distance - radius, ~mask, QueryTriggerInteraction.Ignore))
+                if (Physics.SphereCast(origin, radius, direction, out hit, distance - radius, mask, QueryTriggerInteraction.Ignore))
                 {
                     distance = hit.distance;
                     return true;
@@ -104,6 +104,7 @@ namespace Tirocinio
         public Vector3 colliderOffset = new Vector3(0f, 0.5f, 0f);
         [Header("Sensor Options")]
         public SensorType sensorType = SensorType.Raycast;
+        public LayerMask collisionLayers;
         [Range(0.5f, 1f)]
         public float sensorRange = 0.55f;
         public float sphereCastRadius = 0.5f;
@@ -179,14 +180,13 @@ namespace Tirocinio
 
 
             Vector3 origin = transform.position + transform.rotation * colliderOffset;
-            LayerMask mask = gameObject.layer;
             RaycastHit hit;
             switch (sensorType)
             {
                 case SensorType.Raycast:
                     currentRaycast = new Raycast(origin, -transform.up, colliderHeight * sensorRange);
 
-                    _isGrounded = currentRaycast.Cast(mask, out hit);
+                    _isGrounded = currentRaycast.Cast(collisionLayers, out hit);
                     if (_isGrounded)
                     {
                         groundPoint = hit.point;
@@ -197,7 +197,7 @@ namespace Tirocinio
                 case SensorType.Spherecast:
                     currentRaycast = new Raycast(origin, -transform.up, colliderHeight * sensorRange);
 
-                    _isGrounded = currentRaycast.SphereCast(sphereCastRadius, mask, out hit);
+                    _isGrounded = currentRaycast.SphereCast(sphereCastRadius, collisionLayers, out hit);
                     if (_isGrounded)
                     {
                         groundPoint = hit.point;
@@ -220,12 +220,11 @@ namespace Tirocinio
             List<Vector3> normals = new List<Vector3>();
             raycastArray = new List<Raycast>();
 
-            LayerMask mask = gameObject.layer;
 
 
             Raycast ray = new Raycast(center, -transform.up, colliderHeight * sensorRange);
             //center ray
-            if (ray.Cast(mask, out RaycastHit hit))
+            if (ray.Cast(collisionLayers, out RaycastHit hit))
             {
                 points.Add(hit.point);
                 normals.Add(hit.normal);
@@ -259,7 +258,7 @@ namespace Tirocinio
 
                     ray = new Raycast(worldPos, -transform.up, colliderHeight * sensorRange);
 
-                    if (ray.Cast(mask, out RaycastHit hit2))
+                    if (ray.Cast(collisionLayers, out RaycastHit hit2))
                     {
                         points.Add(hit2.point);
                         normals.Add(hit2.normal);
@@ -322,10 +321,9 @@ namespace Tirocinio
 
         void Depenetrate()
         {
-            LayerMask mask = gameObject.layer;
             Collider[] neighbours = new Collider[5];
             float max = Mathf.Max(colliderHeight, colliderThickness);
-            int count = Physics.OverlapSphereNonAlloc(transform.position, max, neighbours, ~mask, QueryTriggerInteraction.Ignore);
+            int count = Physics.OverlapSphereNonAlloc(transform.position, max, neighbours, collisionLayers, QueryTriggerInteraction.Ignore);
 
 
             for (int i = 0; i < count; ++i)
@@ -366,8 +364,10 @@ namespace Tirocinio
 
             Vector3 direction = linearVelocity.normalized;
             float distance = linearVelocity.magnitude;
-            if (_rigidbody.SweepTest(direction, out hitInfo, distance, QueryTriggerInteraction.Ignore))
+            if (_rigidbody.SweepTest(direction, out hitInfo, distance, QueryTriggerInteraction.Ignore)
+                && collisionLayers.Contains(hitInfo.transform.gameObject.layer))
             {
+
 
                 Vector3 closestPoint = _collider.ClosestPoint(hitInfo.point);
                 safeDistance = (closestPoint - hitInfo.point).magnitude - 0.08f;
@@ -388,6 +388,8 @@ namespace Tirocinio
             }
 
         }
+
+        
 
 
 
