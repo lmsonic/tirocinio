@@ -127,3 +127,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e5d32ab3772a58749879090e3b26514a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  grassDecal: {fileID: 4332629886473699280, guid: 4d647b445075ef54888b2f2ca959088e, type: 3}
+  timeToDisappear: 5
