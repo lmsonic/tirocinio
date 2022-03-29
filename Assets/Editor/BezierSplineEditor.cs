@@ -12,17 +12,31 @@ namespace Tirocinio
 
         public override void OnInspectorGUI()
         {
-            DrawDefaultInspector();
             spline = target as BezierSpline;
+            if (selectedIndex >= 0 && selectedIndex < spline.ControlPointCount)
+            {
+                DrawSelectedPointInspector();
+            }
             if (GUILayout.Button("Add Curve"))
             {
                 Undo.RecordObject(spline, "Add Curve");
                 spline.AddCurve();
                 EditorUtility.SetDirty(spline);
-
-
             }
 
+        }
+
+        void DrawSelectedPointInspector()
+        {
+            GUILayout.Label("Selected Point");
+            EditorGUI.BeginChangeCheck();
+            Vector3 point = EditorGUILayout.Vector3Field("Position", spline.GetControlPoint(selectedIndex));
+            if (EditorGUI.EndChangeCheck())
+            {
+                Undo.RecordObject(spline, "Move Point");
+                EditorUtility.SetDirty(spline);
+                spline.SetControlPoint(selectedIndex, point);
+            }
         }
 
 
@@ -37,7 +51,7 @@ namespace Tirocinio
 
 
             Vector3 p0 = ShowPoint(0);
-            for (int i = 1; i < spline.points.Length; i += 3)
+            for (int i = 1; i < spline.ControlPointCount; i += 3)
             {
                 Vector3 p1 = ShowPoint(i);
                 Vector3 p2 = ShowPoint(i + 1);
@@ -81,7 +95,7 @@ namespace Tirocinio
 
         private Vector3 ShowPoint(int index)
         {
-            Vector3 point = handleTransform.TransformPoint(spline.points[index]);
+            Vector3 point = handleTransform.TransformPoint(spline.GetControlPoint(index));
             float size = HandleUtility.GetHandleSize(point);
             Handles.color = Color.white;
             if (Handles.Button(point, handleRotation, size * handleSize, size * pickSize, Handles.DotHandleCap))
@@ -97,7 +111,7 @@ namespace Tirocinio
                 {
                     Undo.RecordObject(spline, "Move Point");
                     EditorUtility.SetDirty(spline);
-                    spline.points[index] = handleTransform.InverseTransformPoint(point);
+                    spline.SetControlPoint(index, handleTransform.InverseTransformPoint(point));
                 }
             }
 
