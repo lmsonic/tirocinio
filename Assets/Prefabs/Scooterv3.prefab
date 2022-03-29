@@ -312,7 +312,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   stepHeight: 0.5
-  wallAngle: 89
+  wallAngle: 80
   ceilingAngle: 120
   colliderHeight: 3.5
   colliderThickness: 0.5
