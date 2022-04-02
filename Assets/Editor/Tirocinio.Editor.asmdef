@@ -1,0 +1,16 @@
+{
+    "name": "Tirocinio.Editor",
+    "rootNamespace": "Tirocinio",
+    "references": [
+        "GUID:a5713cbf6aea22f42a424734af183ede"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
