@@ -234,5 +234,92 @@ namespace Tirocinio
             return GetVelocity(t).normalized;
         }
 
+
+
+
+        public Vector3 GetClosestPoint(Vector3 point)
+        {
+
+
+            (float a, float b) = FindClosestInterval(point);
+
+            return GetPoint(FindClosestPointBisection(a, b, point));
+        }
+
+        const float maxIterations = 20;
+        const float precision = 1e-3f;
+
+
+        float FindClosestPointBisection(float a, float b, Vector3 point)
+        {
+            float c = (a + b) / 2;
+            int k = 0;
+            while (b - a > precision && k < maxIterations)
+            {
+                c = (a + b) / 2;
+
+                float distA = DistanceFromPointOnBezier(point, a);
+                float distB = DistanceFromPointOnBezier(point, b);
+                float distC = DistanceFromPointOnBezier(point, c);
+
+                if (distC < distA)
+                    a = c;
+                else if (distC < distB)
+                    b = c;
+
+                k++;
+            }
+
+            return c;
+        }
+
+
+
+        const int samples = 20;
+
+        public (float a, float b) FindClosestInterval(Vector3 point)
+        {
+            float stepSize = 1f / samples;
+
+            float closestPoint = 0f;
+            float minDistance = Mathf.Infinity;
+            for (int i = 0; i <= samples; i++)
+            {
+                float distance = DistanceFromPointOnBezier(point, stepSize * i);
+                if (distance < minDistance)
+                {
+                    closestPoint = stepSize * i;
+                    minDistance = distance;
+                }
+            }
+
+            float previousDistance = DistanceFromPointOnBezier(point, closestPoint - stepSize);
+            float nextDistance = DistanceFromPointOnBezier(point, closestPoint + stepSize);
+
+            float otherPoint = closestPoint + stepSize;
+            if (previousDistance < nextDistance)
+            {
+                float tmp = closestPoint;
+                closestPoint = closestPoint - stepSize;
+                otherPoint = tmp;
+            }
+
+
+
+            return (closestPoint, otherPoint);
+
+        }
+
+        float DistanceFromPointOnBezier(Vector3 point, float t)
+        {
+            return (point - GetPoint(t)).magnitude;
+        }
+
+
+
+
+
+
+
     }
 }

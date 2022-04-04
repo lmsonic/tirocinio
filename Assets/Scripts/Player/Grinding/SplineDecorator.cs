@@ -21,6 +21,7 @@ namespace Tirocinio
                 stepSize = 1f / stepSize;
             else
                 stepSize = 1f / (stepSize - 1);
+                
             for (int p = 0, f = 0; f < frequency; f++)
             {
                 for (int i = 0; i < items.Length; i++, p++)
