@@ -21,6 +21,7 @@ namespace Tirocinio
             spline = GetComponent<BezierSpline>();
             MeshFilter meshFilter = GetComponent<MeshFilter>();
             meshFilter.mesh = CreateMesh();
+
         }
 
 
@@ -28,12 +29,21 @@ namespace Tirocinio
         Mesh CreateMesh()
         {
             Mesh mesh = new Mesh();
+            mesh.name = "Bezier";
             List<Vector3> vertices = new List<Vector3>();
             List<int> triangles = new List<int>();
             List<Vector2> uv = new List<Vector2>();
 
-            DrawPolygonFace(spline.GetPoint(0f), spline.GetDirection(0f), ref vertices, ref triangles);
-            DrawPolygonFace(spline.GetPoint(1f), spline.GetDirection(1f), ref vertices, ref triangles, true);
+            GeneratePolyFace(0f, ref vertices, ref triangles);
+
+            float stepSize = 1f / resolution;
+            for (int i = 0; i < resolution; i++)
+            {
+                Debug.Log(stepSize * i + "," + stepSize * (i + 1));
+                GenerateSegment(stepSize * i, stepSize * (i + 1), ref vertices, ref triangles);
+            }
+
+            GeneratePolyFace(1f, ref vertices, ref triangles, true);
 
 
 
@@ -51,9 +61,12 @@ namespace Tirocinio
 
         }
 
-        void DrawPolygonFace(Vector3 center, Vector3 normal, ref List<Vector3> vertices, ref List<int> triangles, bool flip = false)
+        void GeneratePolyFace(float t, ref List<Vector3> vertices, ref List<int> triangles, bool flip = false)
         {
+            Vector3 center = spline.GetPoint(t);
+            Vector3 normal = spline.GetDirection(t);
             if (flip) normal = -normal;
+
             Vector3 offset = new Vector3(radius, 0f, 0f);
 
             float deltaAngle = 360f / sides;
@@ -77,6 +90,69 @@ namespace Tirocinio
                     triangles.AddRange(new int[] { centerIndex, centerIndex + i, centerIndex + i - 1 });
                 }
             }
+
+        }
+        struct Quad
+        {
+            public Vector3 bottomRight, topLeft;
+
+        }
+
+
+
+        void GenerateSegment(float startT, float endT, ref List<Vector3> vertices, ref List<int> triangles)
+        {
+
+            Vector3 start = spline.GetPoint(startT);
+            Vector3 end = spline.GetPoint(endT);
+
+            Vector3 startNormal = spline.GetDirection(startT);
+            Vector3 endNormal = spline.GetDirection(endT);
+
+            Vector3 offset = new Vector3(radius, 0f, 0f);
+
+            float deltaAngle = 360f / sides;
+
+            for (int i = 0; i <= sides; i++)
+            {
+
+
+                float angle = deltaAngle * i;
+                Quaternion startRotation = Quaternion.AngleAxis(angle, startNormal);
+                Quaternion endRotation = Quaternion.AngleAxis(angle, endNormal);
+
+                Vector3 startPos = start + startRotation * offset;
+                Vector3 endPos = end + endRotation * offset;
+
+                vertices.Add(startPos);
+                vertices.Add(endPos);
+
+                if (i > 0)
+                {
+                    Vector3 OldStart = vertices[vertices.Count - 4];
+                    Vector3 OldEnd = vertices[vertices.Count - 3];
+
+
+
+
+                    int currentIndex = vertices.Count - 1;
+
+
+                    triangles.AddRange(new int[]{
+                        currentIndex - 1, currentIndex , currentIndex - 3,
+                    });
+
+                    triangles.AddRange(new int[]{
+                        currentIndex - 3, currentIndex , currentIndex - 2,
+                    });
+                }
+
+
+            }
+
+
+
+
 
         }
 

@@ -539,7 +539,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2c4da553589bb3243817455d93327de9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  resolution: 10
+  resolution: 30
   radius: 0.5
   sides: 6
 --- !u!23 &1223130794
