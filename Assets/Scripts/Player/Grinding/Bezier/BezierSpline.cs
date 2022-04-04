@@ -14,6 +14,10 @@ namespace Tirocinio
         [SerializeField]
         private bool loop;
 
+        public delegate void Refresh();
+        public Action RefreshBezier;
+
+
         public bool Loop
         {
             get
@@ -27,6 +31,7 @@ namespace Tirocinio
                 {
                     points[points.Length - 1] = points[0];
                     SetControlPoint(0, points[0]);
+                    RefreshBezier.Invoke();
                 }
             }
         }
@@ -88,6 +93,7 @@ namespace Tirocinio
             }
             points[index] = point;
             EnforceMode(index);
+            RefreshBezier.Invoke();
         }
 
         public BezierControlPointMode GetControlPointMode(int index)
@@ -111,6 +117,7 @@ namespace Tirocinio
                 }
             }
             EnforceMode(index);
+            RefreshBezier.Invoke();
         }
 
         void EnforceMode(int index)
@@ -166,6 +173,7 @@ namespace Tirocinio
                 BezierControlPointMode.Free,
                 BezierControlPointMode.Free,
             };
+            RefreshBezier.Invoke();
         }
 
         public void AddCurve()
@@ -190,6 +198,7 @@ namespace Tirocinio
                 EnforceMode(0);
 
             }
+            RefreshBezier.Invoke();
         }
 
 

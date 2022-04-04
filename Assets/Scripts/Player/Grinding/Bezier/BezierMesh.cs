@@ -1,9 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEditor;
 
 namespace Tirocinio
 {
+    [ExecuteInEditMode]
     [RequireComponent(typeof(BezierSpline))]
     public class BezierMesh : MonoBehaviour
     {
@@ -13,15 +15,24 @@ namespace Tirocinio
         public float radius = 0.5f;
         public int sides = 6;
 
+        MeshFilter meshFilter;
+
+
 
 
 
         void Start()
         {
             spline = GetComponent<BezierSpline>();
-            MeshFilter meshFilter = GetComponent<MeshFilter>();
+            meshFilter = GetComponent<MeshFilter>();
             meshFilter.mesh = CreateMesh();
+            spline.RefreshBezier += UpdateMesh;
+        }
 
+        public void UpdateMesh()
+        {
+
+            meshFilter.mesh = CreateMesh();
         }
 
 
@@ -67,7 +78,7 @@ namespace Tirocinio
             Vector3 normal = spline.GetDirection(t);
             if (flip) normal = -normal;
 
-            Vector3 offset = new Vector3(radius, 0f, 0f);
+
 
             float deltaAngle = 360f / sides;
 
@@ -81,7 +92,7 @@ namespace Tirocinio
                 float angle = deltaAngle * i;
                 Quaternion rotation = Quaternion.AngleAxis(angle, normal);
 
-                Vector3 vertexPos = center + rotation * offset;
+                Vector3 vertexPos = center + (rotation * Vector3.up) * radius;
 
 
                 vertices.Add(vertexPos);
@@ -109,9 +120,12 @@ namespace Tirocinio
             Vector3 startNormal = spline.GetDirection(startT);
             Vector3 endNormal = spline.GetDirection(endT);
 
-            Vector3 offset = new Vector3(radius, 0f, 0f);
+
+
 
             float deltaAngle = 360f / sides;
+
+
 
             for (int i = 0; i <= sides; i++)
             {
@@ -121,13 +135,15 @@ namespace Tirocinio
                 Quaternion startRotation = Quaternion.AngleAxis(angle, startNormal);
                 Quaternion endRotation = Quaternion.AngleAxis(angle, endNormal);
 
-                Vector3 startPos = start + startRotation * offset;
-                Vector3 endPos = end + endRotation * offset;
+
+                Vector3 startPos = start + (startRotation * Vector3.up) * radius;
+                Vector3 endPos = end + (endRotation * Vector3.up) * radius;
 
                 vertices.Add(startPos);
                 vertices.Add(endPos);
 
                 if (i > 0)
+
                 {
                     Vector3 OldStart = vertices[vertices.Count - 4];
                     Vector3 OldEnd = vertices[vertices.Count - 3];
