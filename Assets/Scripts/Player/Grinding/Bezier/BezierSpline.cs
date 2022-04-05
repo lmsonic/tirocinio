@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Events;
 using System;
 
 namespace Tirocinio
@@ -15,7 +16,7 @@ namespace Tirocinio
         private bool loop;
 
         public delegate void Refresh();
-        public Action RefreshBezier;
+        public UnityAction RefreshBezier;
 
 
         public bool Loop

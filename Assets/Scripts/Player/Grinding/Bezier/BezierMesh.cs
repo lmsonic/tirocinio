@@ -17,17 +17,36 @@ namespace Tirocinio
 
         MeshFilter meshFilter;
 
+        bool update = false;
 
-
-
-
-        void Start()
+        private void OnValidate()
         {
+            update = true;
+        }
+
+        private void LateUpdate()
+        {
+            if (update)
+            {
+                UpdateMesh();
+                update = false;
+            }
+
+        }
+
+
+
+
+        private void OnEnable()
+        {
+            Debug.Log("Editor Start");
             spline = GetComponent<BezierSpline>();
             meshFilter = GetComponent<MeshFilter>();
             meshFilter.mesh = CreateMesh();
             spline.RefreshBezier += UpdateMesh;
+            Undo.undoRedoPerformed += UpdateMesh;
         }
+
 
         public void UpdateMesh()
         {
@@ -50,7 +69,6 @@ namespace Tirocinio
             float stepSize = 1f / resolution;
             for (int i = 0; i < resolution; i++)
             {
-                Debug.Log(stepSize * i + "," + stepSize * (i + 1));
                 GenerateSegment(stepSize * i, stepSize * (i + 1), ref vertices, ref triangles);
             }
 

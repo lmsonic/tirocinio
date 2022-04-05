@@ -10,6 +10,8 @@ namespace Tirocinio
         private Transform handleTransform;
         private Quaternion handleRotation;
 
+
+
         public override void OnInspectorGUI()
         {
             spline = target as BezierSpline;
