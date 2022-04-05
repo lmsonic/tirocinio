@@ -92,7 +92,9 @@ namespace Tirocinio
                 float angle = deltaAngle * i;
                 Quaternion rotation = Quaternion.AngleAxis(angle, normal);
 
-                Vector3 vertexPos = center + (rotation * Vector3.up) * radius;
+                Vector3 up = Quaternion.Euler(90f, 0f, 0f) * normal;
+
+                Vector3 vertexPos = center + (rotation * up) * radius;
 
 
                 vertices.Add(vertexPos);
@@ -135,9 +137,13 @@ namespace Tirocinio
                 Quaternion startRotation = Quaternion.AngleAxis(angle, startNormal);
                 Quaternion endRotation = Quaternion.AngleAxis(angle, endNormal);
 
+                Vector3 startUp = Quaternion.Euler(90f, 0f, 0f) * startNormal;
+                Vector3 endUp = Quaternion.Euler(90f, 0f, 0f) * endNormal;
 
-                Vector3 startPos = start + (startRotation * Vector3.up) * radius;
-                Vector3 endPos = end + (endRotation * Vector3.up) * radius;
+
+
+                Vector3 startPos = start + (startRotation * startUp) * radius;
+                Vector3 endPos = end + (endRotation * endUp) * radius;
 
                 vertices.Add(startPos);
                 vertices.Add(endPos);
@@ -147,9 +153,6 @@ namespace Tirocinio
                 {
                     Vector3 OldStart = vertices[vertices.Count - 4];
                     Vector3 OldEnd = vertices[vertices.Count - 3];
-
-
-
 
                     int currentIndex = vertices.Count - 1;
 
