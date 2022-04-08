@@ -110,7 +110,7 @@ namespace Tirocinio
                 float angle = deltaAngle * i;
                 Quaternion rotation = Quaternion.AngleAxis(angle, normal);
 
-                Vector3 up = Quaternion.Euler(90f, 0f, 0f) * normal;
+                Vector3 up = Vector3.ProjectOnPlane(Vector3.up, normal).normalized;
 
                 Vector3 vertexPos = center + (rotation * up) * radius;
 
@@ -123,11 +123,7 @@ namespace Tirocinio
             }
 
         }
-        struct Quad
-        {
-            public Vector3 bottomRight, topLeft;
 
-        }
 
 
 
@@ -155,8 +151,8 @@ namespace Tirocinio
                 Quaternion startRotation = Quaternion.AngleAxis(angle, startNormal);
                 Quaternion endRotation = Quaternion.AngleAxis(angle, endNormal);
 
-                Vector3 startUp = Quaternion.Euler(90f, 0f, 0f) * startNormal;
-                Vector3 endUp = Quaternion.Euler(90f, 0f, 0f) * endNormal;
+                Vector3 startUp = Vector3.ProjectOnPlane(Vector3.up, startNormal).normalized;
+                Vector3 endUp = Vector3.ProjectOnPlane(Vector3.up, endNormal).normalized;
 
 
 
