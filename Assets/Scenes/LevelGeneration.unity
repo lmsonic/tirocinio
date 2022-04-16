@@ -491,7 +491,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh-1842
+  m_Name: pb_Mesh-4960
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -847,7 +847,7 @@ MonoBehaviour:
     ModeOverride: 0
     LensShift: {x: 0, y: 0}
     GateFit: 2
-    m_SensorSize: {x: 1.7773019, y: 1}
+    m_SensorSize: {x: 1.8430873, y: 1}
   m_Transitions:
     m_BlendHint: 0
     m_InheritPosition: 0
@@ -864,7 +864,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1246725729}
   m_LocalRotation: {x: 0.1736482, y: 0, z: 0, w: 0.9848078}
-  m_LocalPosition: {x: -0.21147111, y: 6.6725636, z: -7.8075566}
+  m_LocalPosition: {x: -0.21929854, y: 6.6725636, z: -7.8075566}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -1033,7 +1033,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1486304558}
   m_LocalRotation: {x: 0.1736482, y: 0, z: 0, w: 0.9848078}
-  m_LocalPosition: {x: -0.21147111, y: 6.6725636, z: -7.8075566}
+  m_LocalPosition: {x: -0.21929854, y: 6.6725636, z: -7.8075566}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1514,7 +1514,7 @@ PrefabInstance:
       objectReference: {fileID: 1029996320}
     - target: {fileID: 3781031514255989155, guid: 345d680cfbb3c5a4ba3b437db2088949, type: 3}
       propertyPath: m_VersionIndex
-      value: 84
+      value: 93
       objectReference: {fileID: 0}
     - target: {fileID: 6140296542766368193, guid: 345d680cfbb3c5a4ba3b437db2088949, type: 3}
       propertyPath: m_RootOrder
@@ -1560,37 +1560,9 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 6140296542766368194, guid: 345d680cfbb3c5a4ba3b437db2088949, type: 3}
-      propertyPath: hexPrefab
-      value: 
-      objectReference: {fileID: 7011641782255620845, guid: 9b9783ae53652ae41bf65709e07f4ddd, type: 3}
-    - target: {fileID: 6140296542766368194, guid: 345d680cfbb3c5a4ba3b437db2088949, type: 3}
-      propertyPath: exitPrefab
-      value: 
-      objectReference: {fileID: 9079582953156701664, guid: e63782bfdf447ca49a51afca10c58644, type: 3}
-    - target: {fileID: 6140296542766368194, guid: 345d680cfbb3c5a4ba3b437db2088949, type: 3}
-      propertyPath: renderDistance
-      value: 5
-      objectReference: {fileID: 0}
-    - target: {fileID: 6140296542766368194, guid: 345d680cfbb3c5a4ba3b437db2088949, type: 3}
-      propertyPath: _renderDistance
-      value: 4
-      objectReference: {fileID: 0}
-    - target: {fileID: 6140296542766368194, guid: 345d680cfbb3c5a4ba3b437db2088949, type: 3}
-      propertyPath: maxGenerationSteps
-      value: 3
-      objectReference: {fileID: 0}
-    - target: {fileID: 6140296542766368194, guid: 345d680cfbb3c5a4ba3b437db2088949, type: 3}
-      propertyPath: regenerateHexDistance
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 6140296542766368195, guid: 345d680cfbb3c5a4ba3b437db2088949, type: 3}
       propertyPath: m_Name
       value: Chunk
-      objectReference: {fileID: 0}
-    - target: {fileID: 7089320375585003098, guid: 345d680cfbb3c5a4ba3b437db2088949, type: 3}
-      propertyPath: exits.Array.size
-      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 345d680cfbb3c5a4ba3b437db2088949, type: 3}
