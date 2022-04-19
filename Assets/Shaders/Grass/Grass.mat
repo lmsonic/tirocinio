@@ -41,12 +41,12 @@ Material:
     - _BladeHeightMin: 0.65
     - _BladeWidthMax: 0.0603
     - _BladeWidthMin: 0.0216
-    - _GrassFalloff: 0.224
-    - _GrassThreshold: 0.04
-    - _TesselationGrassDistance: 0.22
+    - _GrassFalloff: 0.204
+    - _GrassThreshold: 0.05
+    - _TesselationGrassDistance: 0.12
     - _WindFrequency: 0.056
     m_Colors:
-    - _BaseColor: {r: 0, g: 0, b: 0, a: 1}
-    - _TipColor: {r: 0.4528302, g: 0.12532178, b: 0, a: 1}
+    - _BaseColor: {r: 0, g: 0.3490566, b: 0.05635807, a: 1}
+    - _TipColor: {r: 0.26937675, g: 1, b: 0, a: 1}
     - _WindVelocity: {r: 0.1, g: 0, b: 0, a: 0}
   m_BuildTextureStacks: []

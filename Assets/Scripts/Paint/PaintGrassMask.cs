@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Tirocinio
 {
-    public class PaintTexture : MonoBehaviour
+    public class PaintGrassMask : MonoBehaviour
     {
 
 
@@ -12,17 +12,36 @@ namespace Tirocinio
 
 
 
+
         private void Start()
         {
             rend = GetComponent<Renderer>();
-            ResetTextureToBlack();
+            ResetTexture();
 
-            GenerateWhiteCircle(new Vector2(128, 128), 100);
+            //GenerateWhiteCircle(new Vector2(128, 128), 100);
         }
 
-        void GenerateWhiteCircle(Vector2 center, float radius)
+        public void OnCollisionEnter(Collision collision)
+        {
+            if (collision.gameObject.CompareTag("SeedBomb"))
+            {
+
+                Ray ray = new Ray(collision.contacts[0].point - collision.contacts[0].normal, collision.contacts[0].normal);
+                if (Physics.Raycast(ray, out RaycastHit hit))
+                {
+                    GenerateWhiteCircle(hit.textureCoord, 50f);
+                    Debug.Log("Seed Bombed at " + hit.textureCoord.x + " " + hit.textureCoord.y);
+                }
+                collision.gameObject.SetActive(false);
+            }
+        }
+
+
+        void GenerateWhiteCircle(Vector2 uvCoord, float radius)
         {
             Texture2D texture = Instantiate(rend.material.GetTexture("_GrassMap")) as Texture2D;
+
+            Vector2 center = new Vector2(uvCoord.x * texture.width, uvCoord.y * texture.height);
 
             rend.material.SetTexture("_GrassMap", texture);
 
@@ -36,8 +55,12 @@ namespace Tirocinio
                 for (int x = 0; x < texture.width; x++)
                 {
                     float distance = Vector2.Distance(new Vector2(x, y), center);
-                    Color color = Color.Lerp(Color.white, Color.black, distance / radius);
-                    texture.SetPixel(x, y, color);
+                    if (distance < radius)
+                    {
+                        Color input = texture.GetPixel(x, y);
+                        Color color = Color.Lerp(Color.white, input, distance / radius);
+                        texture.SetPixel(x, y, color);
+                    }
                 }
             }
             // actually apply all SetPixels, don't recalculate mip levels
@@ -46,7 +69,7 @@ namespace Tirocinio
 
         }
 
-        void ResetTextureToBlack()
+        void ResetTexture()
         {
 
             Texture2D texture = new Texture2D(256, 256);
@@ -71,6 +94,11 @@ namespace Tirocinio
             // actually apply all SetPixels, don't recalculate mip levels
             texture.Apply(false);
 
+        }
+
+        private void OnDestroy()
+        {
+            Destroy(rend.material);
         }
     }
 }
