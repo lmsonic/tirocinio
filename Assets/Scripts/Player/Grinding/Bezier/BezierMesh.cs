@@ -48,6 +48,7 @@ namespace Tirocinio
         }
 
 
+
         public void UpdateMesh()
         {
 
@@ -92,7 +93,7 @@ namespace Tirocinio
 
         void GeneratePolyFace(float t, ref List<Vector3> vertices, ref List<int> triangles, bool flip = false)
         {
-            Vector3 center = spline.GetPoint(t);
+            Vector3 center = spline.GetPoint(t) - transform.position;
             Vector3 normal = spline.GetDirection(t);
             if (flip) normal = -normal;
 
@@ -130,8 +131,8 @@ namespace Tirocinio
         void GenerateSegment(float startT, float endT, ref List<Vector3> vertices, ref List<int> triangles)
         {
 
-            Vector3 start = spline.GetPoint(startT);
-            Vector3 end = spline.GetPoint(endT);
+            Vector3 start = spline.GetPoint(startT) - transform.position;
+            Vector3 end = spline.GetPoint(endT) - transform.position;
 
             Vector3 startNormal = spline.GetDirection(startT);
             Vector3 endNormal = spline.GetDirection(endT);

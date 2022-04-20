@@ -586,6 +586,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 93829ec413ff08c4bbb4dcc937640401, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  rend: {fileID: 6869339792944996560}
+  grassMap: {fileID: 0}
 --- !u!64 &5131917859162738726
 MeshCollider:
   m_ObjectHideFlags: 0

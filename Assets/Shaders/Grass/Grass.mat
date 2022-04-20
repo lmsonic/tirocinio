@@ -42,7 +42,7 @@ Material:
     - _BladeWidthMax: 0.0603
     - _BladeWidthMin: 0.0216
     - _GrassFalloff: 0.204
-    - _GrassThreshold: 0.05
+    - _GrassThreshold: 0.032
     - _TesselationGrassDistance: 0.12
     - _WindFrequency: 0.056
     m_Colors:

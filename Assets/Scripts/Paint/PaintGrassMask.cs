@@ -7,10 +7,11 @@ namespace Tirocinio
     public class PaintGrassMask : MonoBehaviour
     {
 
-
+        [SerializeField]
         Renderer rend;
+        [SerializeField]
 
-        public Texture2D grassMap;
+        Texture2D grassMap;
 
 
 
@@ -18,7 +19,10 @@ namespace Tirocinio
 
         private void Start()
         {
-            rend = GetComponent<Renderer>();
+            if (rend == null)
+            {
+                rend = GetComponent<Renderer>();
+            }
             ResetTexture();
 
             //GenerateWhiteCircle(new Vector2(128, 128), 100);
