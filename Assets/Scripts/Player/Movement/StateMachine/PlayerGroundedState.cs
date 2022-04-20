@@ -37,12 +37,12 @@ namespace Tirocinio
             }
         }
 
-        
+
 
         public override void ExitState() { }
         public override void CheckSwitchStates()
         {
-            if (ctx.IsJumpPressed && !ctx.RequireNewJumpPress)
+            if (ctx.PlayerInput.IsJumpPressed && !ctx.PlayerInput.RequireNewJumpPress)
                 SwitchState(factory.Jump());
             else if (!ctx.Mover.IsGrounded())
                 SwitchState(factory.Air());
@@ -51,9 +51,9 @@ namespace Tirocinio
         public override void InitializeSubState()
         {
 
-            if (ctx.BrakeInput > 0.1f)
+            if (ctx.PlayerInput.BrakeInput > 0.1f)
                 SetSubState(factory.Brake());
-            else if (ctx.AccelerationInput > 0.1f)
+            else if (ctx.PlayerInput.AccelerationInput > 0.1f)
                 SetSubState(factory.Acceleration());
             else if (ctx.Velocity.magnitude > 1f)
                 SetSubState(factory.Drag());
@@ -82,15 +82,15 @@ namespace Tirocinio
             CheckSwitchStates();
 
             ctx.LerpGroundedVelocity(ctx.transform.forward * ctx.MaxSpeed,
-                ctx.AccelerationMultiplier * ctx.AccelerationInput * Time.fixedDeltaTime);
+                ctx.AccelerationMultiplier * ctx.PlayerInput.AccelerationInput * Time.fixedDeltaTime);
 
         }
         public override void ExitState() { }
         public override void CheckSwitchStates()
         {
-            if (ctx.BrakeInput > 0.1f)
+            if (ctx.PlayerInput.BrakeInput > 0.1f)
                 SwitchState(factory.Brake());
-            else if (ctx.AccelerationInput < 0.1f)
+            else if (ctx.PlayerInput.AccelerationInput < 0.1f)
                 SwitchState(factory.Drag());
 
         }
@@ -114,9 +114,9 @@ namespace Tirocinio
         public override void ExitState() { }
         public override void CheckSwitchStates()
         {
-            if (ctx.AccelerationInput > 0.1f)
+            if (ctx.PlayerInput.AccelerationInput > 0.1f)
                 SwitchState(factory.Acceleration());
-            else if (ctx.CurrentMovement.z < -0.1f)
+            else if (ctx.PlayerInput.CurrentMovement.z < -0.1f)
                 SwitchState(factory.Backwards());
             else if (ctx.Velocity.magnitude > 1f)
                 SwitchState(factory.Drag());
@@ -135,15 +135,15 @@ namespace Tirocinio
 
             CheckSwitchStates();
 
-            ctx.LerpGroundedVelocity(Vector3.zero, ctx.BrakeMultiplier * ctx.BrakeInput * Time.fixedDeltaTime);
+            ctx.LerpGroundedVelocity(Vector3.zero, ctx.BrakeMultiplier * ctx.PlayerInput.BrakeInput * Time.fixedDeltaTime);
 
         }
         public override void ExitState() { }
         public override void CheckSwitchStates()
         {
-            if (ctx.BrakeInput < 0.1f)
+            if (ctx.PlayerInput.BrakeInput < 0.1f)
             {
-                
+
                 if (ctx.Velocity.magnitude > 1f)
                     SwitchState(factory.Drag());
                 else
@@ -173,9 +173,9 @@ namespace Tirocinio
         {
 
 
-            if (ctx.BrakeInput > 0.1f)
+            if (ctx.PlayerInput.BrakeInput > 0.1f)
                 SwitchState(factory.Brake());
-            else if (ctx.AccelerationInput > 0.1f)
+            else if (ctx.PlayerInput.AccelerationInput > 0.1f)
                 SwitchState(factory.Acceleration());
             else if (ctx.Velocity.magnitude < 1f)
                 SwitchState(factory.Idle());
@@ -195,14 +195,14 @@ namespace Tirocinio
             CheckSwitchStates();
 
 
-            ctx.LerpGroundedVelocity(ctx.transform.forward * ctx.BackwardsSpeed * ctx.CurrentMovement.z, Time.fixedDeltaTime);
+            ctx.LerpGroundedVelocity(ctx.transform.forward * ctx.BackwardsSpeed * ctx.PlayerInput.CurrentMovement.z, Time.fixedDeltaTime);
 
 
         }
         public override void ExitState() { }
         public override void CheckSwitchStates()
         {
-            if (ctx.CurrentMovement.z > -0.1f)
+            if (ctx.PlayerInput.CurrentMovement.z > -0.1f)
             {
                 SwitchState(factory.Idle());
             }

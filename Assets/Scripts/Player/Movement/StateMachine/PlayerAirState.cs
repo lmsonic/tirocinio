@@ -11,15 +11,15 @@ namespace Tirocinio
             isRootState = true;
 
         }
-            
-        
+
+
         public override void UpdateState()
         {
             CheckSwitchStates();
 
-            
 
-            bool isFalling = ctx.Velocity.y <= 0f || !ctx.IsJumpPressed;
+
+            bool isFalling = ctx.Velocity.y <= 0f || !ctx.PlayerInput.IsJumpPressed;
 
             if (isFalling)
             {
@@ -33,15 +33,15 @@ namespace Tirocinio
         }
         public override void ExitState()
         {
-            if (ctx.IsJumpPressed)
-                ctx.RequireNewJumpPress = true;
+            if (ctx.PlayerInput.IsJumpPressed)
+                ctx.PlayerInput.RequireNewJumpPress = true;
 
         }
         public override void CheckSwitchStates()
         {
             if (ctx.Mover.IsGrounded())
                 SwitchState(factory.Grounded());
-                
+
         }
 
         public override void InitializeSubState() { }

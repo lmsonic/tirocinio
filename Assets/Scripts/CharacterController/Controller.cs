@@ -10,7 +10,7 @@ namespace Tirocinio
 
 
 
-        public PlayerInput playerInput;
+        public PlayerControls playerInput;
 
         public float movementSpeed = 20f;
         public float rotationSpeed = 10f;
@@ -35,7 +35,7 @@ namespace Tirocinio
 
         private void Awake()
         {
-            playerInput = new PlayerInput();
+            playerInput = new PlayerControls();
             mover = GetComponent<Mover>();
             playerInput.BasicInput.Move.started += ctx => movementInput = ctx.ReadValue<Vector2>();
             playerInput.BasicInput.Move.performed += ctx => movementInput = ctx.ReadValue<Vector2>();

@@ -5,6 +5,7 @@ using UnityEngine.InputSystem;
 
 namespace Tirocinio
 {
+    [RequireComponent(typeof(PlayerInput))]
     public class PlayerShooting : MonoBehaviour
     {
         public GameObject seedBombPrefab;
@@ -17,26 +18,28 @@ namespace Tirocinio
 
         ObjectPool<PoolObject> seedBombPool;
 
-        private void OnEnable()
-        {
-            playerInput.Enable();
-        }
-
-        private void OnDisable()
-        {
-            playerInput.Disable();
-        }
+        public float shootTime = 0.5f;
+        float timer = 0f;
 
         private void Awake()
         {
-            playerInput = new PlayerInput();
-
-            playerInput.Player.Shoot.started += Shoot;
-
+            playerInput = GetComponent<PlayerInput>();
             seedBombPool = new ObjectPool<PoolObject>(seedBombPrefab, 10);
         }
 
-        void Shoot(InputAction.CallbackContext ctx)
+        private void FixedUpdate()
+        {
+            timer += Time.fixedDeltaTime;
+            if (playerInput.IsShooting && timer > shootTime)
+            {
+                Shoot();
+                timer = 0f;
+            }
+        }
+
+
+
+        void Shoot()
         {
 
             GameObject go = seedBombPool.PullGameObject(shootingOrigin.position);
@@ -44,7 +47,6 @@ namespace Tirocinio
 
             Vector3 force = (transform.forward + transform.up).normalized * forceMultiplier;
             rb.AddForce(force, ForceMode.VelocityChange);
-
 
         }
     }

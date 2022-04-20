@@ -5,9 +5,11 @@ using UnityEngine.InputSystem;
 
 namespace Tirocinio
 {
+    [RequireComponent(typeof(PlayerInput))]
+    [RequireComponent(typeof(Mover))]
     public class PlayerStateMachine : MonoBehaviour
     {
-
+        public PlayerInput PlayerInput { get => playerInput; }
         PlayerInput playerInput;
         public Mover Mover { get => mover; }
         Mover mover;
@@ -33,13 +35,6 @@ namespace Tirocinio
         public float Gravity { get => gravity; }
         float gravity;
 
-        Vector2 currentMovementInput;
-        [HideInInspector]
-        public Vector3 CurrentMovement;
-        public float AccelerationInput { get => accelerationInput; }
-        float accelerationInput;
-        public float BrakeInput { get => brakeInput; }
-        float brakeInput;
         public Vector3 Velocity;
 
         public float AccelerationMultiplier = 2f;
@@ -47,10 +42,6 @@ namespace Tirocinio
         public float DragMultiplier = 1.5f;
 
 
-        public bool IsJumpPressed { get => isJumpPressed; }
-        bool isJumpPressed = false;
-        public bool RequireNewJumpPress { set => requireNewJumpPress = value; get => requireNewJumpPress; }
-        bool requireNewJumpPress = false;
         float initialJumpVelocity;
 
         public float InitialJumpVelocity { get => initialJumpVelocity; }
@@ -82,7 +73,7 @@ namespace Tirocinio
 
         private void Awake()
         {
-            playerInput = new PlayerInput();
+            playerInput = GetComponent<PlayerInput>();
             mover = GetComponent<Mover>();
             cameraTransform = Camera.main.transform;
 
@@ -90,21 +81,6 @@ namespace Tirocinio
 
             currentState = states.Grounded();
             currentState.EnterState();
-
-            playerInput.Player.Move.started += OnMovementInput;
-            playerInput.Player.Move.canceled += OnMovementInput;
-            playerInput.Player.Move.performed += OnMovementInput;
-
-            playerInput.Player.Accelerate.started += OnAccelerationInput;
-            playerInput.Player.Accelerate.canceled += OnAccelerationInput;
-            playerInput.Player.Accelerate.performed += OnAccelerationInput;
-
-            playerInput.Player.Brake.started += OnBrakeInput;
-            playerInput.Player.Brake.canceled += OnBrakeInput;
-            playerInput.Player.Brake.performed += OnBrakeInput;
-
-            playerInput.Player.Jump.started += OnJump;
-            playerInput.Player.Jump.canceled += OnJump;
 
             SetupJumpVariables();
         }
@@ -115,47 +91,23 @@ namespace Tirocinio
             gravity = (-2 * maxJumpHeight) / Mathf.Pow(timeToApex, 2);
             initialJumpVelocity = 2 * maxJumpHeight / timeToApex;
         }
-        void OnJump(InputAction.CallbackContext context)
-        {
-            isJumpPressed = context.ReadValueAsButton();
-            requireNewJumpPress = false;
-        }
 
 
 
-        void OnAccelerationInput(InputAction.CallbackContext context)
-        {
-            accelerationInput = context.ReadValue<float>();
-        }
 
-        void OnBrakeInput(InputAction.CallbackContext context)
-        {
-            brakeInput = context.ReadValue<float>();
-        }
-
-
-
-        void OnMovementInput(InputAction.CallbackContext context)
-        {
-            currentMovementInput = context.ReadValue<Vector2>();
-            CurrentMovement.x = currentMovementInput.x;
-            CurrentMovement.z = currentMovementInput.y;
-            CurrentMovement.y = 0f;
-
-        }
 
         void HandleRotation()
         {
             float targetAngle = cameraTransform.eulerAngles.y;
 
             //rotate handle
-            Quaternion targetRotation = Quaternion.Euler(0f, CurrentMovement.x * maxTurnDegrees, 0f);
+            Quaternion targetRotation = Quaternion.Euler(0f, playerInput.CurrentMovement.x * maxTurnDegrees, 0f);
             handleTransform.localRotation = Quaternion.Slerp(handleTransform.localRotation, targetRotation, 2f * Time.deltaTime);
             //turn
-            targetRotation = Quaternion.Euler(-90f, 0f, -CurrentMovement.x * maxTurnDegrees);
+            targetRotation = Quaternion.Euler(-90f, 0f, -playerInput.CurrentMovement.x * maxTurnDegrees);
             bodyTransform.localRotation = Quaternion.Slerp(bodyTransform.localRotation, targetRotation, Time.deltaTime);
 
-            targetRotation = Quaternion.Euler(0f, 0f, -CurrentMovement.x * maxTurnDegrees);
+            targetRotation = Quaternion.Euler(0f, 0f, -playerInput.CurrentMovement.x * maxTurnDegrees);
             modelTransform.localRotation = Quaternion.Slerp(modelTransform.localRotation, targetRotation, Time.deltaTime);
 
             Vector3 normal = Vector3.Lerp(transform.up, Vector3.up, returnToNormalLerpSpeed);
@@ -199,7 +151,7 @@ namespace Tirocinio
         public void LerpGroundedVelocity(Vector3 target, float t)
         {
             Vector3 groundedDirection = target;
-            groundedDirection.y= 0f;
+            groundedDirection.y = 0f;
             Velocity = Vector3.Lerp(Velocity, groundedDirection, t);
         }
 
@@ -229,17 +181,6 @@ namespace Tirocinio
         {
             Gizmos.color = Color.blue;
             Gizmos.DrawRay(transform.position, Velocity);
-        }
-
-
-        private void OnEnable()
-        {
-            playerInput.Player.Enable();
-        }
-
-        private void OnDisable()
-        {
-            playerInput.Player.Disable();
         }
     }
 }
