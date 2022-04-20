@@ -10,6 +10,9 @@ namespace Tirocinio
 
         Renderer rend;
 
+        public Texture2D grassMap;
+
+
 
 
 
@@ -39,32 +42,31 @@ namespace Tirocinio
 
         void GenerateWhiteCircle(Vector2 uvCoord, float radius)
         {
-            Texture2D texture = Instantiate(rend.material.GetTexture("_GrassMap")) as Texture2D;
 
-            Vector2 center = new Vector2(uvCoord.x * texture.width, uvCoord.y * texture.height);
+            Vector2 center = new Vector2(uvCoord.x * grassMap.width, uvCoord.y * grassMap.height);
 
-            rend.material.SetTexture("_GrassMap", texture);
+            rend.material.SetTexture("_GrassMap", grassMap);
 
             // colors used to tint the first 3 mip levels
 
-            int mipCount = Mathf.Min(3, texture.mipmapCount);
+            int mipCount = Mathf.Min(3, grassMap.mipmapCount);
 
             // tint each mip level
-            for (int y = 0; y < texture.height; y++)
+            for (int y = 0; y < grassMap.height; y++)
             {
-                for (int x = 0; x < texture.width; x++)
+                for (int x = 0; x < grassMap.width; x++)
                 {
                     float distance = Vector2.Distance(new Vector2(x, y), center);
                     if (distance < radius)
                     {
-                        Color input = texture.GetPixel(x, y);
+                        Color input = grassMap.GetPixel(x, y);
                         Color color = Color.Lerp(Color.white, input, distance / radius);
-                        texture.SetPixel(x, y, color);
+                        grassMap.SetPixel(x, y, color);
                     }
                 }
             }
             // actually apply all SetPixels, don't recalculate mip levels
-            texture.Apply(false);
+            grassMap.Apply(false);
 
 
         }
@@ -72,27 +74,27 @@ namespace Tirocinio
         void ResetTexture()
         {
 
-            Texture2D texture = new Texture2D(256, 256);
+            grassMap = new Texture2D(256, 256);
 
             // duplicate the original texture and assign to the material
-            rend.material.SetTexture("_GrassMap", texture);
+            rend.material.SetTexture("_GrassMap", grassMap);
 
             // colors used to tint the first 3 mip levels
 
-            int mipCount = Mathf.Min(3, texture.mipmapCount);
+            int mipCount = Mathf.Min(3, grassMap.mipmapCount);
 
             // tint each mip level
             for (int mip = 0; mip < mipCount; ++mip)
             {
-                Color[] cols = texture.GetPixels(mip);
+                Color[] cols = grassMap.GetPixels(mip);
                 for (int i = 0; i < cols.Length; ++i)
                 {
                     cols[i] = Color.black;
                 }
-                texture.SetPixels(cols, mip);
+                grassMap.SetPixels(cols, mip);
             }
             // actually apply all SetPixels, don't recalculate mip levels
-            texture.Apply(false);
+            grassMap.Apply(false);
 
         }
 
