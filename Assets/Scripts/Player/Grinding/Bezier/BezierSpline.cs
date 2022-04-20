@@ -247,13 +247,15 @@ namespace Tirocinio
 
 
 
-        public Vector3 GetClosestPoint(Vector3 point)
+        public (Vector3, float) GetClosestPoint(Vector3 point)
         {
 
 
             (float a, float b) = FindClosestInterval(point);
 
-            return GetPoint(FindClosestPointBisection(a, b, point));
+            float t = FindClosestPointBisection(a, b, point);
+
+            return (GetPoint(t), t);
         }
 
         const float maxIterations = 20;

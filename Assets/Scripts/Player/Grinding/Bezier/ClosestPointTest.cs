@@ -19,7 +19,7 @@ namespace Tirocinio
             Gizmos.DrawSphere(spline.GetPoint(b), 0.1f);
 
             Gizmos.color = Color.magenta;
-            Vector3 closestPoint = spline.GetClosestPoint(transform.position);
+            Vector3 closestPoint = spline.GetClosestPoint(transform.position).Item1;
             Gizmos.DrawLine(transform.position, closestPoint);
             Gizmos.DrawSphere(closestPoint, 0.3f);
 

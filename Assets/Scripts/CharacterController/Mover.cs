@@ -316,8 +316,6 @@ namespace Tirocinio
 
             MoveAndSlide(_velocity * Time.fixedDeltaTime);
 
-
-
             _rigidbody.MovePosition(targetPosition);
         }
 

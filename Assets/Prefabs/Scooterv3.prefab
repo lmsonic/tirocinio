@@ -245,6 +245,7 @@ GameObject:
   - component: {fileID: 1536190571}
   - component: {fileID: 8740392723001654576}
   - component: {fileID: 1764405909}
+  - component: {fileID: 7981906908402696873}
   m_Layer: 6
   m_Name: Scooterv3
   m_TagString: Player
@@ -375,6 +376,19 @@ MonoBehaviour:
   seedBombPrefab: {fileID: 1843189571761026303, guid: d4059fcd7dd9f6f4699e3fcea600ff7a, type: 3}
   shootingOrigin: {fileID: 1496802511}
   forceMultiplier: 10
+--- !u!114 &7981906908402696873
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9143775345407581415}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d8ff66e79cce96949b338ef5128b0724, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  grindDistanceThreshold: 0.5
 --- !u!1 &9143775345840500072
 GameObject:
   m_ObjectHideFlags: 0
