@@ -28,6 +28,7 @@ namespace Tirocinio
         [Header("Ground Movement Variables")]
         public float MaxSpeed = 30f;
         public float BackwardsSpeed = 10f;
+        public float GrindSpeed = 10f;
 
 
         float gravity;
@@ -57,6 +58,14 @@ namespace Tirocinio
 
 
         HybridStateMachine fsm;
+
+        BezierSpline grindingSpline = null;
+
+        public void SetGrindingState(BezierSpline spline)
+        {
+            grindingSpline = spline;
+        }
+
         private void Start()
         {
             HybridStateMachine groundState = InitializeGroundStateMachine();
@@ -92,11 +101,38 @@ namespace Tirocinio
                 },
                 onLogic: (state) => fsm.RequestStateChange("Air"));
 
+            fsm.AddState("Grinding",
+            onEnter: (state) =>
+            {
+                Debug.Log(state.name);
+                float t;
+                (transform.position, t) = grindingSpline.GetClosestPoint(transform.position);
+                Vector3 grindDirection = grindingSpline.GetDirection(t);
+                if (Vector3.Dot(velocity, grindDirection) < 0)
+                    grindDirection = -grindDirection;
+
+                velocity = grindDirection * GrindSpeed;
+            },
+            onLogic: (state) =>
+            {
+                float t;
+                (_, t) = grindingSpline.GetClosestPoint(transform.position);
+
+                Vector3 grindDirection = grindingSpline.GetDirection(t);
+                if (Vector3.Dot(velocity, grindDirection) < 0)
+                    grindDirection = -grindDirection;
+
+                velocity = grindDirection * GrindSpeed;
+            },
+            onExit: (state) => grindingSpline = null);
+
             fsm.AddTransition("Ground", "Jump",
                 (transition) => playerInput.IsJumpPressed && !playerInput.RequireNewJumpPress);
 
             fsm.AddTransition("Ground", "Air", (transition) => !mover.IsGrounded());
             fsm.AddTransition("Air", "Ground", (transition) => mover.IsGrounded());
+            fsm.AddTransition("Air", "Grinding", (transition) => grindingSpline != null);
+            fsm.AddTransition("Grinding", "Jump", (transition) => playerInput.IsJumpPressed && !playerInput.RequireNewJumpPress);
 
             fsm.SetStartState("Ground");
 
