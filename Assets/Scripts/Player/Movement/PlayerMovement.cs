@@ -63,7 +63,8 @@ namespace Tirocinio
             fsm = new HybridStateMachine();
             fsm.AddState("Ground", groundState);
 
-            fsm.AddState("Air", onLogic: (state) =>
+            fsm.AddState("Air", onEnter: (state) => Debug.Log(state.name),
+             onLogic: (state) =>
             {
                 bool isFalling = velocity.y <= 0f || !playerInput.IsJumpPressed;
 
@@ -86,6 +87,7 @@ namespace Tirocinio
             fsm.AddState("Jump",
                 onEnter: (state) =>
                 {
+                    Debug.Log(state.name);
                     velocity.y = initialJumpVelocity;
                 },
                 onLogic: (state) => fsm.RequestStateChange("Air"));
@@ -109,6 +111,7 @@ namespace Tirocinio
             HybridStateMachine groundFSM = new HybridStateMachine(
                 onEnter: (state) =>
                 {
+                    Debug.Log(state.name);
                     velocity.y = 0f;
                 },
                 onLogic: (state) =>
@@ -117,28 +120,34 @@ namespace Tirocinio
                 }
             );
 
-            groundFSM.AddState("Idle", onLogic: (state) => velocity = Vector3.zero, needsExitTime: false);
 
-            groundFSM.AddState("Acceleration", onLogic: (state) =>
+            groundFSM.AddState("Idle", onEnter: (state) => Debug.Log(state.name),
+             onLogic: (state) => velocity = Vector3.zero, needsExitTime: false);
+
+            groundFSM.AddState("Acceleration", onEnter: (state) => Debug.Log(state.name),
+            onLogic: (state) =>
             {
 
                 LerpGroundedVelocity(transform.forward * MaxSpeed,
                                 AccelerationMultiplier * playerInput.AccelerationInput * Time.fixedDeltaTime);
             });
 
-            groundFSM.AddState("Brake", onLogic: (state) =>
+            groundFSM.AddState("Brake", onEnter: (state) => Debug.Log(state.name),
+            onLogic: (state) =>
             {
                 LerpGroundedVelocity(Vector3.zero,
                                 BrakeMultiplier * playerInput.BrakeInput * Time.fixedDeltaTime);
             });
 
-            groundFSM.AddState("Drag", onLogic: (state) =>
+            groundFSM.AddState("Drag", onEnter: (state) => Debug.Log(state.name),
+            onLogic: (state) =>
             {
                 LerpGroundedVelocity(Vector3.zero,
                                 DragMultiplier * Time.fixedDeltaTime);
             });
 
-            groundFSM.AddState("Backwards", onLogic: (state) =>
+            groundFSM.AddState("Backwards", onEnter: (state) => Debug.Log(state.name),
+             onLogic: (state) =>
             {
                 LerpGroundedVelocity(transform.forward * BackwardsSpeed * playerInput.CurrentMovement.z,
                                 Time.fixedDeltaTime);
@@ -299,9 +308,8 @@ namespace Tirocinio
 
         public void LerpGroundedVelocity(Vector3 target, float t)
         {
-            Vector3 groundedDirection = target;
-            groundedDirection.y = 0f;
-            velocity = Vector3.Lerp(velocity, groundedDirection, t);
+            velocity = Vector3.MoveTowards(velocity, target, t);
+
         }
 
 

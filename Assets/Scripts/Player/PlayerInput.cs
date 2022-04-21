@@ -32,9 +32,9 @@ public class PlayerInput : MonoBehaviour
         playerControls.Player.Accelerate.canceled += ctx => accelerationInput = ctx.ReadValue<float>();
         playerControls.Player.Accelerate.performed += ctx => accelerationInput = ctx.ReadValue<float>();
 
-        playerControls.Player.Brake.started += ctx => accelerationInput = ctx.ReadValue<float>();
-        playerControls.Player.Brake.canceled += ctx => accelerationInput = ctx.ReadValue<float>();
-        playerControls.Player.Brake.performed += ctx => accelerationInput = ctx.ReadValue<float>();
+        playerControls.Player.Brake.started += ctx => brakeInput = ctx.ReadValue<float>();
+        playerControls.Player.Brake.canceled += ctx => brakeInput = ctx.ReadValue<float>();
+        playerControls.Player.Brake.performed += ctx => brakeInput = ctx.ReadValue<float>();
 
         playerControls.Player.Jump.started +=
             ctx => { isJumpPressed = ctx.ReadValueAsButton(); requireNewJumpPress = false; };
