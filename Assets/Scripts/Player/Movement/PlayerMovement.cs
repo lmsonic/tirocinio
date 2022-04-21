@@ -9,9 +9,7 @@ namespace Tirocinio
     [RequireComponent(typeof(Mover))]
     public class PlayerMovement : MonoBehaviour
     {
-        public PlayerInput PlayerInput { get => playerInput; }
         PlayerInput playerInput;
-        public Mover Mover { get => mover; }
         Mover mover;
 
         Transform cameraTransform;
@@ -31,7 +29,6 @@ namespace Tirocinio
         public float BackwardsSpeed = 10f;
 
 
-        public float Gravity { get => gravity; }
         float gravity;
 
         public Vector3 Velocity;
@@ -43,7 +40,6 @@ namespace Tirocinio
 
         float initialJumpVelocity;
 
-        public float InitialJumpVelocity { get => initialJumpVelocity; }
 
         [Header("Air Movement Variables")]
         public float maxJumpHeight = 1f;
@@ -68,33 +64,33 @@ namespace Tirocinio
 
             fsm.AddState("Air", onLogic: (state) =>
             {
-                bool isFalling = Velocity.y <= 0f || !PlayerInput.IsJumpPressed;
+                bool isFalling = Velocity.y <= 0f || !playerInput.IsJumpPressed;
 
                 if (isFalling)
                 {
-                    Velocity.y = Mathf.Max(Velocity.y + Gravity * FallMultiplier * Time.fixedDeltaTime, MaxFallSpeed);
+                    Velocity.y = Mathf.Max(Velocity.y + gravity * FallMultiplier * Time.fixedDeltaTime, MaxFallSpeed);
                 }
                 else
                 {
-                    Velocity.y = Velocity.y + Gravity * Time.fixedDeltaTime;
+                    Velocity.y = Velocity.y + gravity * Time.fixedDeltaTime;
                 }
             },
             onExit: (state) =>
             {
-                if (PlayerInput.IsJumpPressed)
-                    PlayerInput.RequireNewJumpPress = true;
+                if (playerInput.IsJumpPressed)
+                    playerInput.RequireNewJumpPress = true;
             });
 
 
             fsm.AddState("Jump",
-                onEnter: (state) => Velocity.y = InitialJumpVelocity,
+                onEnter: (state) => Velocity.y = initialJumpVelocity,
                 onLogic: (state) => fsm.RequestStateChange("Air"));
 
             fsm.AddTransition("Ground", "Jump",
-                (transition) => PlayerInput.IsJumpPressed && !PlayerInput.RequireNewJumpPress);
+                (transition) => playerInput.IsJumpPressed && !playerInput.RequireNewJumpPress);
 
-            fsm.AddTransition("Ground", "Air", (transition) => !Mover.IsGrounded());
-            fsm.AddTransition("Air", "Ground", (transition) => Mover.IsGrounded());
+            fsm.AddTransition("Ground", "Air", (transition) => !mover.IsGrounded());
+            fsm.AddTransition("Air", "Ground", (transition) => mover.IsGrounded());
 
             fsm.SetStartState("Ground");
 
@@ -108,7 +104,7 @@ namespace Tirocinio
                 onEnter: (state) =>
                 {
                     ResetXRotation();
-                    Mover.SetKeepOnGround(true);
+                    mover.SetKeepOnGround(true);
                     Velocity.y = 0f;
                 },
                 onLogic: (state) =>
@@ -122,13 +118,13 @@ namespace Tirocinio
             groundFSM.AddState("Acceleration", onLogic: (state) =>
             {
                 LerpGroundedVelocity(transform.forward * MaxSpeed,
-                                AccelerationMultiplier * PlayerInput.AccelerationInput * Time.fixedDeltaTime);
+                                AccelerationMultiplier * playerInput.AccelerationInput * Time.fixedDeltaTime);
             });
 
             groundFSM.AddState("Brake", onLogic: (state) =>
             {
                 LerpGroundedVelocity(Vector3.zero,
-                                BrakeMultiplier * PlayerInput.BrakeInput * Time.fixedDeltaTime);
+                                BrakeMultiplier * playerInput.BrakeInput * Time.fixedDeltaTime);
             });
 
             groundFSM.AddState("Drag", onLogic: (state) =>
@@ -139,46 +135,46 @@ namespace Tirocinio
 
             groundFSM.AddState("Backwards", onLogic: (state) =>
             {
-                LerpGroundedVelocity(transform.forward * BackwardsSpeed * PlayerInput.CurrentMovement.z,
+                LerpGroundedVelocity(transform.forward * BackwardsSpeed * playerInput.CurrentMovement.z,
                                 Time.fixedDeltaTime);
             });
 
             groundFSM.AddTransition("Idle", "Acceleration",
-                (transition) => PlayerInput.AccelerationInput > 0.1f
+                (transition) => playerInput.AccelerationInput > 0.1f
             );
             groundFSM.AddTransition("Idle", "Backwards",
-                (transition) => PlayerInput.CurrentMovement.z < -0.1f
+                (transition) => playerInput.CurrentMovement.z < -0.1f
             );
             groundFSM.AddTransition("Idle", "Drag",
                 (transition) => Velocity.magnitude > 1f
             );
 
             groundFSM.AddTransition("Acceleration", "Brake",
-                (transition) => PlayerInput.BrakeInput > 0.1f
+                (transition) => playerInput.BrakeInput > 0.1f
             );
             groundFSM.AddTransition("Acceleration", "Drag",
-                (transition) => PlayerInput.AccelerationInput < 0.1f
+                (transition) => playerInput.AccelerationInput < 0.1f
             );
 
             groundFSM.AddTransition("Brake", "Drag",
-                (transition) => PlayerInput.BrakeInput < 0.1f && Velocity.magnitude > 1f
+                (transition) => playerInput.BrakeInput < 0.1f && Velocity.magnitude > 1f
             );
             groundFSM.AddTransition("Brake", "Idle",
-                (transition) => PlayerInput.BrakeInput < 0.1f && Velocity.magnitude <= 1f
+                (transition) => playerInput.BrakeInput < 0.1f && Velocity.magnitude <= 1f
             );
 
             groundFSM.AddTransition("Drag", "Acceleration",
-                (transition) => PlayerInput.AccelerationInput > 0.1f
+                (transition) => playerInput.AccelerationInput > 0.1f
             );
             groundFSM.AddTransition("Drag", "Brake",
-                (transition) => PlayerInput.BrakeInput > 0.1f
+                (transition) => playerInput.BrakeInput > 0.1f
             );
             groundFSM.AddTransition("Drag", "Idle",
                 (transition) => Velocity.magnitude < 1f
             );
 
             groundFSM.AddTransition("Backwards", "Idle",
-                (transition) => PlayerInput.CurrentMovement.z > -0.1f
+                (transition) => playerInput.CurrentMovement.z > -0.1f
             );
 
             groundFSM.SetStartState("Idle");
@@ -192,9 +188,9 @@ namespace Tirocinio
         {
             if (OnSteepSlope())
             {
-                Vector3 groundNormal = Mover.GetGroundNormal();
-                float groundAngle = Mover.GetGroundAngle();
-                Vector3 groundPoint = Mover.GetGroundPoint();
+                Vector3 groundNormal = mover.GetGroundNormal();
+                float groundAngle = mover.GetGroundAngle();
+                Vector3 groundPoint = mover.GetGroundPoint();
 
                 Vector3 slopeDirection = Vector3.up - groundNormal * Vector3.Dot(Vector3.up, groundNormal);
                 float slideSpeed = steepSlopeForce * Time.fixedDeltaTime;
@@ -206,7 +202,7 @@ namespace Tirocinio
         void EnterGroundState()
         {
             ResetXRotation();
-            Mover.SetKeepOnGround(true);
+            mover.SetKeepOnGround(true);
             Velocity.y = 0f;
         }
 
@@ -282,7 +278,7 @@ namespace Tirocinio
 
         void ResetKeepOnGround()
         {
-            Mover.SetKeepOnGround(true);
+            mover.SetKeepOnGround(true);
         }
 
 
