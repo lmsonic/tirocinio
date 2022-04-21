@@ -10,6 +10,7 @@ namespace Tirocinio
     public class PlayerMovement : MonoBehaviour
     {
         PlayerInput playerInput;
+
         Mover mover;
 
         Transform cameraTransform;
@@ -31,7 +32,7 @@ namespace Tirocinio
 
         float gravity;
 
-        public Vector3 Velocity;
+        public Vector3 velocity = Vector3.zero;
 
         public float AccelerationMultiplier = 2f;
         public float BrakeMultiplier = 3f;
@@ -51,7 +52,7 @@ namespace Tirocinio
 
         [Range(0, 90f)]
         public float steepSlopeLimit = 45f;
-        public float steepSlopeForce = 15f;
+        public float slideSpeed = 15f;
 
 
 
@@ -64,15 +65,15 @@ namespace Tirocinio
 
             fsm.AddState("Air", onLogic: (state) =>
             {
-                bool isFalling = Velocity.y <= 0f || !playerInput.IsJumpPressed;
+                bool isFalling = velocity.y <= 0f || !playerInput.IsJumpPressed;
 
                 if (isFalling)
                 {
-                    Velocity.y = Mathf.Max(Velocity.y + gravity * FallMultiplier * Time.fixedDeltaTime, MaxFallSpeed);
+                    velocity.y = Mathf.Max(velocity.y + gravity * FallMultiplier * Time.fixedDeltaTime, MaxFallSpeed);
                 }
                 else
                 {
-                    Velocity.y = Velocity.y + gravity * Time.fixedDeltaTime;
+                    velocity.y = velocity.y + gravity * Time.fixedDeltaTime;
                 }
             },
             onExit: (state) =>
@@ -83,7 +84,10 @@ namespace Tirocinio
 
 
             fsm.AddState("Jump",
-                onEnter: (state) => Velocity.y = initialJumpVelocity,
+                onEnter: (state) =>
+                {
+                    velocity.y = initialJumpVelocity;
+                },
                 onLogic: (state) => fsm.RequestStateChange("Air"));
 
             fsm.AddTransition("Ground", "Jump",
@@ -98,14 +102,14 @@ namespace Tirocinio
 
         }
 
+
+
         HybridStateMachine InitializeGroundStateMachine()
         {
             HybridStateMachine groundFSM = new HybridStateMachine(
                 onEnter: (state) =>
                 {
-                    ResetXRotation();
-                    mover.SetKeepOnGround(true);
-                    Velocity.y = 0f;
+                    velocity.y = 0f;
                 },
                 onLogic: (state) =>
                 {
@@ -113,10 +117,11 @@ namespace Tirocinio
                 }
             );
 
-            groundFSM.AddState("Idle", onEnter: (state) => Velocity = Vector3.zero);
+            groundFSM.AddState("Idle", onLogic: (state) => velocity = Vector3.zero, needsExitTime: false);
 
             groundFSM.AddState("Acceleration", onLogic: (state) =>
             {
+
                 LerpGroundedVelocity(transform.forward * MaxSpeed,
                                 AccelerationMultiplier * playerInput.AccelerationInput * Time.fixedDeltaTime);
             });
@@ -146,7 +151,7 @@ namespace Tirocinio
                 (transition) => playerInput.CurrentMovement.z < -0.1f
             );
             groundFSM.AddTransition("Idle", "Drag",
-                (transition) => Velocity.magnitude > 1f
+                (transition) => velocity.magnitude > 1f
             );
 
             groundFSM.AddTransition("Acceleration", "Brake",
@@ -157,10 +162,10 @@ namespace Tirocinio
             );
 
             groundFSM.AddTransition("Brake", "Drag",
-                (transition) => playerInput.BrakeInput < 0.1f && Velocity.magnitude > 1f
+                (transition) => playerInput.BrakeInput < 0.1f && velocity.magnitude > 1f
             );
             groundFSM.AddTransition("Brake", "Idle",
-                (transition) => playerInput.BrakeInput < 0.1f && Velocity.magnitude <= 1f
+                (transition) => playerInput.BrakeInput < 0.1f && velocity.magnitude <= 1f
             );
 
             groundFSM.AddTransition("Drag", "Acceleration",
@@ -170,12 +175,13 @@ namespace Tirocinio
                 (transition) => playerInput.BrakeInput > 0.1f
             );
             groundFSM.AddTransition("Drag", "Idle",
-                (transition) => Velocity.magnitude < 1f
+                (transition) => velocity.magnitude < 1f
             );
 
             groundFSM.AddTransition("Backwards", "Idle",
                 (transition) => playerInput.CurrentMovement.z > -0.1f
             );
+
 
             groundFSM.SetStartState("Idle");
 
@@ -186,33 +192,22 @@ namespace Tirocinio
         }
         void SteepSlopeMovement()
         {
-            if (OnSteepSlope())
+            if (mover.IsGrounded())
             {
                 Vector3 groundNormal = mover.GetGroundNormal();
-                float groundAngle = mover.GetGroundAngle();
-                Vector3 groundPoint = mover.GetGroundPoint();
+                if (IsOnSteepSlope(groundNormal))
+                {
+                    Vector3 slideDirection = Vector3.zero;
+                    slideDirection.x = ((1f - groundNormal.y) * groundNormal.x) * slideSpeed;
+                    slideDirection.z = ((1f - groundNormal.y) * groundNormal.z) * slideSpeed;
+                    velocity += slideDirection;
+                }
 
-                Vector3 slopeDirection = Vector3.up - groundNormal * Vector3.Dot(Vector3.up, groundNormal);
-                float slideSpeed = steepSlopeForce * Time.fixedDeltaTime;
-                Vector3 slopeVector = -slopeDirection * slideSpeed;
-                Velocity += slopeVector;
             }
         }
 
-        void EnterGroundState()
-        {
-            ResetXRotation();
-            mover.SetKeepOnGround(true);
-            Velocity.y = 0f;
-        }
+        bool IsOnSteepSlope(Vector3 normal) => Vector3.Angle(Vector3.up, normal) >= steepSlopeLimit;
 
-
-        void ResetXRotation()
-        {
-            Vector3 eulers = transform.localEulerAngles;
-            eulers.x = 0f;
-            transform.localEulerAngles = eulers;
-        }
 
         private void Awake()
         {
@@ -269,17 +264,32 @@ namespace Tirocinio
 
         }
 
-
-        public void DisableKeepOnGroundFor(float seconds)
+        Quaternion GetVelocityRot()
         {
-            mover.SetKeepOnGround(false);
-            Invoke("ResetKeepOnGround", seconds);
+            Vector3 vel = velocity;
+            if (vel.magnitude > 0.2f)
+            {
+                vel.y = 0;
+                Vector3 direction = transform.forward;
+                direction.y = 0;
+                Quaternion velocityRotation = Quaternion.FromToRotation(direction.normalized, vel.normalized);
+                return velocityRotation;
+            }
+            else
+                return Quaternion.identity;
         }
 
-        void ResetKeepOnGround()
+        Quaternion GetGroundRotation()
         {
-            mover.SetKeepOnGround(true);
+            Vector3 groundNormal = Vector3.up;
+            if (mover.IsGrounded())
+                groundNormal = mover.GetGroundNormal();
+
+            return Quaternion.FromToRotation(transform.up, groundNormal);
         }
+
+
+
 
 
         private void Update()
@@ -291,35 +301,25 @@ namespace Tirocinio
         {
             Vector3 groundedDirection = target;
             groundedDirection.y = 0f;
-            Velocity = Vector3.Lerp(Velocity, groundedDirection, t);
+            velocity = Vector3.Lerp(velocity, groundedDirection, t);
         }
 
 
 
         private void FixedUpdate()
         {
-
             mover.CheckForGround();
-            Velocity = mover.GetVelocity();
+            velocity = mover.GetVelocity();
             fsm.OnLogic();
-            mover.SetVelocity(Velocity);
+            mover.SetVelocity(velocity);
         }
 
-        public bool OnSteepSlope()
-        {
-            if (!mover.IsGrounded()) return false;
 
-            float angle = Vector3.Angle(Vector3.up, mover.GetGroundNormal());
-            if (angle > steepSlopeLimit)
-                return true;
-
-            return false;
-        }
 
         private void OnDrawGizmos()
         {
             Gizmos.color = Color.blue;
-            Gizmos.DrawRay(transform.position, Velocity);
+            Gizmos.DrawRay(transform.position, velocity);
         }
     }
 }

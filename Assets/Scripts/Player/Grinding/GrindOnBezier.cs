@@ -37,7 +37,7 @@ namespace Tirocinio
             if ((closestPoint - transform.position).magnitude < grindDistanceThreshold)
             {
                 transform.position = closestPoint;
-                player.Velocity = closestSpline.GetVelocity(t);
+                player.velocity = closestSpline.GetVelocity(t);
             }
         }
 

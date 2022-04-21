@@ -88,8 +88,6 @@ namespace Tirocinio
 
         public enum SensorType { Raycast, Spherecast, RaycastArray }
         [Header("Mover Options")]
-        [Range(0, 2)]
-        public float stepHeight = 0.25f;
 
         [Range(0, 180f)]
         public float wallAngle = 80f;
@@ -142,11 +140,6 @@ namespace Tirocinio
             colliderThickness = _newColliderThickness;
             _collider.radius = _newColliderThickness;
         }
-        public void SetStepHeight(float _newStepHeight)
-        {
-            stepHeight = _newStepHeight;
-        }
-
         private void Awake()
         {
             _collider = GetComponent<CapsuleCollider>();
@@ -156,13 +149,6 @@ namespace Tirocinio
 
 
 
-
-        bool keepOnGround = true;
-
-        public void SetKeepOnGround(bool value)
-        {
-            keepOnGround = value;
-        }
 
 
 
@@ -314,7 +300,7 @@ namespace Tirocinio
 
             targetPosition = _rigidbody.position;
 
-            MoveAndSlide(_velocity * Time.fixedDeltaTime);
+            MoveAndSlide(_velocity);
 
             _rigidbody.MovePosition(targetPosition);
         }
@@ -356,14 +342,14 @@ namespace Tirocinio
         List<Vector3> slidePositions = new List<Vector3>();
 
 
-        CollisionInfo MoveAndCollide(Vector3 linearVelocity)
+        CollisionInfo MoveAndCollide(Vector3 movement)
         {
             RaycastHit hitInfo;
 
             float safeDistance;
 
-            Vector3 direction = linearVelocity.normalized;
-            float distance = linearVelocity.magnitude;
+            Vector3 direction = movement.normalized;
+            float distance = movement.magnitude;
             if (_rigidbody.SweepTest(direction, out hitInfo, distance, QueryTriggerInteraction.Ignore)
                 && collisionLayers.Contains(hitInfo.transform.gameObject.layer))
             {
@@ -383,7 +369,7 @@ namespace Tirocinio
             }
             else
             {
-                targetPosition += linearVelocity;
+                targetPosition += movement;
                 return null;
             }
 
@@ -393,34 +379,43 @@ namespace Tirocinio
 
 
 
-        void MoveAndSlide(Vector3 linearVelocity, int maxSlides = 4, float slopeLimit = 45f)
+
+
+        void MoveAndSlide(Vector3 velocity, int maxSlides = 4, float slopeLimit = 45f)
         {
             slidePositions = new List<Vector3>();
+
+            Vector3 movement = velocity * Time.fixedDeltaTime;
 
 
 
             for (int i = 0; i < maxSlides; i++)
             {
 
-                CollisionInfo info = MoveAndCollide(linearVelocity);
+                CollisionInfo info = MoveAndCollide(movement);
                 if (info == null) break;
 
 
                 float angle = Vector3.Angle(Vector3.up, info.normal);
                 if (angle < wallAngle)
                 {//ground
-                    linearVelocity = info.remainingVelocity;
+                    movement = info.remainingVelocity;
                 }
                 else if (angle > wallAngle && angle < ceilingAngle)
                 {//wall
                     Vector3 perpendicularNormal = Vector3.ProjectOnPlane(info.normal, Vector3.up);
-                    linearVelocity = Vector3.ProjectOnPlane(linearVelocity, perpendicularNormal);
+                    movement = Vector3.ProjectOnPlane(movement, perpendicularNormal);
+                    velocity = Vector3.ProjectOnPlane(velocity, perpendicularNormal);
+
                 }
                 else
                 {//ceiling
                     Vector3 perpendicularNormal = Vector3.ProjectOnPlane(info.normal, Vector3.up);
-                    linearVelocity = Vector3.ProjectOnPlane(linearVelocity, perpendicularNormal);
-                    linearVelocity.y = 0f;
+                    movement = Vector3.ProjectOnPlane(movement, perpendicularNormal);
+                    movement.y = 0f;
+
+                    velocity = Vector3.ProjectOnPlane(velocity, perpendicularNormal);
+                    velocity.y = 0f;
                 }
 
 
@@ -431,8 +426,7 @@ namespace Tirocinio
             }
             Depenetrate();
 
-            float inverseDeltaTime = 1f / Time.fixedDeltaTime;
-            _velocity = linearVelocity * inverseDeltaTime;
+            _velocity = velocity;
 
         }
 

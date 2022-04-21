@@ -39,7 +39,6 @@ namespace Tirocinio
 
         private void OnEnable()
         {
-            Debug.Log("Editor Start");
             spline = GetComponent<BezierSpline>();
             meshFilter = GetComponent<MeshFilter>();
             meshFilter.mesh = CreateMesh();

@@ -71,10 +71,6 @@ namespace Tirocinio
                 velocity.y = mover.GetVelocity().y;
                 velocity.y -= gravity * Time.fixedDeltaTime;
             }
-
-
-            mover.SetKeepOnGround(jumpInput);
-
             mover.SetVelocity(velocity);
         }
 
@@ -82,10 +78,10 @@ namespace Tirocinio
         {
             Vector3 groundNormal = mover.GetGroundNormal();
 
-            Quaternion targetRotationY = Quaternion.AngleAxis(rotationSpeed * rotationInput.x,groundNormal);
+            Quaternion targetRotationY = Quaternion.AngleAxis(rotationSpeed * rotationInput.x, groundNormal);
             Quaternion targetRotationGround = Quaternion.FromToRotation(transform.up, groundNormal);
 
-            Quaternion finalRotation = targetRotationY * targetRotationGround  * transform.rotation;
+            Quaternion finalRotation = targetRotationY * targetRotationGround * transform.rotation;
 
             transform.rotation = Quaternion.Slerp(transform.rotation, finalRotation, rotationLerpSpeed * Time.deltaTime);
 

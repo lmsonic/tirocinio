@@ -6,7 +6,6 @@ namespace Tirocinio
     [CustomEditor(typeof(Mover))]
     public class MoverEditor : Editor
     {
-        SerializedProperty stepHeight;
 
         SerializedProperty wallAngle;
         SerializedProperty ceilingAngle;
@@ -27,7 +26,6 @@ namespace Tirocinio
         private void OnEnable()
         {
 
-            stepHeight = serializedObject.FindProperty("stepHeight");
 
             wallAngle = serializedObject.FindProperty("wallAngle");
             ceilingAngle = serializedObject.FindProperty("ceilingAngle");
@@ -54,7 +52,6 @@ namespace Tirocinio
         {
 
             serializedObject.Update();
-            EditorGUILayout.PropertyField(stepHeight);
             EditorGUILayout.PropertyField(wallAngle);
             EditorGUILayout.PropertyField(ceilingAngle);
 
