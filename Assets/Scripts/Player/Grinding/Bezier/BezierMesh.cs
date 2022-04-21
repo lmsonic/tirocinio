@@ -55,6 +55,12 @@ namespace Tirocinio
             meshFilter.mesh = CreateMesh();
         }
 
+        private void OnDisable()
+        {
+            spline.RefreshBezier -= UpdateMesh;
+            Undo.undoRedoPerformed -= UpdateMesh;
+        }
+
 
 
         Mesh CreateMesh()

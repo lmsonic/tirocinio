@@ -12,10 +12,10 @@ namespace Tirocinio
         BezierSpline closestSpline;
 
         public float grindDistanceThreshold = 0.5f;
-        PlayerStateMachine player;
+        PlayerMovement player;
         void Start()
         {
-            player = GetComponent<PlayerStateMachine>();
+            player = GetComponent<PlayerMovement>();
             splines = new List<BezierSpline>(FindObjectsOfType<BezierSpline>());
             closestSpline = FindClosestSpline();
         }

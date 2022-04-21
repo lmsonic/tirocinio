@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "com.inspiaaa.unityhfsm": "https://github.com/Inspiaaa/UnityHFSM.git#upm",
     "com.prenominal.realtimecsg": "https://github.com/LogicalError/realtime-CSG-for-unity.git",
     "com.unity.cinemachine": "2.8.4",
     "com.unity.collab-proxy": "1.15.15",
