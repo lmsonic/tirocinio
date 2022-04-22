@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 8770807068630224798}
   - component: {fileID: 8770807068630224796}
   - component: {fileID: 8770807068630224797}
+  - component: {fileID: 2091544499}
   m_Layer: 0
   m_Name: Bezier
   m_TagString: Untagged
@@ -98,18 +99,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   points:
-  - {x: -44.619644, y: 2.3652706, z: -43.177567}
-  - {x: -71.43928, y: -0.9659996, z: -36.267853}
-  - {x: -40.60125, y: 2.6893008, z: -16.275639}
-  - {x: -38.306694, y: 2.6893008, z: -13.142934}
-  - {x: -27.94934, y: 2.8010285, z: 3.8483505}
-  - {x: -5.3066044, y: 5.8238683, z: 0.47863746}
-  - {x: -2.5902424, y: 5.696541, z: -19.638273}
-  - {x: -2.0334744, y: 5.6704426, z: -23.7616}
-  - {x: -19.624758, y: 5.696541, z: -49.702263}
-  - {x: -30.420204, y: 2.3652706, z: -37.07724}
+  - {x: -19.881615, y: 3.1375427, z: -25.2725}
+  - {x: -31.86079, y: 0.5785446, z: -13.737137}
+  - {x: -32.85183, y: 2.6893003, z: -5.351245}
+  - {x: -29.907204, y: 2.6893005, z: -3.3564987}
+  - {x: -19.54985, y: 2.8010283, z: 13.634786}
+  - {x: -3.1639442, y: 5.8238683, z: 2.1212215}
+  - {x: -0.4475813, y: 5.696541, z: -17.99569}
+  - {x: 0.10918677, y: 5.6704426, z: -22.119017}
+  - {x: -7.902439, y: 5.696541, z: -36.80786}
+  - {x: -19.881615, y: 3.1375427, z: -25.2725}
   modes: 02000000000000000100000001000000
-  loop: 0
+  loop: 1
 --- !u!114 &8770807068630224797
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -125,3 +126,16 @@ MonoBehaviour:
   resolution: 31
   radius: 0.1
   sides: 6
+--- !u!114 &2091544499
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8770807068630224785}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4b383e1660a501a48acb81439af611a1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  grindDistance: 1

@@ -60,10 +60,15 @@ namespace Tirocinio
         HybridStateMachine fsm;
 
         BezierSpline grindingSpline = null;
+        float grindJumpTimer = 1f;
+        const float grindJumpTime = 0.5f;
+
+
 
         public void SetGrindingState(BezierSpline spline)
         {
-            grindingSpline = spline;
+            if (grindJumpTimer >= grindJumpTime && velocity.y < 0f)
+                grindingSpline = spline;
         }
 
         private void Start()
@@ -105,24 +110,20 @@ namespace Tirocinio
             onEnter: (state) =>
             {
                 Debug.Log(state.name);
+                grindJumpTimer = 0f;
                 float t;
                 (transform.position, t) = grindingSpline.GetClosestPoint(transform.position);
-                Vector3 grindDirection = grindingSpline.GetDirection(t);
-                if (Vector3.Dot(velocity, grindDirection) < 0)
-                    grindDirection = -grindDirection;
-
-                velocity = grindDirection * GrindSpeed;
+                velocity = GetGrindVelocity(t);
             },
             onLogic: (state) =>
             {
-                float t;
-                (_, t) = grindingSpline.GetClosestPoint(transform.position);
+                float t; Vector3 closestPosition;
+                (closestPosition, t) = grindingSpline.GetClosestPoint(transform.position);
 
-                Vector3 grindDirection = grindingSpline.GetDirection(t);
-                if (Vector3.Dot(velocity, grindDirection) < 0)
-                    grindDirection = -grindDirection;
+                Vector3 delta = closestPosition - transform.position;
+                velocity = delta + GetGrindVelocity(t);
 
-                velocity = grindDirection * GrindSpeed;
+                if ((t > 1f || t < 0f) && !grindingSpline.Loop) fsm.RequestStateChange("Air");
             },
             onExit: (state) => grindingSpline = null);
 
@@ -138,6 +139,13 @@ namespace Tirocinio
 
             fsm.Init();
 
+        }
+
+        Vector3 GetGrindVelocity(float t)
+        {
+            Vector3 grindDirection = grindingSpline.GetDirection(t);
+            grindDirection = Vector3.Dot(velocity.normalized, grindDirection) * grindDirection;
+            return grindDirection * GrindSpeed;
         }
 
 
@@ -355,6 +363,10 @@ namespace Tirocinio
             mover.CheckForGround();
             velocity = mover.GetVelocity();
             fsm.OnLogic();
+            if (fsm.ActiveStateName != "Grinding")
+            {
+                grindJumpTimer += Time.fixedDeltaTime;
+            }
             mover.SetVelocity(velocity);
         }
 
