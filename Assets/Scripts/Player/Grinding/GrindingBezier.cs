@@ -25,7 +25,7 @@ namespace Tirocinio
         {
             if (player)
             {
-                (Vector3 closestPoint, float t) = spline.GetClosestPoint(player.transform.position);
+                (Vector3 closestPoint, _) = spline.GetClosestPoint(player.transform.position);
 
                 if ((closestPoint - player.transform.position).magnitude < grindDistance)
                 {

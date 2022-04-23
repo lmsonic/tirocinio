@@ -20,6 +20,9 @@ public class PlayerInput : MonoBehaviour
     public bool IsShooting { get => isShooting; }
     bool isShooting = false;
 
+    public Vector2 LookInput { get => lookInput; }
+    Vector2 lookInput;
+
     private void Awake()
     {
         playerControls = new PlayerControls();
@@ -27,6 +30,10 @@ public class PlayerInput : MonoBehaviour
         playerControls.Player.Move.started += OnMovementInput;
         playerControls.Player.Move.canceled += OnMovementInput;
         playerControls.Player.Move.performed += OnMovementInput;
+
+        playerControls.Player.Look.started += ctx => lookInput = ctx.ReadValue<Vector2>();
+        playerControls.Player.Look.canceled += ctx => lookInput = ctx.ReadValue<Vector2>();
+        playerControls.Player.Look.performed += ctx => lookInput = ctx.ReadValue<Vector2>();
 
         playerControls.Player.Accelerate.started += ctx => accelerationInput = ctx.ReadValue<float>();
         playerControls.Player.Accelerate.canceled += ctx => accelerationInput = ctx.ReadValue<float>();
@@ -64,5 +71,7 @@ public class PlayerInput : MonoBehaviour
         CurrentMovement.y = 0f;
 
     }
+
+
 
 }

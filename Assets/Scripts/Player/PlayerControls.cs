@@ -132,7 +132,7 @@ public partial class @PlayerControls : IInputActionCollection2, IDisposable
                     ""id"": ""38af0795-0c61-4844-a2aa-e796e7ffaec7"",
                     ""path"": ""<Gamepad>/rightStick"",
                     ""interactions"": """",
-                    ""processors"": ""ScaleVector2"",
+                    ""processors"": """",
                     ""groups"": ""Gamepad"",
                     ""action"": ""Look"",
                     ""isComposite"": false,
@@ -140,7 +140,7 @@ public partial class @PlayerControls : IInputActionCollection2, IDisposable
                 },
                 {
                     ""name"": """",
-                    ""id"": ""ec05f491-419f-4b57-a23a-934e12646e70"",
+                    ""id"": ""fdf83cba-58bc-4ecf-a818-2c80cd3745b6"",
                     ""path"": ""<Gamepad>/leftStick"",
                     ""interactions"": """",
                     ""processors"": ""ScaleVector2(y=0.1)"",
