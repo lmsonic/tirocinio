@@ -67,8 +67,11 @@ namespace Tirocinio
 
         public void SetGrindingState(BezierSpline spline)
         {
-            if (grindJumpTimer >= grindJumpTime && velocity.y < 0f)
+            if (grindJumpTimer >= grindJumpTime && velocity.y < -0.5f)
+            {
+                Debug.Log("Set Spline with velocity " + velocity);
                 grindingSpline = spline;
+            }
         }
 
         private void Start()
@@ -352,6 +355,7 @@ namespace Tirocinio
 
         public void LerpGroundedVelocity(Vector3 target, float t)
         {
+            target.y = 0f;
             velocity = Vector3.MoveTowards(velocity, target, t);
 
         }

@@ -291,7 +291,7 @@ namespace Tirocinio
         {
             return _velocity;
         }
-        Vector3 targetPosition;
+        Vector3 targetPosition = Vector3.zero;
 
 
         private void FixedUpdate()
@@ -331,7 +331,9 @@ namespace Tirocinio
                     out direction, out distance
                 );
 
-                targetPosition += direction * distance * 1.5f;
+                if (overlapped)
+                    targetPosition += direction * distance * 1.5f;
+
 
             }
         }
@@ -347,6 +349,8 @@ namespace Tirocinio
             RaycastHit hitInfo;
 
             float safeDistance;
+
+
 
             Vector3 direction = movement.normalized;
             float distance = movement.magnitude;
@@ -395,7 +399,6 @@ namespace Tirocinio
                 CollisionInfo info = MoveAndCollide(movement);
                 if (info == null) break;
 
-
                 float angle = Vector3.Angle(Vector3.up, info.normal);
                 if (angle < wallAngle)
                 {//ground
@@ -424,9 +427,12 @@ namespace Tirocinio
 
 
             }
+
             Depenetrate();
 
+
             _velocity = velocity;
+
 
         }
 

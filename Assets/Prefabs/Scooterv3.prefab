@@ -55,9 +55,9 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 958067776201317378}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 3.33, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 2.89, z: -0.5}
+  m_LocalScale: {x: 3.3333328, y: 0.6666664, z: 3.3333323}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 9143775345407581414}
@@ -76,6 +76,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cameraController: {fileID: 2604819109106061837}
+  lerpSpeed: 20
 --- !u!1 &6065835700474517067
 GameObject:
   m_ObjectHideFlags: 0
@@ -463,8 +464,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cameraTransform: {fileID: 8716634277540225924}
-  cameraZoom: 5
-  rotationSpeed: 30
+  cameraDistance: 5
+  minPitch: 0
+  maxPitch: 45
+  rotationSpeed: 180
 --- !u!1 &9143775345840500072
 GameObject:
   m_ObjectHideFlags: 0

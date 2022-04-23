@@ -4,6 +4,7 @@ using UnityEngine;
 
 namespace Tirocinio
 {
+
     public class CameraController : MonoBehaviour
     {
         public Transform cameraTransform;
@@ -26,6 +27,7 @@ namespace Tirocinio
         {
             playerInput = GetComponent<PlayerInput>();
             baseCameraOffset = cameraTransform.localPosition;
+
         }
 
         private void Update()
