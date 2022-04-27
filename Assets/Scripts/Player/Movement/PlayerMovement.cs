@@ -48,6 +48,7 @@ namespace Tirocinio
         public float maxJumpTime = 0.5f;
         public float MaxFallSpeed = -30f;
         public float FallMultiplier = 1.5f;
+        public float AirSpeed = 10f;
 
         [Header("Slope Variables")]
 
@@ -84,6 +85,9 @@ namespace Tirocinio
              onLogic: (state) =>
             {
                 bool isFalling = velocity.y <= 0f || !playerInput.IsJumpPressed;
+
+                Vector3 movement = playerInput.CurrentMovement.x * transform.right + playerInput.CurrentMovement.y * transform.forward;
+                velocity += movement * AirSpeed * Time.fixedDeltaTime;
 
                 if (isFalling)
                 {
