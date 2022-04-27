@@ -10,29 +10,37 @@ namespace Tirocinio
     {
         public Hex hex1, hex2;
 
-        public Renderer rend;
+        public Renderer wallRenderer;
 
-        public Collider coll;
+        public Collider wallCollider;
+
+        public Renderer roadRenderer;
+
+        public Collider roadCollider;
 
         bool isOpen = false;
 
-        public void SetColor(Color color) => rend.material.color = color;
+        public void SetColor(Color color) => wallRenderer.material.color = color;
 
 
         public void Open()
         {//when open, the exit is invisible and the collider becomes a trigger
-            isOpen=true;
-            rend.enabled = false;
-            coll.isTrigger = true;
-            coll.enabled = false;
+            isOpen = true;
+            wallRenderer.enabled = false;
+            wallCollider.enabled = false;
+
+            roadRenderer.enabled = true;
+            roadCollider.enabled = true;
         }
 
         public void Close()
         {//when closed, the exit wall is visible and the collider blocks the player
-            isOpen=false;
-            rend.enabled = true;
-            coll.isTrigger = false;
-            coll.enabled = true;
+            isOpen = false;
+            wallRenderer.enabled = true;
+            wallCollider.enabled = true;
+
+            roadRenderer.enabled = false;
+            roadCollider.enabled = false;
         }
         public void Init(Hex h1, Hex h2)
         {
@@ -53,10 +61,12 @@ namespace Tirocinio
 
         }
 
-        private void OnDrawGizmos() {
-            if (isOpen){
+        private void OnDrawGizmos()
+        {
+            if (isOpen)
+            {
                 //Debug lines for open exit connections
-                Debug.DrawLine(hex1.transform.position,hex2.transform.position,Color.magenta);
+                Debug.DrawLine(hex1.transform.position, hex2.transform.position, Color.magenta);
             }
         }
 

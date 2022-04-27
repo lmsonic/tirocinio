@@ -282,7 +282,7 @@ namespace Tirocinio
             Vector3 offset = Vector3.forward * hexRadius * Mathf.Sqrt(3f);
             offset = rotation * offset;
 
-            Hex hex =(Hex)hexPool.Pull(startPosition + offset, Quaternion.identity, transform);
+            Hex hex = (Hex)hexPool.Pull(startPosition + offset, Quaternion.identity, transform);
             hex.transform.localScale = Vector3.one;
 
             return hex;
@@ -297,7 +297,6 @@ namespace Tirocinio
 
             Exit exit = MakeExit(hex1.transform.position, hex2.transform.position);
             exit.Init(hex1, hex2);
-            exit.SetColor(Color.black);
 
             bool isOpen = Random.value < exitProbability;
             if (isOpen) exit.Open(); else exit.Close();
