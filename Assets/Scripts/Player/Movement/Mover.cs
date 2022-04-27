@@ -114,8 +114,6 @@ namespace Tirocinio
         public int sensorArrayRayCount;
         public bool sensorArrayRowsAreOffset;
 
-        public Mesh capsuleMesh;
-
         Vector3 groundPoint;
         Vector3 groundNormal;
 
@@ -296,8 +294,6 @@ namespace Tirocinio
 
         private void FixedUpdate()
         {
-
-
             targetPosition = _rigidbody.position;
 
             MoveAndSlide(_velocity);

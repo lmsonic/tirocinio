@@ -13,26 +13,22 @@ namespace Tirocinio
         public Renderer rend;
 
 
-        public void SetColor(Color color) => rend.material.color = color;
-
-        public Color GetColor() {return rend.material.color;}
-
-        
 
         public void ClearExits()
         {
             foreach (Exit exit in exits)
             {
-                
+
                 Hex otherHex = exit.GetOtherHex(this);
                 otherHex.exits.Remove(exit);
                 exit.gameObject.SetActive(false);
             }
             exits.Clear();
-            
+
         }
 
-        public void ClearNeighbours(){
+        public void ClearNeighbours()
+        {
             for (int i = 0; i < neighbours.Length; i++)
             {
                 ExitDirection oppositeDirection = HelperEnums.GetOppositeDirection((ExitDirection)i);
@@ -43,16 +39,18 @@ namespace Tirocinio
             neighbours = new Hex[6];
         }
 
-  
-        
 
 
-        private void OnDrawGizmos() {
+
+
+        private void OnDrawGizmos()
+        {
             for (int i = 0; i < neighbours.Length; i++)
             {
-                if (neighbours[i]){
+                if (neighbours[i])
+                {
                     Vector3 direction = (neighbours[i].transform.position - transform.position);
-                    Debug.DrawRay(transform.position,direction*0.3f,Color.black);
+                    Debug.DrawRay(transform.position, direction * 0.3f, Color.black);
                 }
             }
 
@@ -61,7 +59,7 @@ namespace Tirocinio
 
 
 
-        
+
 
 
 

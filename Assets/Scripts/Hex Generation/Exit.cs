@@ -20,9 +20,6 @@ namespace Tirocinio
 
         bool isOpen = false;
 
-        public void SetColor(Color color) => wallRenderer.material.color = color;
-
-
         public void Open()
         {//when open, the exit is invisible and the collider becomes a trigger
             isOpen = true;

@@ -21,7 +21,6 @@ namespace Tirocinio
 
         [Header("Rotation Variables")]
         public float maxTurnDegrees = 30f;
-        public float rotationSpeed = 30f;
         public float rotationLerpSpeed = 30f;
         public float returnToNormalLerpSpeed = 10f;
 
@@ -89,14 +88,10 @@ namespace Tirocinio
                 Vector3 movement = playerInput.CurrentMovement.x * transform.right + playerInput.CurrentMovement.y * transform.forward;
                 velocity += movement * AirSpeed * Time.fixedDeltaTime;
 
-                if (isFalling)
-                {
-                    velocity.y = Mathf.Max(velocity.y + gravity * FallMultiplier * Time.fixedDeltaTime, MaxFallSpeed);
-                }
-                else
-                {
-                    velocity.y = velocity.y + gravity * Time.fixedDeltaTime;
-                }
+                velocity.y = isFalling ?
+                            Mathf.Max(velocity.y + gravity * FallMultiplier * Time.fixedDeltaTime, MaxFallSpeed) :
+                            velocity.y + gravity * Time.fixedDeltaTime;
+
             },
             onExit: (state) =>
             {
@@ -284,6 +279,11 @@ namespace Tirocinio
             float timeToApex = maxJumpTime / 2;
             gravity = (-2 * maxJumpHeight) / Mathf.Pow(timeToApex, 2);
             initialJumpVelocity = 2 * maxJumpHeight / timeToApex;
+        }
+
+        private void OnValidate()
+        {
+            SetupJumpVariables();
         }
 
 

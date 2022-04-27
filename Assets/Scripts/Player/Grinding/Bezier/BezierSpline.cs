@@ -244,28 +244,6 @@ namespace Tirocinio
             return GetVelocity(t).normalized;
         }
 
-        public Vector3 GetOppositeVelocity(float t)
-        {
-            int i;
-            if (t >= 1f)
-            {
-                t = 1f;
-                i = points.Length - 4;
-            }
-            else
-            {
-                t = Mathf.Clamp01(t) * CurveCount;
-                i = (int)t;
-                t -= i;
-                i *= 3;
-            }
-            return transform.TransformPoint(Bezier.GetFirstDerivative(points[i + 3], points[i + 2], points[i + 1], points[i], 1 - t)) - transform.position;
-        }
-
-        public Vector3 GetOppositeDirection(float t)
-        {
-            return GetOppositeVelocity(t).normalized;
-        }
 
 
 

@@ -6,7 +6,6 @@ namespace Tirocinio
 {
     public class CameraFollow : MonoBehaviour
     {
-        public CameraController cameraController;
 
         public float lerpSpeed = 20f;
 
