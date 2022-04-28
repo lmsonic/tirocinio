@@ -2,7 +2,6 @@ Shader "Custom/GrassComputeHLSL"
 {
     Properties
     {
-        [Toggle(BLEND)] _BlendFloor ("Blend with floor", Float) = 0
         _Fade ("Top Fade Offset", Range(-1, 10)) = 0
         _AmbientAdjustment ("Ambient Adjustment", Range(-1, 10)) = 0
     }
@@ -46,9 +45,6 @@ Shader "Custom/GrassComputeHLSL"
     float4 _BottomTint;
     float _Fade;
     float4 _PositionMoving;
-    float _OrthographicCamSize;
-    float3 _OrthographicCamPos;
-    uniform sampler2D _TerrainDiffuse;
     float _AmbientAdjustment;
     // ----------------------------------------
     
@@ -91,10 +87,6 @@ Shader "Custom/GrassComputeHLSL"
             return 0;
         #else
             // For Color Pass
-            // rendertexture UV for terrain blending
-            float2 uv = i.positionWS.xz - _OrthographicCamPos.xz;
-            uv = uv / (_OrthographicCamSize * 2);
-            uv += 0.5;
             
             // get ambient color from environment lighting
             float4 ambient = float4(unity_SHAr.w, unity_SHAg.w, unity_SHAb.w, 1); //float4(ShadeSH9(float4(0,0,1,1)),0);
@@ -129,26 +121,16 @@ Shader "Custom/GrassComputeHLSL"
             // colors from the tool with tinting from the grass script
             float4 baseColor = lerp(_BottomTint, _TopTint, verticalFade) * float4(i.diffuseColor, 1);
             // get the floor map
-            float4 terrainForBlending = tex2D(_TerrainDiffuse, uv);
-            
             float4 final = float4(0, 0, 0, 0);
-            #if BLEND
-                _TopTint = _TopTint * ambient;
-                // tint the top blades and add in light color
-                terrainForBlending = lerp(terrainForBlending, terrainForBlending + (_TopTint * float4(i.diffuseColor, 1)), verticalFade);
-                final = lerp((terrainForBlending) * shadow, terrainForBlending, shadow);
-                // add in ambient and attempt to blend in with the shadows
-                final += lerp((ambient * terrainForBlending) * _AmbientAdjustment, 0, shadow);
-            #else
-                final = baseColor;
-                // add in shadows
-                final *= shadow;
-                // if theres a main light, multiply with its color and intensity
-                final *= float4(mainLight.color, 1);
-                
-                // add in ambient
-                final += (ambient * baseColor) ;
-            #endif
+
+            final = baseColor;
+            // add in shadows
+            final *= shadow;
+            // if theres a main light, multiply with its color and intensity
+            final *= float4(mainLight.color, 1);
+            
+            // add in ambient
+            final += (ambient * baseColor) ;
             final += float4(extraLights, 1);
             // fog
             float fogFactor = i.fogFactor;
