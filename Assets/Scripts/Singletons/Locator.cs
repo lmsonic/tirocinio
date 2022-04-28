@@ -10,7 +10,8 @@ namespace Tirocinio
         static public Locator Instance = null;
 
         public Chunk Chunk;
-        
+        public GrassPainter GrassPainter;
+
         private void Awake()
         {
             if (Instance)
@@ -19,5 +20,6 @@ namespace Tirocinio
                 Instance = this;
 
         }
+
     }
 }

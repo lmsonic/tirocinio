@@ -148,6 +148,11 @@ namespace Tirocinio
 
         private void OnEnable()
         {
+            UpdateMesh();
+        }
+
+        private void UpdateMesh()
+        {
             // If initialized, call on disable to clean things up
             if (m_Initialized)
             {
@@ -173,7 +178,6 @@ namespace Tirocinio
                 return;
 
             }
-
             m_Initialized = true;
 
             // Instantiate the shaders so they can point to their own buffers
@@ -251,12 +255,13 @@ namespace Tirocinio
             // Transform the bounds to world space
             bounds = TransformBounds(m_LocalBounds);
 
+
             SetGrassDataBase();
+
         }
 
-        private void OnDisable()
+        private void CleanMesh()
         {
-            // Dispose of buffers and copied shaders here
             if (m_Initialized)
             {
                 // If the application is not in play mode, we have to call DestroyImmediate
@@ -280,16 +285,21 @@ namespace Tirocinio
             m_Initialized = false;
         }
 
+        private void OnDisable()
+        {
+            CleanMesh();
+        }
+
+
         // LateUpdate is called after all Update calls
         private void LateUpdate()
         {
             // If in edit mode, we need to update the shaders each Update to make sure settings changes are applied
             // Don't worry, in edit mode, Update isn't called each frame
-            if (Application.isPlaying == false)
-            {
-                OnDisable();
-                OnEnable();
-            }
+
+            CleanMesh();
+            UpdateMesh();
+
 
             // If not initialized, do nothing (creating zero-length buffer will crash)
             if (!m_Initialized)
