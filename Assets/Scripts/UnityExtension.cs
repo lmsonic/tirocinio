@@ -14,4 +14,9 @@ public static class UnityExtensions
     {
         return ((mask & (1 << layer)) != 0);
     }
+
+    public static bool ContainsOnly(this LayerMask mask, int layer)
+    {
+        return ((mask & (1 << layer)) != 0);
+    }
 }

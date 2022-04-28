@@ -459,6 +459,8 @@ public class GrassPainter : MonoBehaviour
             {
                 if ((paintMask.value & (1 << terrainHit.transform.gameObject.layer)) > 0)
                 {
+
+
                     hitPos = terrainHit.point;
                     hitNormal = terrainHit.normal;
                     if (k != 0)

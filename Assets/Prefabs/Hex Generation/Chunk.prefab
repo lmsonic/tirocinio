@@ -59,6 +59,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 6140296542766368193}
     m_Modifications:
+    - target: {fileID: 4661496423885030117, guid: 9b9783ae53652ae41bf65709e07f4ddd, type: 3}
+      propertyPath: MeshDescription.surfaceParameter
+      value: 25878
+      objectReference: {fileID: 0}
     - target: {fileID: 7011641781879200781, guid: 9b9783ae53652ae41bf65709e07f4ddd, type: 3}
       propertyPath: m_Mesh
       value: 

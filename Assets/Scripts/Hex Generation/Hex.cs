@@ -10,7 +10,6 @@ namespace Tirocinio
 
         public List<Exit> exits;
         public Hex[] neighbours = new Hex[6];
-        public Renderer rend;
 
 
 

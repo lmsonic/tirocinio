@@ -32,8 +32,9 @@ namespace Tirocinio
             if (paintableTerrain.Contains(other.gameObject.layer))
             {
                 Locator.Instance.GrassPainter.AddGrass(other.GetContact(0).point, other.GetContact(0).normal);
-                gameObject.SetActive(false);
+
             }
+            gameObject.SetActive(false);
         }
 
 
