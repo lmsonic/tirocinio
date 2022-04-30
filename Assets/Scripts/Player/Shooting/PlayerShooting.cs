@@ -24,8 +24,13 @@ namespace Tirocinio
         float timer = 0f;
 
         LineRenderer lineRenderer;
+        [Header("Line Trajectory")]
         [Range(0f, 100f)]
         public float lineLength = 10f;
+        public LayerMask plantableMask;
+        public LayerMask hitMask;
+        public Color plantableColor = Color.green;
+        public Color dryColor = Color.gray;
 
 
         private void Awake()
@@ -68,8 +73,8 @@ namespace Tirocinio
         private Vector3[] segments;
         private int maxSegmentCount = 40;
         private int numSegments = 0;
-        private int maxIterations = 100;
-        private float segmentStepModulo = 5f;
+        private int maxIterations = 200;
+        private float segmentStepModulo = 10f;
 
 
 
@@ -78,6 +83,8 @@ namespace Tirocinio
         private void SimulatePath(Vector3 startPos, Vector3 forceDirection, float drag)
         {
             float timestep = Time.fixedDeltaTime;
+
+            bool isPlantable = false;
 
             float currentLineLength = 0f;
 
@@ -93,29 +100,41 @@ namespace Tirocinio
 
             segments[0] = position;
             numSegments = 1;
+            RaycastHit hit;
 
             for (int i = 0; i < maxIterations && numSegments < maxSegmentCount && currentLineLength < lineLength; i++)
             {
                 velocity += gravity;
                 velocity *= stepDrag;
 
+
                 position += velocity;
 
                 currentLineLength += velocity.magnitude;
+
 
                 if (i % segmentStepModulo == 0)
                 {
                     segments[numSegments] = position;
                     numSegments++;
                 }
+
+                if (Physics.Raycast(position, velocity, out hit, velocity.magnitude, hitMask))
+                {
+                    isPlantable = plantableMask.Contains(hit.collider.gameObject.layer);
+                    break;
+                }
             }
 
-            Draw();
+            Draw(isPlantable);
         }
 
-        private void Draw()
+        private void Draw(bool isPlantable)
         {
+            Color lineColor = isPlantable ? plantableColor : dryColor;
 
+            lineRenderer.startColor = lineColor;
+            lineRenderer.endColor = lineColor;
             lineRenderer.transform.position = segments[0];
 
 
