@@ -30,6 +30,7 @@ public class GrassPainter : MonoBehaviour
     List<Vector3> normals = new List<Vector3>();
     [SerializeField]
     List<Vector2> length = new List<Vector2>();
+    List<Vector2> spawnTime = new List<Vector2>();
     int[] indi;
     public int i = 0;
 
@@ -92,6 +93,7 @@ public class GrassPainter : MonoBehaviour
             mesh.GetIndices(indicies, 0);
             indi = indicies.ToArray();
             mesh.GetUVs(0, length);
+            mesh.GetUVs(1, spawnTime);
             mesh.GetColors(colors);
             mesh.GetNormals(normals);
             RebuildMesh();
@@ -126,6 +128,7 @@ public class GrassPainter : MonoBehaviour
         mesh.GetIndices(indicies, 0);
         indi = indicies.ToArray();
         mesh.GetUVs(0, length);
+        mesh.GetUVs(1, spawnTime);
         mesh.GetColors(colors);
         mesh.GetNormals(normals);
     }
@@ -139,6 +142,7 @@ public class GrassPainter : MonoBehaviour
         colors = new List<Color>();
         normals = new List<Vector3>();
         length = new List<Vector2>();
+        spawnTime = new List<Vector2>();
         RebuildMesh();
     }
 
@@ -249,6 +253,7 @@ public class GrassPainter : MonoBehaviour
                                         positions.Add((grassPosition));
                                         indicies.Add(i);
                                         length.Add(new Vector2(sizeWidth, sizeLength));
+                                        spawnTime.Add(new Vector2(Time.time - r, 0f));
                                         // add random color variations                          
                                         colors.Add(new Color(AdjustedColor.r + (Random.Range(0, 1.0f) * rangeR), AdjustedColor.g + (Random.Range(0, 1.0f) * rangeG), AdjustedColor.b + (Random.Range(0, 1.0f) * rangeB), 1));
 
@@ -265,6 +270,7 @@ public class GrassPainter : MonoBehaviour
                                             positions.Add((grassPosition));
                                             indicies.Add(i);
                                             length.Add(new Vector2(sizeWidth, sizeLength));
+                                            spawnTime.Add(new Vector2(Time.time - r, 0f));
                                             colors.Add(new Color(AdjustedColor.r + (Random.Range(0, 1.0f) * rangeR), AdjustedColor.g + (Random.Range(0, 1.0f) * rangeG), AdjustedColor.b + (Random.Range(0, 1.0f) * rangeB), 1));
                                             normals.Add(terrainHit.normal);
                                             i++;
@@ -302,6 +308,7 @@ public class GrassPainter : MonoBehaviour
                                     colors.RemoveAt(j);
                                     normals.RemoveAt(j);
                                     length.RemoveAt(j);
+                                    spawnTime.RemoveAt(j);
                                     indicies.RemoveAt(j);
                                     i--;
 
@@ -416,6 +423,7 @@ public class GrassPainter : MonoBehaviour
         indi = indicies.ToArray();
         mesh.SetIndices(indi, MeshTopology.Points, 0);
         mesh.SetUVs(0, length);
+        mesh.SetUVs(1, spawnTime);
         mesh.SetColors(colors);
         mesh.SetNormals(normals);
         mesh.RecalculateBounds();
@@ -471,6 +479,7 @@ public class GrassPainter : MonoBehaviour
                         positions.Add((grassPosition));
                         indicies.Add(i);
                         length.Add(new Vector2(sizeWidth, sizeLength));
+                        spawnTime.Add(new Vector2(Time.time - r, 0f));
                         // add random color variations                          
                         colors.Add(new Color(AdjustedColor.r + (Random.Range(0, 1.0f) * rangeR), AdjustedColor.g + (Random.Range(0, 1.0f) * rangeG), AdjustedColor.b + (Random.Range(0, 1.0f) * rangeB), 1));
 
@@ -487,6 +496,7 @@ public class GrassPainter : MonoBehaviour
                             positions.Add((grassPosition));
                             indicies.Add(i);
                             length.Add(new Vector2(sizeWidth, sizeLength));
+                            spawnTime.Add(new Vector2(Time.time - r, 0f));
                             colors.Add(new Color(AdjustedColor.r + (Random.Range(0, 1.0f) * rangeR), AdjustedColor.g + (Random.Range(0, 1.0f) * rangeG), AdjustedColor.b + (Random.Range(0, 1.0f) * rangeB), 1));
                             normals.Add(terrainHit.normal);
                             i++;

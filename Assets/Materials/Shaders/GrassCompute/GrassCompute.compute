@@ -17,6 +17,7 @@ struct SourceVertex
     float3 positionOS; // position in object space
     float3 normalOS;
     float2 uv;  // contains widthMultiplier, heightMultiplier
+    float2 uv2; //contains spawnTime
     float3 color;
 };
 
@@ -69,6 +70,7 @@ float4x4 _LocalToWorld;
 
 // Time
 float _Time;
+float _GrowthTime;
 
 // Grass
 half _GrassHeight;
@@ -128,6 +130,11 @@ float3x3 AngleAxis3x3(float angle, float3 axis)
         t * x * x + c, t * x * y - s * z, t * x * z + s * y,
         t * x * y + s * z, t * y * y + c, t * y * z - s * x,
         t * x * z - s * y, t * y * z + s * x, t * z * z + c);
+}
+
+float inverseLerp(float a, float b, float x)
+{
+    return (x - a) / (b - a);
 }
 
 // Generate each grass vertex for output triangles
@@ -217,8 +224,10 @@ void Main(uint3 id : SV_DispatchThreadID)
     // Set grass height
     _GrassHeight = sv.uv.y;
     _GrassWidth = sv.uv.x;  // UV.x == width multiplier (set in GrassPainter.cs)
+    float growthFactor = saturate(inverseLerp(0, _GrowthTime, _Time - sv.uv2.x));
     _GrassHeight += clamp(randomisedPos * _GrassRandomHeight, 1 - _GrassRandomHeight, 1 + _GrassRandomHeight);
-    _GrassWidth *= (distanceFade);
+    _GrassHeight *= growthFactor;
+    _GrassWidth *= (distanceFade) * growthFactor;
     
     
     DrawVertex drawVertices[GRASS_NUM_VERTICES_PER_BLADE];

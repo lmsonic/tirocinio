@@ -56,6 +56,8 @@ namespace Tirocinio
         [Header("Other")]
         public UnityEngine.Rendering.ShadowCastingMode castShadow;
 
+        public float growthTime = 0.5f;
+
 
         ShaderInteractor[] interactors;
 
@@ -71,6 +73,7 @@ namespace Tirocinio
             public Vector3 position;
             public Vector3 normal;
             public Vector2 uv;
+            public Vector2 uv2;
             public Vector3 color;
         }
 
@@ -95,7 +98,7 @@ namespace Tirocinio
         private Camera sceneCam;
 
         // The size of one entry in the various compute buffers
-        private const int SOURCE_VERT_STRIDE = sizeof(float) * (3 + 3 + 2 + 3);
+        private const int SOURCE_VERT_STRIDE = sizeof(float) * (3 + 3 + 2 + 2 + 3);
         private const int DRAW_STRIDE = sizeof(float) * (3 + (3 + 2 + 3) * 3);
         private const int INDIRECT_ARGS_STRIDE = sizeof(int) * 4;
 
@@ -188,6 +191,7 @@ namespace Tirocinio
             Vector3[] positions = sourceMesh.vertices;
             Vector3[] normals = sourceMesh.normals;
             Vector2[] uvs = sourceMesh.uv;
+            Vector2[] uv2s = sourceMesh.uv2;
             Color[] colors = sourceMesh.colors;
 
             // Create the data to upload to the source vert buffer
@@ -200,6 +204,7 @@ namespace Tirocinio
                     position = positions[i],
                     normal = normals[i],
                     uv = uvs[i],
+                    uv2 = uv2s[i],
                     color = new Vector3(color.r, color.g, color.b) // Color --> Vector3
                 };
             }
@@ -335,6 +340,7 @@ namespace Tirocinio
             // Send things to compute shader that dont need to be set every frame
             m_InstantiatedComputeShader.SetMatrix("_LocalToWorld", transform.localToWorldMatrix);
             m_InstantiatedComputeShader.SetFloat("_Time", Time.time);
+            m_InstantiatedComputeShader.SetFloat("_GrowthTime", growthTime);
 
             m_InstantiatedComputeShader.SetFloat("_GrassRandomHeight", grassRandomHeight);
 
