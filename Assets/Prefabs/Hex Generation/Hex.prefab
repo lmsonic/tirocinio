@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 5683974693461899559}
   - component: {fileID: 2121412481257533196}
   - component: {fileID: 5178356134696042376}
-  m_Layer: 3
+  m_Layer: 2
   m_Name: Trigger
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -442,7 +442,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5819097106418928999, guid: 9d5ba86c81034e449bb4799a9367271c, type: 3}
       propertyPath: MeshDescription.surfaceParameter
-      value: 25878
+      value: 25734
       objectReference: {fileID: 0}
     - target: {fileID: 7269470796596750512, guid: 9d5ba86c81034e449bb4799a9367271c, type: 3}
       propertyPath: m_Mesh
@@ -458,7 +458,7 @@ PrefabInstance:
       objectReference: {fileID: -661722101761176695}
     - target: {fileID: 8181546454045654480, guid: 9d5ba86c81034e449bb4799a9367271c, type: 3}
       propertyPath: MeshDescription.surfaceParameter
-      value: 25756
+      value: 25608
       objectReference: {fileID: 0}
     - target: {fileID: 8232485910406178697, guid: 9d5ba86c81034e449bb4799a9367271c, type: 3}
       propertyPath: m_Mesh

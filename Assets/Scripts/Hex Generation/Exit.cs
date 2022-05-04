@@ -23,22 +23,34 @@ namespace Tirocinio
         public void Open()
         {//when open, the exit is invisible and the collider becomes a trigger
             isOpen = true;
-            wallRenderer.enabled = false;
-            wallCollider.enabled = false;
 
-            roadRenderer.enabled = true;
-            roadCollider.enabled = true;
+            if (wallRenderer)
+                wallRenderer.enabled = false;
+            if (wallCollider)
+                wallCollider.enabled = false;
+
+            if (roadRenderer)
+                roadRenderer.enabled = true;
+            if (roadCollider)
+                roadCollider.enabled = true;
         }
 
         public void Close()
         {//when closed, the exit wall is visible and the collider blocks the player
             isOpen = false;
-            wallRenderer.enabled = true;
-            wallCollider.enabled = true;
 
-            roadRenderer.enabled = false;
-            roadCollider.enabled = false;
+            if (wallRenderer)
+                wallRenderer.enabled = true;
+            if (wallCollider)
+                wallCollider.enabled = true;
+
+            if (roadRenderer)
+                roadRenderer.enabled = false;
+            if (roadCollider)
+                roadCollider.enabled = false;
+
         }
+
         public void Init(Hex h1, Hex h2)
         {
             hex1 = h1;
