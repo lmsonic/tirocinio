@@ -456,7 +456,7 @@ MonoBehaviour:
     meshQuery:
       layers: 33554440
       maskAndChannels: 8
-    surfaceParameter: 25604
+    surfaceParameter: 25794
     meshQueryIndex: 1
     subMeshQueryIndex: 0
     geometryHashValue: -3049614613259231701
@@ -959,7 +959,7 @@ MonoBehaviour:
     meshQuery:
       layers: 33554440
       maskAndChannels: 8
-    surfaceParameter: 25604
+    surfaceParameter: 25794
     meshQueryIndex: 1
     subMeshQueryIndex: 0
     geometryHashValue: -3049614613259231701
@@ -1702,6 +1702,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1539404643, guid: 3f780a04d1bfe814caa13679e7db040c, type: 3}
+      propertyPath: shootTime
+      value: 0.25
+      objectReference: {fileID: 0}
     - target: {fileID: 1539404643, guid: 3f780a04d1bfe814caa13679e7db040c, type: 3}
       propertyPath: angleTrajectory
       value: 60

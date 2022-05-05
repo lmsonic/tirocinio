@@ -1,5 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
+
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -47,7 +46,7 @@ namespace Tirocinio
             playerInput = GetComponent<PlayerInput>();
             cameraTransform = Camera.main.transform;
             lineRenderer = GetComponent<LineRenderer>();
-            seedBombPool = new ObjectPool<PoolObject>(seedBombPrefab, 10);
+            seedBombPool = new ObjectPool<PoolObject>(seedBombPrefab, 100);
 
         }
 
@@ -59,10 +58,9 @@ namespace Tirocinio
             return (transform.forward * Mathf.Cos(angle) + transform.up * Mathf.Sin(angle)).normalized;
         }
 
-        Vector3 CalculateForce()
-        {
-            return AngledInitialVelocity(angleTrajectory) * forceTrajectory;
-        }
+
+        Vector3 CalculateForce() => AngledInitialVelocity(angleTrajectory) * forceTrajectory;
+
 
 
 
@@ -87,7 +85,7 @@ namespace Tirocinio
 
             GameObject go = seedBombPool.PullGameObject(shootingOrigin.position);
             Rigidbody rb = go.GetComponent<Rigidbody>();
-
+            rb.velocity = Vector3.zero;
             Vector3 force = CalculateForce();
             rb.AddForce(force, ForceMode.VelocityChange);
 
