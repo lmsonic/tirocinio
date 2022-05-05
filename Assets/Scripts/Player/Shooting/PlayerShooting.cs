@@ -61,7 +61,7 @@ namespace Tirocinio
 
         Vector3 CalculateForce()
         {
-            return player.velocity + AngledInitialVelocity(angleTrajectory) * forceTrajectory;
+            return AngledInitialVelocity(angleTrajectory) * forceTrajectory;
         }
 
 
