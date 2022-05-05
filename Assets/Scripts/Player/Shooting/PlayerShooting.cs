@@ -117,7 +117,7 @@ namespace Tirocinio
 
             if (segments == null || segments.Length != lineResolution)
             {
-                segments = new Vector3[lineResolution];
+                segments = new Vector3[lineResolution + 1];
             }
 
             segments[0] = position;
