@@ -1704,7 +1704,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1539404643, guid: 3f780a04d1bfe814caa13679e7db040c, type: 3}
       propertyPath: shootTime
-      value: 0.25
+      value: 0.1
       objectReference: {fileID: 0}
     - target: {fileID: 1539404643, guid: 3f780a04d1bfe814caa13679e7db040c, type: 3}
       propertyPath: angleTrajectory

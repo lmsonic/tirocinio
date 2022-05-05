@@ -65,6 +65,7 @@ namespace Tirocinio
 
 
 
+
         public void SetGrindingState(BezierSpline spline)
         {
             if (grindJumpTimer >= grindJumpTime && velocity.y < -0.5f)
@@ -85,7 +86,7 @@ namespace Tirocinio
             {
                 bool isFalling = velocity.y <= 0f || !playerInput.IsJumpPressed;
 
-                Vector3 movement = playerInput.CurrentMovement.x * transform.right + playerInput.CurrentMovement.y * transform.forward;
+                Vector3 movement = playerInput.CurrentMovement.x * transform.right + playerInput.CurrentMovement.z * transform.forward;
                 velocity += movement * AirSpeed * Time.fixedDeltaTime;
 
                 velocity.y = isFalling ?
@@ -115,6 +116,7 @@ namespace Tirocinio
                 grindJumpTimer = 0f;
                 float t;
                 (transform.position, t) = grindingSpline.GetClosestPoint(transform.position);
+
                 velocity = GetGrindVelocity(t);
             },
             onLogic: (state) =>
@@ -147,7 +149,32 @@ namespace Tirocinio
         {
             Vector3 grindDirection = grindingSpline.GetDirection(t);
             grindDirection = Vector3.Dot(velocity.normalized, grindDirection) * grindDirection;
-            return grindDirection * GrindSpeed;
+
+            Vector3 right = Quaternion.Euler(0f, 90f, 0f) * grindDirection;
+
+
+            Vector3 grindDirectionXZ = new Vector3(grindDirection.x, 0f, grindDirection.z);
+
+            float angle = Vector3.SignedAngle(grindDirectionXZ, grindDirection, right);
+            Debug.Log(angle);
+
+            float steepMultiplier = Mathf.InverseLerp(-90, 90, angle);
+            Debug.Log(steepMultiplier);
+
+
+            Vector3 optimalGrindDirectionPos = Quaternion.Euler(0f, 15f, 0f) * grindDirection;
+            Vector3 optimalGrindDirectionNeg = Quaternion.Euler(0f, -15f, 0f) * grindDirection;
+
+            Vector3 optimalGrindDirection =
+            (transform.forward - optimalGrindDirectionPos).sqrMagnitude < (transform.forward - optimalGrindDirectionNeg).sqrMagnitude
+                ? optimalGrindDirectionPos : optimalGrindDirectionNeg;
+
+
+            Vector3 vel = Mathf.Clamp01(Vector3.Dot(transform.forward, optimalGrindDirection)) * grindDirection;
+            vel *= GrindSpeed * steepMultiplier;
+
+
+            return vel;
         }
 
 

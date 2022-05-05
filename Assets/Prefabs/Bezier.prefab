@@ -138,4 +138,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4b383e1660a501a48acb81439af611a1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  grindDistance: 1
+  grindDistance: 0.5
