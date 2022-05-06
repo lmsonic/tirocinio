@@ -75,7 +75,7 @@ namespace Tirocinio
                 timer = 0f;
             }
             Vector3 force = CalculateForce();
-            SimulatePath(transform.position, force, 0f);
+            SimulatePath(transform.position, force);
         }
 
 
@@ -96,19 +96,19 @@ namespace Tirocinio
         private int maxIterations = 200;
 
 
-        private void SimulatePath(Vector3 startPos, Vector3 forceDirection, float drag)
+        private void SimulatePath(Vector3 startPos, Vector3 forceDirection)
         {
             float timestep = Time.fixedDeltaTime;
 
-            float segmentLength = lineLength / (float)lineResolution;
+
 
             float currentLineLength = 0f;
+            float finalLineLength = lineLength;
             float currentSegmentLength = 0f;
 
             bool isPlantable = false;
 
 
-            float stepDrag = 1 - drag * timestep;
             Vector3 velocity = forceDirection * timestep;
             Vector3 gravity = Physics.gravity * timestep * timestep;
             Vector3 position = startPos;
@@ -120,19 +120,17 @@ namespace Tirocinio
 
             segments[0] = position;
             numSegments = 1;
-            RaycastHit hit;
 
-            for (int i = 0; i < maxIterations && numSegments < lineResolution && currentLineLength < lineLength; i++)
+            (finalLineLength, isPlantable) = CalculateLineLength(position, velocity, gravity);
+
+            float segmentLength = finalLineLength / (float)lineResolution;
+
+            for (int i = 0; i < maxIterations && numSegments < lineResolution && currentLineLength < finalLineLength; i++)
             {
                 velocity += gravity;
-                velocity *= stepDrag;
-
-
                 position += velocity;
 
-                currentLineLength += velocity.magnitude;
                 currentSegmentLength += velocity.magnitude;
-
 
                 if (currentSegmentLength >= segmentLength)
                 {
@@ -140,17 +138,33 @@ namespace Tirocinio
                     numSegments++;
                     currentSegmentLength = 0f;
                 }
+            }
+
+            Draw(isPlantable);
+        }
+
+        (float, bool) CalculateLineLength(Vector3 position, Vector3 velocity, Vector3 gravity)
+        {
+            float currentLineLength = 0;
+            RaycastHit hit;
+            bool isPlantable = false;
+            for (int i = 0; i < maxIterations && currentLineLength < lineLength; i++)
+            {
+                velocity += gravity;
+                position += velocity;
+
+                currentLineLength += velocity.magnitude;
+
 
                 if (Physics.Raycast(position, velocity, out hit, velocity.magnitude, hitMask))
                 {
                     isPlantable = plantableMask.Contains(hit.collider.gameObject.layer);
-                    segments[numSegments] = hit.point;
-                    numSegments++;
+                    currentLineLength += (position - hit.point).magnitude;
                     break;
                 }
             }
 
-            Draw(isPlantable);
+            return (currentLineLength, isPlantable);
         }
 
         private void Draw(bool isPlantable)
