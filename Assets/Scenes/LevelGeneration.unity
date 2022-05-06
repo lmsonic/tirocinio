@@ -456,7 +456,7 @@ MonoBehaviour:
     meshQuery:
       layers: 33554440
       maskAndChannels: 8
-    surfaceParameter: 25794
+    surfaceParameter: 25788
     meshQueryIndex: 1
     subMeshQueryIndex: 0
     geometryHashValue: -3049614613259231701
@@ -959,7 +959,7 @@ MonoBehaviour:
     meshQuery:
       layers: 33554440
       maskAndChannels: 8
-    surfaceParameter: 25794
+    surfaceParameter: 25788
     meshQueryIndex: 1
     subMeshQueryIndex: 0
     geometryHashValue: -3049614613259231701
@@ -1707,6 +1707,14 @@ PrefabInstance:
       value: 0.1
       objectReference: {fileID: 0}
     - target: {fileID: 1539404643, guid: 3f780a04d1bfe814caa13679e7db040c, type: 3}
+      propertyPath: lineLength
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 1539404643, guid: 3f780a04d1bfe814caa13679e7db040c, type: 3}
+      propertyPath: lineResolution
+      value: 50
+      objectReference: {fileID: 0}
+    - target: {fileID: 1539404643, guid: 3f780a04d1bfe814caa13679e7db040c, type: 3}
       propertyPath: angleTrajectory
       value: 60
       objectReference: {fileID: 0}
@@ -2203,7 +2211,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8836869458586575490, guid: 345d680cfbb3c5a4ba3b437db2088949, type: 3}
       propertyPath: m_Layer
-      value: 0
+      value: 2
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 3804809113942456316, guid: 345d680cfbb3c5a4ba3b437db2088949, type: 3}
