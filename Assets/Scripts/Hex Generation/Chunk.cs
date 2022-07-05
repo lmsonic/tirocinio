@@ -40,8 +40,8 @@ namespace Tirocinio
             centerHex.Initialize(hexPool.Push);
 
             hexes.Add(centerHex);
-            //StartCoroutine(GenerateHexesRecursive(centerHex, maxGenerationSteps));
             GenerateHexesIterative(centerHex, renderDistance);
+            //StartCoroutine(GenerateHexesIterativeCoroutine(centerHex, renderDistance));
         }
 
 
@@ -83,7 +83,10 @@ namespace Tirocinio
                     {
                         foreach (Hex neighbour in hex.neighbours)
                             if (neighbour == null)
+                            {
                                 outerLayer.Add(hex);
+                                break;
+                            }
                     }
 
                 }
@@ -158,10 +161,11 @@ namespace Tirocinio
         void GenerateHexesIterative(Hex pivotHex, int nSteps) // n = nSteps , N = number of hexes
         //O( 1 + 3n^2-3n + 18*N^2 )
         {
+            float initialTime = Time.realtimeSinceStartup;
             //1+ 0,6,18,36,60,90 calls of GenerateHexes()
             List<Hex> outerLayer = GenerateHexes(pivotHex);//o(1)
             for (int i = 0; i < nSteps - 1; i++)// n = nSteps in this 
-            //O(6*sigma(n-1)) = O(6*n*(n-1)/2) = O(3n^2-3n)
+            //O(6*sigma(n-1)) = O(6*(n-2)*(n-1)/2) = O(3n^2-3n)
             {
                 List<Hex> generatedHexes = new List<Hex>();
                 for (int j = 0; j < outerLayer.Count; j++)
@@ -174,27 +178,59 @@ namespace Tirocinio
 
             GenerateExits();//O(18*N^2) where N is number of hexes
 
+            float finishTime = Time.realtimeSinceStartup;
+            Debug.Log("Generation finished in " + (finishTime - initialTime) * 1000 + "ms  with " + nSteps + " steps");
+        }
+
+        const float waitTime = 0.1f;
+
+        IEnumerator GenerateHexesIterativeCoroutine(Hex pivotHex, int nSteps) // n = nSteps , N = number of hexes
+        //O( 1 + 3n^2-3n + 18*N^2 )
+        {
+            //1+ 0,6,18,36,60,90 calls of GenerateHexes()
+            List<Hex> outerLayer = GenerateHexes(pivotHex);//o(1)
+            for (int i = 0; i < nSteps - 1; i++)// n = nSteps in this 
+            //O(6*sigma(n-1)) = O(6*n*(n-1)/2) = O(3n^2-3n)
+            {
+                List<Hex> generatedHexes = new List<Hex>();
+                for (int j = 0; j < outerLayer.Count; j++)
+                {
+                    List<Hex> hexLayer = GenerateHexes(outerLayer[j]);
+                    generatedHexes.AddRange(hexLayer);
+                    yield return new WaitForSeconds(waitTime);
+                }
+                outerLayer = generatedHexes;
+            }
+            StartCoroutine(GenerateExitsCoroutine());
+            //O(18*N^2) where N is number of hexes
+
 
         }
 
-
-
-
+        IEnumerator GenerateExitsCoroutine()//O(18*n^2)
+        {
+            for (int i = 0; i < hexes.Count; i++)//O(n^2)
+            {
+                foreach (Hex neighbour in hexes[i].neighbours)//O(6)
+                {
+                    if (neighbour && !HaveExitConnection(hexes[i], neighbour))
+                    {
+                        AddExit(hexes[i], neighbour);
+                        yield return new WaitForSeconds(waitTime * 0.5f);
+                    }
+                }
+            }
+        }
 
         void GenerateExits()//O(18*n^2)
         {
             for (int i = 0; i < hexes.Count; i++)//O(n^2)
             {
-                for (int j = 0; j < hexes.Count; j++)//O(n)
+                foreach (Hex neighbour in hexes[i].neighbours)//O(6)
                 {
-                    if (i == j) continue;
-                    if (AreNeighbours(hexes[i], hexes[j]))//O(6)
+                    if (neighbour && !HaveExitConnection(hexes[i], neighbour))
                     {
-                        if (!HaveExitConnection(hexes[i], hexes[j]))//O(12)
-                        {
-                            AddExit(hexes[i], hexes[j]);
-
-                        }
+                        AddExit(hexes[i], neighbour);
                     }
                 }
             }
@@ -228,7 +264,6 @@ namespace Tirocinio
 
         List<Hex> GenerateHexes(Hex pivotHex)//O(12)
         {
-            Debug.Log("Call GenerateHexes()");
             Transform centerHexTransform = pivotHex.gameObject.transform;
             List<Hex> generatedHexes = new List<Hex>();
             for (int i = 0; i < 6; i++)//O(6)

@@ -127,7 +127,8 @@ namespace Tirocinio
                 Vector3 delta = closestPosition - transform.position;
                 velocity = delta + GetGrindVelocity(t);
 
-                if ((t > 1f || t < 0f) && !grindingSpline.Loop) fsm.RequestStateChange("Air");
+                if (velocity.magnitude < 0.5f) fsm.RequestStateChange("Air");
+                if ((t > 1f || t < 0f) && grindingSpline != null && !grindingSpline.Loop) fsm.RequestStateChange("Air");
             },
             onExit: (state) => grindingSpline = null);
 
@@ -144,6 +145,7 @@ namespace Tirocinio
             fsm.Init();
 
         }
+        const float minGrindVelocity = 5f;
 
         Vector3 GetGrindVelocity(float t)
         {
@@ -162,8 +164,8 @@ namespace Tirocinio
             Debug.Log(steepMultiplier);
 
 
-            Vector3 optimalGrindDirectionPos = Quaternion.Euler(0f, 15f, 0f) * grindDirection;
-            Vector3 optimalGrindDirectionNeg = Quaternion.Euler(0f, -15f, 0f) * grindDirection;
+            Vector3 optimalGrindDirectionPos = Quaternion.Euler(0f, 40f, 0f) * grindDirection;
+            Vector3 optimalGrindDirectionNeg = Quaternion.Euler(0f, -40f, 0f) * grindDirection;
 
             Vector3 optimalGrindDirection =
             (transform.forward - optimalGrindDirectionPos).sqrMagnitude < (transform.forward - optimalGrindDirectionNeg).sqrMagnitude
@@ -172,6 +174,8 @@ namespace Tirocinio
 
             Vector3 vel = Mathf.Clamp01(Vector3.Dot(transform.forward, optimalGrindDirection)) * grindDirection;
             vel *= GrindSpeed * steepMultiplier;
+            if (vel.magnitude < minGrindVelocity)
+                vel = vel.normalized * minGrindVelocity;
 
 
             return vel;
