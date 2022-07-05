@@ -456,7 +456,7 @@ MonoBehaviour:
     meshQuery:
       layers: 33554440
       maskAndChannels: 8
-    surfaceParameter: 25596
+    surfaceParameter: 25600
     meshQueryIndex: 1
     subMeshQueryIndex: 0
     geometryHashValue: -3049614613259231701
@@ -2403,7 +2403,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6140296542766368194, guid: 345d680cfbb3c5a4ba3b437db2088949, type: 3}
       propertyPath: renderDistance
-      value: 8
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 6140296542766368195, guid: 345d680cfbb3c5a4ba3b437db2088949, type: 3}
       propertyPath: m_Name
