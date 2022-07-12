@@ -1,5 +1,10 @@
 # Tirocinio
 
+Thesis project made by me at the University of Cagliari.
+Made in Unity
+
+uses code from [MinionsArt](https://www.youtube.com/watch?v=wbEn3PqX80c) for the grass shader and [catlikecoding](https://catlikecoding.com/unity/tutorials/curves-and-splines/) for the splines
+
 ### Introduction 
 - It’s a fast paced 3D game where you ride on a electric scooter throwing seed bombs to make the industrial city become livelier and solarpunk. Inspired by the 3D Sonic games from the Dreamcast era ( and other Sega games such as Jet Set Radio and Crazy Taxi).
 
